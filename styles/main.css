@@ -1,0 +1,39 @@
+body {
+  font-family: Noto Sans, sans-serif;
+}
+
+.sidebar {
+  width: 25%;
+  border-radius: 5px;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+  background-color: rgb(157, 199, 255);
+
+  float: right;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+
+  border-radius: 5px;
+  background-color: rgb(255,255,255,0.5);
+  margin: 0.5rem;
+}
+
+.player > * {
+  margin: 0.5rem;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 9999px;
+  flex-shrink: 0;
+
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+.username {
+  flex: 1 1 auto;
+}

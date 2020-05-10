@@ -104,7 +104,7 @@ viewPlayer : Player -> Html Msg
 viewPlayer player =
   div [ class "player" ] [
     img [ class "avatar", alt "Player Avatar", src player.image ] [],
-    span [] [ text player.username ],
+    span [ class "username" ] [ text player.username ],
     span [] [ case player.status of
       Done ->
         (text "Done")
@@ -115,5 +115,5 @@ viewPlayer player =
       Stuck ->
         (text "Hit a wall")
     ],
-    text "❌"
+    a [ href "#" ] [ text "❌" ]
   ]
