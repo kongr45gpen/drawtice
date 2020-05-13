@@ -6,6 +6,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Url
 import Debug
+import Time
+import Task
 
 
 
@@ -39,16 +41,17 @@ type alias Player =
 type alias Model =
   { key : Nav.Key
   , url : Url.Url
+  , lastUpdate : Maybe Time.Posix
   , players : List Player
   }
 
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url [
+  ( Model key url Nothing [
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
-  ], Cmd.none )
+  ], Task.perform Tick Time.now )
 
 
 
@@ -58,6 +61,7 @@ init flags url key =
 type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
+  | Tick Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -76,6 +80,28 @@ update msg model =
       , Cmd.none
       )
 
+    Tick newTime ->
+      ( { model | lastUpdate = Just newTime, players =
+        case model.lastUpdate of
+          Nothing ->
+            model.players
+
+          Just lastUpdate ->
+            List.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
+      , Cmd.none
+      )
+
+posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
+posixTimeDifferenceSeconds a b =
+  toFloat (Time.posixToMillis a - Time.posixToMillis b) / 1000
+
+updatePlayerTime : Float -> Player -> Player
+updatePlayerTime timeDifference player =
+  case player.status of
+    Working timeLeft ->
+      { player | status = Working (timeLeft - timeDifference) }
+    _ ->
+      player
 
 
 -- SUBSCRIPTIONS
@@ -83,7 +109,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-  Sub.none
+  Time.every 1000 Tick
 
 
 
@@ -109,7 +135,7 @@ viewPlayer player =
       Done ->
         (text "Done")
       Working timeLeft ->
-        (text ("Working, " ++ String.fromFloat timeLeft ++ " s left"))
+        (text ("Working, " ++ String.fromInt (round timeLeft) ++ " s left"))
       Uploading fraction ->
         (text ("Uploading (" ++ String.fromFloat (fraction * 100) ++ "% done)"))
       Stuck ->
