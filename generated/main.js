@@ -4401,6 +4401,43 @@ function _Time_getZoneName()
 		callback(_Scheduler_succeed(name));
 	});
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $author$project$Main$LinkClicked = function (a) {
 	return {$: 'LinkClicked', a: a};
 };
@@ -5197,14 +5234,15 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Done = {$: 'Done'};
-var $author$project$Main$Model = F4(
-	function (key, url, lastUpdate, players) {
-		return {key: key, lastUpdate: lastUpdate, players: players, url: url};
+var $author$project$Main$Model = F5(
+	function (key, url, status, lastUpdate, players) {
+		return {key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
 	});
 var $author$project$Main$Player = F3(
 	function (username, image, status) {
 		return {image: image, status: status, username: username};
 	});
+var $author$project$Main$Starting = {$: 'Starting'};
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
@@ -5230,13 +5268,19 @@ var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			A4(
+			A5(
 				$author$project$Main$Model,
 				key,
 				url,
+				$author$project$Main$Starting,
 				$elm$core$Maybe$Nothing,
 				_List_fromArray(
 					[
+						A3(
+						$author$project$Main$Player,
+						'kongr45gpen',
+						'https://via.placeholder.com/150x300',
+						$author$project$Main$Working(253)),
 						A3(
 						$author$project$Main$Player,
 						'electrovesta',
@@ -5780,9 +5824,210 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padLeft = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)),
+			string);
+	});
+var $author$project$Main$formatTimeDifference = function (seconds) {
+	return A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt((seconds / 60) | 0)) + (':' + A3(
+		$elm$core$String$padLeft,
+		2,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$core$Basics$modBy, 60, seconds))));
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$html$Html$header = _VirtualDom_node('header');
+var $elm$core$Debug$log = _Debug_log;
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $author$project$Main$viewPlayerAvatar = function (player) {
+	return A2(
+		$elm$html$Html$img,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('avatar'),
+				$elm$html$Html$Attributes$alt(player.username + ' Avatar'),
+				$elm$html$Html$Attributes$src(player.image)
+			]),
+		_List_Nil);
+};
+var $author$project$Main$viewHeader = function (model) {
+	return A2(
+		$elm$html$Html$header,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('player-header')
+			]),
+		_Utils_ap(
+			function () {
+				var _v0 = $elm$core$List$head(model.players);
+				if (_v0.$ === 'Nothing') {
+					return _List_Nil;
+				} else {
+					var me = _v0.a;
+					return _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('player-header-me')
+								]),
+							_List_fromArray(
+								[
+									$author$project$Main$viewPlayerAvatar(me),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('my-username')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(me.username)
+										]))
+								])),
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('my-status')
+								]),
+							_List_fromArray(
+								[
+									function () {
+									var _v1 = me.status;
+									switch (_v1.$) {
+										case 'Done':
+											return A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('status')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Ready')
+													]));
+										case 'Working':
+											var timeLeft = _v1.a;
+											return A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('big-scary-clock')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														$author$project$Main$formatTimeDifference(
+															$elm$core$Basics$floor(
+																A2($elm$core$Debug$log, 'timeLeft', timeLeft))))
+													]));
+										case 'Uploading':
+											var percentage = _v1.a;
+											return A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('status')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(
+														$elm$core$String$fromInt(
+															$elm$core$Basics$floor(percentage * 100)) + '%')
+													]));
+										default:
+											return A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('status')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Stuck')
+													]));
+									}
+								}()
+								]))
+						]);
+				}
+			}(),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('game-status')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							function () {
+								var _v2 = model.status;
+								switch (_v2.$) {
+									case 'Starting':
+										return 'Starting…';
+									case 'Drawing':
+										return 'Drawing…';
+									case 'Understanding':
+										return 'Understanding…';
+									default:
+										return 'Game Over';
+								}
+							}())
+						]))
+				])));
+};
+var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -5790,91 +6035,81 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$core$Basics$round = _Basics_round;
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
-var $author$project$Main$viewPlayer = function (player) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('player')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$img,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('avatar'),
-						$elm$html$Html$Attributes$alt('Player Avatar'),
-						$elm$html$Html$Attributes$src(player.image)
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$span,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('username')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(player.username)
-					])),
-				A2(
-				$elm$html$Html$span,
-				_List_Nil,
-				_List_fromArray(
-					[
-						function () {
-						var _v0 = player.status;
-						switch (_v0.$) {
-							case 'Done':
-								return $elm$html$Html$text('Done');
-							case 'Working':
-								var timeLeft = _v0.a;
-								return $elm$html$Html$text(
-									'Working, ' + ($elm$core$String$fromInt(
-										$elm$core$Basics$round(timeLeft)) + ' s left'));
-							case 'Uploading':
-								var fraction = _v0.a;
-								return $elm$html$Html$text(
-									'Uploading (' + ($elm$core$String$fromFloat(fraction * 100) + '% done)'));
-							default:
-								return $elm$html$Html$text('Hit a wall');
-						}
-					}()
-					])),
-				A2(
-				$elm$html$Html$a,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$href('#')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('❌')
-					]))
-			]));
-};
+var $author$project$Main$viewPlayer = F2(
+	function (isMe, player) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class(
+					'player' + (isMe ? ' me' : ''))
+				]),
+			_List_fromArray(
+				[
+					$author$project$Main$viewPlayerAvatar(player),
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('username')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(player.username)
+						])),
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							function () {
+							var _v0 = player.status;
+							switch (_v0.$) {
+								case 'Done':
+									return $elm$html$Html$text('Done');
+								case 'Working':
+									var timeLeft = _v0.a;
+									return $elm$html$Html$text(
+										'Working, ' + ($elm$core$String$fromInt(
+											$elm$core$Basics$round(timeLeft)) + ' s left'));
+								case 'Uploading':
+									var fraction = _v0.a;
+									return $elm$html$Html$text(
+										'Uploading (' + ($elm$core$String$fromFloat(fraction * 100) + '% done)'));
+								default:
+									return $elm$html$Html$text('Hit a wall');
+							}
+						}()
+						])),
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$href('#')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('❌')
+						]))
+				]));
+	});
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
 				$elm$html$Html$text('Hello World'),
+				$author$project$Main$viewHeader(model),
 				A2(
 				$elm$html$Html$aside,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('sidebar')
 					]),
-				A2($elm$core$List$map, $author$project$Main$viewPlayer, model.players))
+				A2(
+					$elm$core$List$map,
+					$author$project$Main$viewPlayer(false),
+					model.players))
 			]),
 		title: 'Drawtice'
 	};

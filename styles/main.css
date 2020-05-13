@@ -4,7 +4,7 @@ body {
 
 .sidebar {
   width: 25%;
-  border-radius: 5px;
+  border-radius: 4px;
   border: 3px solid rgba(0, 0, 0, 0.2);
   background-color: rgb(157, 199, 255);
 
@@ -15,13 +15,22 @@ body {
   display: flex;
   align-items: center;
 
-  border-radius: 5px;
+  border-radius: 2px;
   background-color: rgb(255,255,255,0.5);
   margin: 0.5rem;
 }
 
+.player.me {
+  box-shadow: 0 0 5px rgb(0, 0, 0, 0.2);
+  background-color: rgb(255,255,255,0.7);
+}
+
 .player > * {
   margin: 0.5rem;
+}
+
+.player a {
+  text-decoration: none;
 }
 
 .avatar {

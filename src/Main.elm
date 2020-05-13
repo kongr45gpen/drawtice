@@ -8,6 +8,7 @@ import Url
 import Debug
 import Time
 import Task
+import Array
 
 
 
@@ -31,6 +32,8 @@ main =
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
+type GameStatus = Starting | Drawing | Understanding | GameOver
+
 type alias Player =
   {
     username : String,
@@ -41,6 +44,7 @@ type alias Player =
 type alias Model =
   { key : Nav.Key
   , url : Url.Url
+  , status : GameStatus
   , lastUpdate : Maybe Time.Posix
   , players : List Player
   }
@@ -48,7 +52,8 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url Nothing [
+  ( Model key url Starting Nothing [
+    Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 253),
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
   ], Task.perform Tick Time.now )
@@ -122,14 +127,50 @@ view model =
   , body =
       [
         text "Hello World",
-        aside [ class "sidebar" ] (List.map viewPlayer model.players)
+        viewHeader model,
+        aside [ class "sidebar" ] (List.map (viewPlayer False) model.players)
       ]
   }
 
-viewPlayer : Player -> Html Msg
-viewPlayer player =
-  div [ class "player" ] [
-    img [ class "avatar", alt "Player Avatar", src player.image ] [],
+viewHeader : Model -> Html Msg
+viewHeader model =
+  header [ class "player-header" ] ((case List.head model.players of
+      Nothing ->
+        []
+      Just me ->
+        [
+          div [ class "player-header-me" ] [
+            viewPlayerAvatar me,
+            span [ class "my-username" ] [ text me.username ]
+          ]
+          ,div [ class "my-status" ] [
+            case me.status of
+              Done ->
+                span [ class "status" ] [ text "Ready" ]
+              Working timeLeft ->
+                span [ class "big-scary-clock" ] [ text (formatTimeDifference (floor (Debug.log "timeLeft" timeLeft))) ]
+              Uploading percentage ->
+                span [ class "status" ] [ text (String.fromInt (floor (percentage * 100)) ++ "%") ]
+              Stuck ->
+                span [ class "status" ] [ text "Stuck" ]
+          ]
+        ]
+    )
+    ++ [
+      div [ class "game-status" ] [ text (case model.status of
+          Starting -> "Starting…"
+          Drawing -> "Drawing…"
+          Understanding -> "Understanding…"
+          GameOver -> "Game Over"
+        )
+      ]
+    ]
+  )
+
+viewPlayer : Bool -> Player -> Html Msg
+viewPlayer isMe player =
+  div [ class ("player" ++ if isMe then " me" else "") ] [
+    viewPlayerAvatar player,
     span [ class "username" ] [ text player.username ],
     span [] [ case player.status of
       Done ->
@@ -143,3 +184,12 @@ viewPlayer player =
     ],
     a [ href "#" ] [ text "❌" ]
   ]
+
+
+viewPlayerAvatar : Player -> Html msg
+viewPlayerAvatar player =
+  img [ class "avatar", alt (player.username ++ " Avatar"), src player.image ] []
+
+formatTimeDifference : Int -> String
+formatTimeDifference seconds =
+  String.padLeft 2 '0' (String.fromInt (seconds // 60)) ++ ":" ++ String.padLeft 2 '0' (String.fromInt (modBy 60 seconds))
