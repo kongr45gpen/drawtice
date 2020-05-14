@@ -6,9 +6,11 @@ body {
   width: 25%;
   border-radius: 4px;
   border: 3px solid rgba(0, 0, 0, 0.2);
-  background-color: rgb(157, 199, 255);
+  background-color: #1e88e5;
 
   float: right;
+
+  margin-right: 1rem;
 }
 
 .player {
@@ -31,6 +33,84 @@ body {
 
 .player a {
   text-decoration: none;
+}
+
+/*
+ * PURE MENU (NAVBAR)
+ */
+.pure-menu-item {
+  height: auto !important;
+}
+
+.page-header {
+  background-color: #212121;
+}
+
+.page-header-fin {
+  float: right;
+}
+
+.page-header .pure-menu-active > .pure-menu-link, .page-header .pure-menu-link:focus, .page-header .pure-menu-link:hover {
+  background-color: #424242;
+}
+
+.page-header .pure-menu-heading {
+  color: #90a4ae;
+}
+
+.page-header .pure-menu-link {
+  color: #999;
+}
+
+.page-header .pure-menu-selected > .pure-menu-link, .page-header .pure-menu-selected > .pure-menu-link:visited {
+  color: #fff;
+}
+
+/*
+ * GAME HEADER
+ */
+
+.game-header {
+  height: 5rem;
+  background-color: #1565c0;
+  color: #ffffff;
+
+  text-align: center;
+
+  display: flex;
+  align-content: center;
+  align-items: center;
+
+  font-size: 12pt;
+
+  margin-bottom: 0.5rem;
+}
+
+.game-header > * {
+  flex: 1 1 auto;
+}
+
+.game-header-me {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 20%;
+}
+
+.my-status {
+  font-size: 1.5rem;
+  font-weight: 500;
+
+  width: 60%;
+}
+
+.game-status {
+  width: 20%;
+}
+
+.my-username {
+  margin-left: 2rem;
 }
 
 .avatar {

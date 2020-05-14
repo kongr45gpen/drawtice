@@ -126,20 +126,33 @@ view model =
   { title = "Drawtice"
   , body =
       [
-        text "Hello World",
+        viewNav model,
         viewHeader model,
         aside [ class "sidebar" ] (List.map (viewPlayer False) model.players)
       ]
   }
 
+viewNav : Model -> Html Msg
+viewNav model =
+  nav [ class "page-header pure-menu pure-menu-horizontal" ] [
+    span [ class "pure-menu-heading" ] [ text "Drawtice" ],
+    ul [ class "pure-menu-list" ] [
+      li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
+      li [ class "pure-menu-item pure-menu-selected" ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
+    ],
+    ul [ class "pure-menu-list page-header-fin" ] [
+      li [ class "pure-menu-item" ] [ a [ class "pure-menu-link", href "https://github.com/kongr45gpen/drawtice/", target "_blank", rel "noopener noreferrer" ] [ text "Github" ] ]
+    ]
+  ]
+
 viewHeader : Model -> Html Msg
 viewHeader model =
-  header [ class "player-header" ] ((case List.head model.players of
+  header [ class "game-header" ] ((case List.head model.players of
       Nothing ->
         []
       Just me ->
         [
-          div [ class "player-header-me" ] [
+          div [ class "game-header-me" ] [
             viewPlayerAvatar me,
             span [ class "my-username" ] [ text me.username ]
           ]
@@ -192,4 +205,4 @@ viewPlayerAvatar player =
 
 formatTimeDifference : Int -> String
 formatTimeDifference seconds =
-  String.padLeft 2 '0' (String.fromInt (seconds // 60)) ++ ":" ++ String.padLeft 2 '0' (String.fromInt (modBy 60 seconds))
+  String.padLeft 2 '0' (String.fromInt (seconds // 60)) ++ ":" ++ String.padLeft 2 '0' (String.fromInt (remainderBy 60 seconds))

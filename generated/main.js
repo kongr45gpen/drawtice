@@ -5822,10 +5822,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -5862,8 +5859,7 @@ var $author$project$Main$formatTimeDifference = function (seconds) {
 		$elm$core$String$padLeft,
 		2,
 		_Utils_chr('0'),
-		$elm$core$String$fromInt(
-			A2($elm$core$Basics$modBy, 60, seconds))));
+		$elm$core$String$fromInt(seconds % 60)));
 };
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -5877,6 +5873,8 @@ var $elm$core$List$head = function (list) {
 var $elm$html$Html$header = _VirtualDom_node('header');
 var $elm$core$Debug$log = _Debug_log;
 var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
@@ -5901,7 +5899,7 @@ var $author$project$Main$viewHeader = function (model) {
 		$elm$html$Html$header,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('player-header')
+				$elm$html$Html$Attributes$class('game-header')
 			]),
 		_Utils_ap(
 			function () {
@@ -5916,7 +5914,7 @@ var $author$project$Main$viewHeader = function (model) {
 							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('player-header-me')
+									$elm$html$Html$Attributes$class('game-header-me')
 								]),
 							_List_fromArray(
 								[
@@ -6028,13 +6026,117 @@ var $author$project$Main$viewHeader = function (model) {
 				])));
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
+var $elm$html$Html$ul = _VirtualDom_node('ul');
+var $author$project$Main$viewNav = function (model) {
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('page-header pure-menu pure-menu-horizontal')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-menu-heading')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Drawtice')
+					])),
+				A2(
+				$elm$html$Html$ul,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-menu-list')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$li,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('pure-menu-item')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('pure-menu-link')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('New Game')
+									]))
+							])),
+						A2(
+						$elm$html$Html$li,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('pure-menu-item pure-menu-selected')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('pure-menu-link')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Current Game')
+									]))
+							]))
+					])),
+				A2(
+				$elm$html$Html$ul,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-menu-list page-header-fin')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$li,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('pure-menu-item')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('pure-menu-link'),
+										$elm$html$Html$Attributes$href('https://github.com/kongr45gpen/drawtice/'),
+										$elm$html$Html$Attributes$target('_blank'),
+										$elm$html$Html$Attributes$rel('noopener noreferrer')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Github')
+									]))
+							]))
+					]))
+			]));
+};
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$viewPlayer = F2(
 	function (isMe, player) {
@@ -6098,7 +6200,7 @@ var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				$elm$html$Html$text('Hello World'),
+				$author$project$Main$viewNav(model),
 				$author$project$Main$viewHeader(model),
 				A2(
 				$elm$html$Html$aside,
