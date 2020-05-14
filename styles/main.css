@@ -2,16 +2,34 @@ body {
   font-family: Noto Sans, sans-serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+/*
+ * GENERIC HELPERS
+ */
+ .text-muted {
+   color: #666;
+ }
+
+/*
+ * SIDEBAR
+ */
+
 .sidebar {
   width: 25%;
+  float: right;
+
+  margin-right: 1.5rem;
+}
+
+.player-list {
+  width: 100%;
   border-radius: 4px;
   border: 3px solid rgba(0, 0, 0, 0.2);
   background-color: #1e88e5;
 
-  float: right;
-
-  margin-right: 1rem;
-  margin-top: 1.5rem;
 }
 
 .player {
@@ -34,6 +52,12 @@ body {
 
 .player a {
   text-decoration: none;
+}
+
+.gameId {
+  text-align: center;
+  font-size: 95%;
+  margin: 0.3rem;
 }
 
 /*

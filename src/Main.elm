@@ -4,6 +4,7 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import Url
 import Debug
 import Time
@@ -32,7 +33,7 @@ main =
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
-type GameStatus = Starting | Drawing | Understanding | GameOver
+type GameStatus = NoGame | Lobby | Drawing | Understanding | GameOver
 
 type alias Player =
   {
@@ -45,6 +46,7 @@ type alias Model =
   { key : Nav.Key
   , url : Url.Url
   , status : GameStatus
+  , gameId : Maybe String
   , lastUpdate : Maybe Time.Posix
   , players : List Player
   }
@@ -52,8 +54,8 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url Starting Nothing [
-    Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 253),
+  ( Model key url NoGame (Just "armadillo") Nothing [
+    Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 225),
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
   ], Task.perform Tick Time.now )
@@ -67,6 +69,7 @@ type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
   | Tick Time.Posix
+  | NoAction
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +98,9 @@ update msg model =
             List.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
       , Cmd.none
       )
+
+    NoAction ->
+      (model, Cmd.none)
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -128,19 +134,28 @@ view model =
       [
         viewNav model,
         viewHeader model,
-        aside [ class "sidebar" ] (List.map (viewPlayer False) model.players),
+        viewSidebar model,
         main_ [ class "page" ] [ viewLanding ]
       ]
   }
 
 viewNav : Model -> Html Msg
-viewNav _ =
+viewNav model =
   nav [ class "page-header pure-menu pure-menu-horizontal" ] [
     span [ class "pure-menu-heading" ] [ text "Drawtice" ],
-    ul [ class "pure-menu-list" ] [
+    ul [ class "pure-menu-list" ] ([
       li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
       li [ class "pure-menu-item pure-menu-selected" ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
-    ],
+    ] ++ case model.gameId of
+      Nothing -> []
+      Just id ->
+        [
+          li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "Share this link to invite other people to join:" ] ],
+          let url = "https://game.dev/" ++ id
+          in
+            li [ class "pure-menu-item pure-menu-selected" ] [ a [ class "pure-menu-link", href url, onClick NoAction ] [ text url ] ]
+        ]
+    ),
     ul [ class "pure-menu-list page-header-fin" ] [
       li [ class "pure-menu-item" ] [ a [ class "pure-menu-link", href "https://github.com/kongr45gpen/drawtice/", target "_blank", rel "noopener noreferrer" ] [ text "Github" ] ]
     ]
@@ -172,7 +187,8 @@ viewHeader model =
     )
     ++ [
       div [ class "game-status" ] [ text (case model.status of
-          Starting -> "Starting…"
+          NoGame -> "Ready"
+          Lobby -> "Waiting for Players…"
           Drawing -> "Drawing…"
           Understanding -> "Understanding…"
           GameOver -> "Game Over"
@@ -180,6 +196,20 @@ viewHeader model =
       ]
     ]
   )
+
+viewSidebar : Model -> Html Msg
+viewSidebar model =
+  aside [ class "sidebar" ] [
+    div [ class "gameId" ] [
+      text "Game ID: ",
+      case model.gameId of
+        Nothing ->
+          em [ class "text-muted" ] [ text "Not Started" ]
+        Just id ->
+          text id
+    ],
+    div [ class "player-list" ] (List.map (viewPlayer False) model.players)
+  ]
 
 viewPlayer : Bool -> Player -> Html Msg
 viewPlayer isMe player =
@@ -217,4 +247,7 @@ viewPlayerAvatar player =
 
 formatTimeDifference : Int -> String
 formatTimeDifference seconds =
-  String.padLeft 2 '0' (String.fromInt (seconds // 60)) ++ ":" ++ String.padLeft 2 '0' (String.fromInt (remainderBy 60 seconds))
+  (if seconds < 0 then "-" else "")
+  ++ String.padLeft 2 '0' (String.fromInt (seconds // 60 |> abs))
+  ++ ":"
+  ++ String.padLeft 2 '0' (String.fromInt (remainderBy 60 seconds |> abs))

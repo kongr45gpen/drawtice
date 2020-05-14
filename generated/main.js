@@ -5234,15 +5234,15 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Done = {$: 'Done'};
-var $author$project$Main$Model = F5(
-	function (key, url, status, lastUpdate, players) {
-		return {key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
+var $author$project$Main$Model = F6(
+	function (key, url, status, gameId, lastUpdate, players) {
+		return {gameId: gameId, key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
 	});
+var $author$project$Main$NoGame = {$: 'NoGame'};
 var $author$project$Main$Player = F3(
 	function (username, image, status) {
 		return {image: image, status: status, username: username};
 	});
-var $author$project$Main$Starting = {$: 'Starting'};
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
@@ -5268,11 +5268,12 @@ var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			A5(
+			A6(
 				$author$project$Main$Model,
 				key,
 				url,
-				$author$project$Main$Starting,
+				$author$project$Main$NoGame,
+				$elm$core$Maybe$Just('armadillo'),
 				$elm$core$Maybe$Nothing,
 				_List_fromArray(
 					[
@@ -5280,7 +5281,7 @@ var $author$project$Main$init = F3(
 						$author$project$Main$Player,
 						'kongr45gpen',
 						'https://via.placeholder.com/150x300',
-						$author$project$Main$Working(253)),
+						$author$project$Main$Working(225)),
 						A3(
 						$author$project$Main$Player,
 						'electrovesta',
@@ -5788,7 +5789,7 @@ var $author$project$Main$update = F2(
 						model,
 						{url: url}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'Tick':
 				var newTime = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -5810,9 +5811,10 @@ var $author$project$Main$update = F2(
 							}()
 						}),
 					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5824,6 +5826,12 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -5852,15 +5860,17 @@ var $elm$core$String$padLeft = F3(
 			string);
 	});
 var $author$project$Main$formatTimeDifference = function (seconds) {
-	return A3(
+	return ((seconds < 0) ? '-' : '') + (A3(
 		$elm$core$String$padLeft,
 		2,
 		_Utils_chr('0'),
-		$elm$core$String$fromInt((seconds / 60) | 0)) + (':' + A3(
+		$elm$core$String$fromInt(
+			$elm$core$Basics$abs((seconds / 60) | 0))) + (':' + A3(
 		$elm$core$String$padLeft,
 		2,
 		_Utils_chr('0'),
-		$elm$core$String$fromInt(seconds % 60)));
+		$elm$core$String$fromInt(
+			$elm$core$Basics$abs(seconds % 60)))));
 };
 var $elm$core$List$head = function (list) {
 	if (list.b) {
@@ -6013,8 +6023,10 @@ var $author$project$Main$viewHeader = function (model) {
 							function () {
 								var _v2 = model.status;
 								switch (_v2.$) {
-									case 'Starting':
-										return 'Starting…';
+									case 'NoGame':
+										return 'Ready';
+									case 'Lobby':
+										return 'Waiting for Players…';
 									case 'Drawing':
 										return 'Drawing…';
 									case 'Understanding':
@@ -6089,6 +6101,7 @@ var $author$project$Main$viewLanding = A2(
 					_List_Nil)
 				]))
 		]));
+var $author$project$Main$NoAction = {$: 'NoAction'};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -6097,10 +6110,27 @@ var $elm$html$Html$Attributes$href = function (url) {
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
 var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$viewNav = function (_v0) {
+var $author$project$Main$viewNav = function (model) {
 	return A2(
 		$elm$html$Html$nav,
 		_List_fromArray(
@@ -6125,47 +6155,102 @@ var $author$project$Main$viewNav = function (_v0) {
 					[
 						$elm$html$Html$Attributes$class('pure-menu-list')
 					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$li,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('pure-menu-item')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('pure-menu-link')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('New Game')
-									]))
-							])),
-						A2(
-						$elm$html$Html$li,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('pure-menu-item pure-menu-selected')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$span,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('pure-menu-link')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Current Game')
-									]))
-							]))
-					])),
+				_Utils_ap(
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$li,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('pure-menu-item')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('pure-menu-link')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('New Game')
+										]))
+								])),
+							A2(
+							$elm$html$Html$li,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('pure-menu-item pure-menu-selected')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('pure-menu-link')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Current Game')
+										]))
+								]))
+						]),
+					function () {
+						var _v0 = model.gameId;
+						if (_v0.$ === 'Nothing') {
+							return _List_Nil;
+						} else {
+							var id = _v0.a;
+							return _List_fromArray(
+								[
+									A2(
+									$elm$html$Html$li,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('pure-menu-item')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$span,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('pure-menu-link')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Share this link to invite other people to join:')
+												]))
+										])),
+									function () {
+									var url = 'https://game.dev/' + id;
+									return A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('pure-menu-item pure-menu-selected')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('pure-menu-link'),
+														$elm$html$Html$Attributes$href(url),
+														$elm$html$Html$Events$onClick($author$project$Main$NoAction)
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(url)
+													]))
+											]));
+								}()
+								]);
+						}
+					}())),
 				A2(
 				$elm$html$Html$ul,
 				_List_fromArray(
@@ -6199,6 +6284,8 @@ var $author$project$Main$viewNav = function (_v0) {
 					]))
 			]));
 };
+var $elm$html$Html$aside = _VirtualDom_node('aside');
+var $elm$html$Html$em = _VirtualDom_node('em');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$viewPlayer = F2(
@@ -6259,22 +6346,62 @@ var $author$project$Main$viewPlayer = F2(
 						]))
 				]));
 	});
+var $author$project$Main$viewSidebar = function (model) {
+	return A2(
+		$elm$html$Html$aside,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('sidebar')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('gameId')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Game ID: '),
+						function () {
+						var _v0 = model.gameId;
+						if (_v0.$ === 'Nothing') {
+							return A2(
+								$elm$html$Html$em,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('text-muted')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Not Started')
+									]));
+						} else {
+							var id = _v0.a;
+							return $elm$html$Html$text(id);
+						}
+					}()
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('player-list')
+					]),
+				A2(
+					$elm$core$List$map,
+					$author$project$Main$viewPlayer(false),
+					model.players))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
 				$author$project$Main$viewNav(model),
 				$author$project$Main$viewHeader(model),
-				A2(
-				$elm$html$Html$aside,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('sidebar')
-					]),
-				A2(
-					$elm$core$List$map,
-					$author$project$Main$viewPlayer(false),
-					model.players)),
+				$author$project$Main$viewSidebar(model),
 				A2(
 				$elm$html$Html$main_,
 				_List_fromArray(
