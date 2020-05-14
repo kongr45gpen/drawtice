@@ -128,12 +128,13 @@ view model =
       [
         viewNav model,
         viewHeader model,
-        aside [ class "sidebar" ] (List.map (viewPlayer False) model.players)
+        aside [ class "sidebar" ] (List.map (viewPlayer False) model.players),
+        main_ [ class "page" ] [ viewLanding ]
       ]
   }
 
 viewNav : Model -> Html Msg
-viewNav model =
+viewNav _ =
   nav [ class "page-header pure-menu pure-menu-horizontal" ] [
     span [ class "pure-menu-heading" ] [ text "Drawtice" ],
     ul [ class "pure-menu-list" ] [
@@ -198,6 +199,17 @@ viewPlayer isMe player =
     a [ href "#" ] [ text "❌" ]
   ]
 
+viewLanding : Html Msg
+viewLanding =
+  section [ class "landing" ] [
+    a [ class "pure-button pure-button-primary landing-button" ] [ text "Start a New Game" ],
+    Html.form [ class "landing-join"]  [
+      button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
+        text "Join a running game"
+      ],
+      input [ placeholder "GameId", required True ] []
+    ]
+  ]
 
 viewPlayerAvatar : Player -> Html msg
 viewPlayerAvatar player =

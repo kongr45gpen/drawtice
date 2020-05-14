@@ -5822,6 +5822,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
@@ -6026,6 +6027,68 @@ var $author$project$Main$viewHeader = function (model) {
 				])));
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
+var $elm$html$Html$section = _VirtualDom_node('section');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$viewLanding = A2(
+	$elm$html$Html$section,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('landing')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$a,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Start a New Game')
+				])),
+			A2(
+			$elm$html$Html$form,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('landing-join')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('submit'),
+							$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Join a running game')
+						])),
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$placeholder('GameId'),
+							$elm$html$Html$Attributes$required(true)
+						]),
+					_List_Nil)
+				]))
+		]));
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -6037,7 +6100,7 @@ var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
 var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$viewNav = function (model) {
+var $author$project$Main$viewNav = function (_v0) {
 	return A2(
 		$elm$html$Html$nav,
 		_List_fromArray(
@@ -6211,7 +6274,15 @@ var $author$project$Main$view = function (model) {
 				A2(
 					$elm$core$List$map,
 					$author$project$Main$viewPlayer(false),
-					model.players))
+					model.players)),
+				A2(
+				$elm$html$Html$main_,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('page')
+					]),
+				_List_fromArray(
+					[$author$project$Main$viewLanding]))
 			]),
 		title: 'Drawtice'
 	};
