@@ -5234,9 +5234,9 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Done = {$: 'Done'};
-var $author$project$Main$Model = F6(
-	function (key, url, status, gameId, lastUpdate, players) {
-		return {gameId: gameId, key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
+var $author$project$Main$Model = F7(
+	function (key, url, status, gameId, amAdministrator, lastUpdate, players) {
+		return {amAdministrator: amAdministrator, gameId: gameId, key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
 	});
 var $author$project$Main$NoGame = {$: 'NoGame'};
 var $author$project$Main$Player = F3(
@@ -5268,12 +5268,13 @@ var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			A6(
+			A7(
 				$author$project$Main$Model,
 				key,
 				url,
 				$author$project$Main$NoGame,
-				$elm$core$Maybe$Just('armadillo'),
+				$elm$core$Maybe$Nothing,
+				false,
 				$elm$core$Maybe$Nothing,
 				_List_fromArray(
 					[
@@ -5693,6 +5694,7 @@ var $elm$time$Time$every = F2(
 var $author$project$Main$subscriptions = function (_v0) {
 	return A2($elm$time$Time$every, 1000, $author$project$Main$Tick);
 };
+var $author$project$Main$Lobby = {$: 'Lobby'};
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5811,8 +5813,18 @@ var $author$project$Main$update = F2(
 							}()
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'NoAction':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							amAdministrator: true,
+							gameId: $elm$core$Maybe$Just('armadillo'),
+							status: $author$project$Main$Lobby
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -5825,6 +5837,8 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5884,8 +5898,6 @@ var $elm$core$List$head = function (list) {
 var $elm$html$Html$header = _VirtualDom_node('header');
 var $elm$core$Debug$log = _Debug_log;
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$Attributes$src = function (url) {
@@ -6038,10 +6050,27 @@ var $author$project$Main$viewHeader = function (model) {
 						]))
 				])));
 };
-var $elm$html$Html$a = _VirtualDom_node('a');
+var $author$project$Main$StartGame = {$: 'StartGame'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -6058,15 +6087,16 @@ var $author$project$Main$viewLanding = A2(
 	$elm$html$Html$section,
 	_List_fromArray(
 		[
-			$elm$html$Html$Attributes$class('landing')
+			$elm$html$Html$Attributes$class('landing hall')
 		]),
 	_List_fromArray(
 		[
 			A2(
-			$elm$html$Html$a,
+			$elm$html$Html$button,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button')
+					$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button'),
+					$elm$html$Html$Events$onClick($author$project$Main$StartGame)
 				]),
 			_List_fromArray(
 				[
@@ -6101,34 +6131,137 @@ var $author$project$Main$viewLanding = A2(
 					_List_Nil)
 				]))
 		]));
-var $author$project$Main$NoAction = {$: 'NoAction'};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$getGameLink = function (gameId) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		A6($elm$url$Url$Url, $elm$url$Url$Https, '', $elm$core$Maybe$Nothing, '', $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing),
+		$elm$url$Url$fromString('https://game.dev/' + gameId));
+};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$html$Html$nav = _VirtualDom_node('nav');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
 var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
+var $author$project$Main$viewLobby = function (model) {
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('lobby hall')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('game-link-presentation')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-muted')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Share the following link to let other people join:')
+							])),
+						function () {
+						var url = $author$project$Main$getGameLink(
+							A2($elm$core$Maybe$withDefault, '???', model.gameId));
+						return A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('game-link-large text-tt'),
+									$elm$html$Html$Attributes$href(
+									$elm$url$Url$toString(url)),
+									$elm$html$Html$Attributes$target('_blank'),
+									$elm$html$Html$Attributes$rel('noopener noreferrer')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('game-link-protocol')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(
+											function () {
+												var _v0 = url.protocol;
+												if (_v0.$ === 'Http') {
+													return 'http://';
+												} else {
+													return 'https://';
+												}
+											}())
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('game-link-host')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(url.host)
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('game-link-path')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text(url.path)
+										]))
+								]));
+					}()
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-button pure-button-danger landing-button')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Cancel Game')
+					]))
+			]));
+};
+var $author$project$Main$NoAction = {$: 'NoAction'};
+var $author$project$Main$hasGameStarted = function (model) {
+	var _v0 = model.gameId;
+	if (_v0.$ === 'Nothing') {
+		return false;
+	} else {
+		return true;
+	}
+};
+var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewNav = function (model) {
 	return A2(
@@ -6162,7 +6295,8 @@ var $author$project$Main$viewNav = function (model) {
 							$elm$html$Html$li,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('pure-menu-item')
+									$elm$html$Html$Attributes$class(
+									'pure-menu-item' + ((!$author$project$Main$hasGameStarted(model)) ? ' pure-menu-selected' : ''))
 								]),
 							_List_fromArray(
 								[
@@ -6181,7 +6315,8 @@ var $author$project$Main$viewNav = function (model) {
 							$elm$html$Html$li,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('pure-menu-item pure-menu-selected')
+									$elm$html$Html$Attributes$class(
+									'pure-menu-item' + ($author$project$Main$hasGameStarted(model) ? ' pure-menu-selected' : ''))
 								]),
 							_List_fromArray(
 								[
@@ -6225,7 +6360,8 @@ var $author$project$Main$viewNav = function (model) {
 												]))
 										])),
 									function () {
-									var url = 'https://game.dev/' + id;
+									var url = $elm$url$Url$toString(
+										$author$project$Main$getGameLink(id));
 									return A2(
 										$elm$html$Html$li,
 										_List_fromArray(
@@ -6409,7 +6545,19 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Attributes$class('page')
 					]),
 				_List_fromArray(
-					[$author$project$Main$viewLanding]))
+					[
+						function () {
+						var _v0 = model.status;
+						switch (_v0.$) {
+							case 'NoGame':
+								return $author$project$Main$viewLanding;
+							case 'Lobby':
+								return $author$project$Main$viewLobby(model);
+							default:
+								return $elm$html$Html$text('nothing');
+						}
+					}()
+					]))
 			]),
 		title: 'Drawtice'
 	};

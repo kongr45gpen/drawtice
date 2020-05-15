@@ -47,6 +47,7 @@ type alias Model =
   , url : Url.Url
   , status : GameStatus
   , gameId : Maybe String
+  , amAdministrator : Bool
   , lastUpdate : Maybe Time.Posix
   , players : List Player
   }
@@ -54,7 +55,7 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url NoGame (Just "armadillo") Nothing [
+  ( Model key url NoGame Nothing False Nothing [
     Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 225),
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
@@ -70,6 +71,7 @@ type Msg
   | UrlChanged Url.Url
   | Tick Time.Posix
   | NoAction
+  | StartGame
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,6 +103,9 @@ update msg model =
 
     NoAction ->
       (model, Cmd.none)
+
+    StartGame ->
+      ({model | status = Lobby, gameId = Just "armadillo", amAdministrator = True }, Cmd.none)
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -135,7 +140,15 @@ view model =
         viewNav model,
         viewHeader model,
         viewSidebar model,
-        main_ [ class "page" ] [ viewLanding ]
+        main_ [ class "page" ] [
+          case model.status of
+            NoGame ->
+              viewLanding
+            Lobby ->
+              viewLobby model
+            _ ->
+              text "nothing"
+        ]
       ]
   }
 
@@ -144,14 +157,14 @@ viewNav model =
   nav [ class "page-header pure-menu pure-menu-horizontal" ] [
     span [ class "pure-menu-heading" ] [ text "Drawtice" ],
     ul [ class "pure-menu-list" ] ([
-      li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
-      li [ class "pure-menu-item pure-menu-selected" ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
+      li [ class ("pure-menu-item" ++ if not (hasGameStarted model) then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
+      li [ class ("pure-menu-item" ++ if hasGameStarted model then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
     ] ++ case model.gameId of
       Nothing -> []
       Just id ->
         [
           li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "Share this link to invite other people to join:" ] ],
-          let url = "https://game.dev/" ++ id
+          let url = id |> getGameLink |> Url.toString
           in
             li [ class "pure-menu-item pure-menu-selected" ] [ a [ class "pure-menu-link", href url, onClick NoAction ] [ text url ] ]
         ]
@@ -231,14 +244,35 @@ viewPlayer isMe player =
 
 viewLanding : Html Msg
 viewLanding =
-  section [ class "landing" ] [
-    a [ class "pure-button pure-button-primary landing-button" ] [ text "Start a New Game" ],
+  section [ class "landing hall" ] [
+    button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ],
     Html.form [ class "landing-join"]  [
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
         text "Join a running game"
       ],
       input [ placeholder "GameId", required True ] []
     ]
+  ]
+
+viewLobby : Model -> Html Msg
+viewLobby model =
+  section [ class "lobby hall" ] [
+    div [ class "game-link-presentation" ] [
+      div [ class "text-muted" ] [ text "Share the following link to let other people join:" ],
+      let
+        url = getGameLink (Maybe.withDefault "???" model.gameId)
+      in
+        a [ class "game-link-large text-tt", href (Url.toString url), target "_blank", rel "noopener noreferrer" ] [
+          span [ class "game-link-protocol" ] [ text (
+            case url.protocol of
+            Url.Http -> "http://"
+            Url.Https -> "https://"
+          ) ],
+          span [ class "game-link-host" ] [ text url.host ],
+          span [ class "game-link-path" ] [ text url.path ]
+        ]
+    ],
+    button [ class "pure-button pure-button-danger landing-button" ] [ text "Cancel Game" ]
   ]
 
 viewPlayerAvatar : Player -> Html msg
@@ -251,3 +285,13 @@ formatTimeDifference seconds =
   ++ String.padLeft 2 '0' (String.fromInt (seconds // 60 |> abs))
   ++ ":"
   ++ String.padLeft 2 '0' (String.fromInt (remainderBy 60 seconds |> abs))
+
+getGameLink : String -> Url.Url
+getGameLink gameId =
+  ("https://game.dev/" ++ gameId) |> Url.fromString |> Maybe.withDefault (Url.Url Url.Https "" Nothing "" Nothing Nothing)
+
+hasGameStarted : Model -> Bool
+hasGameStarted model =
+  case model.gameId of
+    Nothing -> False
+    Just _ -> True
