@@ -24,7 +24,7 @@ type Users = Arc<Mutex<HashMap<usize, mpsc::UnboundedSender<Result<Message, warp
 
 #[tokio::main]
 async fn main() {
-    pretty_env_logger::init();
+    pretty_env_logger::init_timed();
 
     // Keep track of all connected users, key is usize, value
     // is a websocket sender.
