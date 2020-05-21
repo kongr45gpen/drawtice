@@ -1,15 +1,20 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Json.Encode
+import Json.Decode
 import Url
 import Debug
 import Time
 import Task
 import Array
+import PortFunnels
+import PortFunnel.WebSocket as WebSocket exposing (Response(..))
+import PortFunnels exposing (FunnelDict, Handler(..), State)
 
 
 
@@ -27,6 +32,31 @@ main =
     , onUrlRequest = LinkClicked
     }
 
+
+-- CONSTANTS
+wsKey : String
+wsKey = "mainws"
+wsUrl : String
+wsUrl = "ws://localhost:3030/ws"
+
+
+-- PORTS
+
+
+port cmdPort : Json.Encode.Value -> Cmd msg
+
+port subPort : (Json.Encode.Value -> msg) -> Sub msg
+
+
+handlers : List (Handler Model Msg)
+handlers =
+    [ WebSocketHandler socketHandler
+    ]
+
+
+funnelDict : FunnelDict Model Msg
+funnelDict =
+    PortFunnels.makeFunnelDict handlers (\_ _ -> cmdPort)
 
 
 -- MODEL
@@ -50,6 +80,8 @@ type alias Model =
   , amAdministrator : Bool
   , lastUpdate : Maybe Time.Posix
   , players : List Player
+  , funnelState : PortFunnels.State
+  , error : Maybe String
   }
 
 
@@ -59,9 +91,20 @@ init flags url key =
     Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 225),
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
-  ], Task.perform Tick Time.now )
+  ] PortFunnels.initialState Nothing, Cmd.batch [
+    Task.perform Tick Time.now,
+    WebSocket.makeOpenWithKey wsKey wsUrl |> send
+  ]
+  )
 
 
+reportError : String -> Model -> Model
+reportError err model =
+  case model.error of
+    Nothing ->
+      { model | error = Just err }
+    Just _ ->
+      model
 
 -- UPDATE
 
@@ -72,6 +115,8 @@ type Msg
   | Tick Time.Posix
   | NoAction
   | StartGame
+  | Send Json.Encode.Value
+  | Receive Json.Encode.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -98,7 +143,7 @@ update msg model =
 
           Just lastUpdate ->
             List.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
-      , Cmd.none
+      , WebSocket.makeSend wsKey "Hello there" |> send
       )
 
     NoAction ->
@@ -106,6 +151,20 @@ update msg model =
 
     StartGame ->
       ({model | status = Lobby, gameId = Just "armadillo", amAdministrator = True }, Cmd.none)
+
+    Send value ->
+      (model, Debug.log ("Send " ++ Json.Encode.encode 0 value) (cmdPort value))
+
+    Receive value ->
+      case
+          PortFunnels.processValue funnelDict (Debug.log ("Receive " ++ Json.Encode.encode 0 value) value) model.funnelState model
+      of
+          Err error ->
+              (reportError error model, Cmd.none)
+
+          Ok res ->
+              (Debug.log "OK" res)
+      -- (model, Debug.log ("Receive " ++ Json.Encode.encode 0 value) Cmd.none)
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -119,13 +178,50 @@ updatePlayerTime timeDifference player =
     _ ->
       player
 
+send : WebSocket.Message -> Cmd Msg
+send message =
+    WebSocket.send cmdPort message
+
+socketHandler : Response -> State -> Model -> ( Model, Cmd Msg )
+socketHandler response state mdl =
+  let
+      model = { mdl | funnelState = state }
+  in
+  case response of
+      WebSocket.MessageReceivedResponse { message } ->
+        (model, Cmd.none)
+
+      WebSocket.ConnectedResponse r ->
+          (model, Cmd.none)
+
+      WebSocket.ClosedResponse { code, wasClean, expected } ->
+          (model, Cmd.none)
+
+      WebSocket.ErrorResponse error ->
+          (reportError (WebSocket.errorToString error) model, Cmd.none)
+
+      _ ->
+          case WebSocket.reconnectedResponses response of
+              [] ->
+                  (model, Cmd.none)
+
+              [ ReconnectedResponse r ] ->
+                  (model, Cmd.none)
+
+              list ->
+                (model, Cmd.none)
+
+
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-  Time.every 1000 Tick
+subscriptions model =
+  Sub.batch [
+    Time.every 1000 Tick,
+    PortFunnels.subscriptions Receive model
+  ]
 
 
 
@@ -159,7 +255,7 @@ viewNav model =
     ul [ class "pure-menu-list" ] ([
       li [ class ("pure-menu-item" ++ if not (hasGameStarted model) then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
       li [ class ("pure-menu-item" ++ if hasGameStarted model then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
-    ] ++ case model.gameId of
+    ] ++ (case model.gameId of
       Nothing -> []
       Just id ->
         [
@@ -167,6 +263,13 @@ viewNav model =
           let url = id |> getGameLink |> Url.toString
           in
             li [ class "pure-menu-item pure-menu-selected" ] [ a [ class "pure-menu-link", href url, onClick NoAction ] [ text url ] ]
+        ])
+    ++ case model.error of
+      Nothing -> []
+      Just err ->
+        [
+          li [ class "pure-menu-item" ] [ span [ class "pure-menu-heading" ] [ text "Error:" ] ],
+          li [ class "pure-menu-item" ] [ span [ class "pure-menu-link pure-menu-error" ] [ text err ] ]
         ]
     ),
     ul [ class "pure-menu-list page-header-fin" ] [
