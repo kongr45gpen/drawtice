@@ -42,6 +42,7 @@ wsUrl = "ws://localhost:3030/ws"
 
 -- PORTS
 
+port errorLog : String -> Cmd msg
 
 port cmdPort : Json.Encode.Value -> Cmd msg
 
@@ -160,7 +161,7 @@ update msg model =
           PortFunnels.processValue funnelDict (Debug.log ("Receive " ++ Json.Encode.encode 0 value) value) model.funnelState model
       of
           Err error ->
-              (reportError error model, Cmd.none)
+              (model, errorLog error)
 
           Ok res ->
               (Debug.log "OK" res)
@@ -198,7 +199,7 @@ socketHandler response state mdl =
           (model, Cmd.none)
 
       WebSocket.ErrorResponse error ->
-          (reportError (WebSocket.errorToString error) model, Cmd.none)
+          (model, errorLog (WebSocket.errorToString error))
 
       _ ->
           case WebSocket.reconnectedResponses response of

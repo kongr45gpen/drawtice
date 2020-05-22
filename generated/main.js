@@ -7537,6 +7537,7 @@ var $author$project$Main$subscriptions = function (model) {
 			]));
 };
 var $author$project$Main$Lobby = {$: 'Lobby'};
+var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
 };
@@ -7686,19 +7687,6 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses 
 			return _List_Nil;
 	}
 };
-var $author$project$Main$reportError = F2(
-	function (err, model) {
-		var _v0 = model.error;
-		if (_v0.$ === 'Nothing') {
-			return _Utils_update(
-				model,
-				{
-					error: $elm$core$Maybe$Just(err)
-				});
-		} else {
-			return model;
-		}
-	});
 var $author$project$Main$socketHandler = F3(
 	function (response, state, mdl) {
 		var model = _Utils_update(
@@ -7719,11 +7707,9 @@ var $author$project$Main$socketHandler = F3(
 			case 'ErrorResponse':
 				var error = response.a;
 				return _Utils_Tuple2(
-					A2(
-						$author$project$Main$reportError,
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error),
-						model),
-					$elm$core$Platform$Cmd$none);
+					model,
+					$author$project$Main$errorLog(
+						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
 				var _v1 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
 				if (!_v1.b) {
@@ -8102,8 +8088,8 @@ var $author$project$Main$update = F2(
 				if (_v3.$ === 'Err') {
 					var error = _v3.a;
 					return _Utils_Tuple2(
-						A2($author$project$Main$reportError, error, model),
-						$elm$core$Platform$Cmd$none);
+						model,
+						$author$project$Main$errorLog(error));
 				} else {
 					var res = _v3.a;
 					return A2($elm$core$Debug$log, 'OK', res);

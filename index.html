@@ -32,18 +32,11 @@ PortFunnel.subscribe(app);
 
 (function() {
   var ports = app.ports;
-  var parse = ports.parse;
-  var parseReturn = ports.parseReturn;
-  if (parse && parseReturn) {
-    parse.subscribe(function(string) {
-      var result;
-      try {
-        var val = JSON.parse(string);
-        result = val
-      } catch(err) {
-        result = "" + err;
-      }
-      parseReturn.send(result);
+
+  var error = ports.errorLog;
+  if (error) {
+    error.subscribe(function(string) {
+      console.error(string);
     });
   }
 })();
