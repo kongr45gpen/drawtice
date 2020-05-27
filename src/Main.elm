@@ -236,15 +236,17 @@ view model =
       [
         viewNav model,
         viewHeader model,
-        viewSidebar model,
-        main_ [ class "page" ] [
-          case model.status of
-            NoGame ->
-              viewLanding
-            Lobby ->
-              viewLobby model
-            _ ->
-              text "nothing"
+        div [ class "page-container" ] [
+          viewSidebar model,
+          main_ [ class "page" ] [
+            case model.status of
+              NoGame ->
+                viewLanding
+              Lobby ->
+                viewLobby model
+              _ ->
+                text "nothing"
+          ]
         ]
       ]
   }

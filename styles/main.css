@@ -18,12 +18,20 @@ body {
 }
 
 /*
+ * PAGE
+ */
+.page-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+/*
  * SIDEBAR
  */
 
 .sidebar {
   width: 25%;
-  float: right;
+  min-width: 400px;
 
   margin-right: 1.5rem;
 }
@@ -193,6 +201,10 @@ body {
   justify-content: space-around;
 }
 
+.hall > * {
+  margin: 3px 0;
+}
+
 .landing-join {
   display: flex;
 }
@@ -203,6 +215,10 @@ body {
 
 .landing-join > *:first-child {
   margin-right: 2rem;
+}
+
+.landing-join input {
+  min-width: 100px;
 }
 
 .game-link-presentation {

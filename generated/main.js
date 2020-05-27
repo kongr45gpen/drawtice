@@ -8104,10 +8104,10 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -8843,26 +8843,35 @@ var $author$project$Main$view = function (model) {
 			[
 				$author$project$Main$viewNav(model),
 				$author$project$Main$viewHeader(model),
-				$author$project$Main$viewSidebar(model),
 				A2(
-				$elm$html$Html$main_,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('page')
+						$elm$html$Html$Attributes$class('page-container')
 					]),
 				_List_fromArray(
 					[
-						function () {
-						var _v0 = model.status;
-						switch (_v0.$) {
-							case 'NoGame':
-								return $author$project$Main$viewLanding;
-							case 'Lobby':
-								return $author$project$Main$viewLobby(model);
-							default:
-								return $elm$html$Html$text('nothing');
-						}
-					}()
+						$author$project$Main$viewSidebar(model),
+						A2(
+						$elm$html$Html$main_,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('page')
+							]),
+						_List_fromArray(
+							[
+								function () {
+								var _v0 = model.status;
+								switch (_v0.$) {
+									case 'NoGame':
+										return $author$project$Main$viewLanding;
+									case 'Lobby':
+										return $author$project$Main$viewLobby(model);
+									default:
+										return $elm$html$Html$text('nothing');
+								}
+							}()
+							]))
 					]))
 			]),
 		title: 'Drawtice'
