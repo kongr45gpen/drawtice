@@ -7537,6 +7537,7 @@ var $author$project$Main$subscriptions = function (model) {
 			]));
 };
 var $author$project$Main$Lobby = {$: 'Lobby'};
+var $author$project$Main$StartCommand = {$: 'StartCommand'};
 var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
@@ -7947,6 +7948,56 @@ var $author$project$PortFunnels$processValue = F4(
 			model);
 	});
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $author$project$Main$prepareSocketCommandJson = F2(
+	function (commandType, data) {
+		if (data.$ === 'Nothing') {
+			return $elm$json$Json$Encode$object(
+				_List_fromArray(
+					[
+						_Utils_Tuple2(
+						'type',
+						$elm$json$Json$Encode$string(commandType))
+					]));
+		} else {
+			var d = data.a;
+			return $elm$json$Json$Encode$object(
+				_List_fromArray(
+					[
+						_Utils_Tuple2(
+						'type',
+						$elm$json$Json$Encode$string(commandType)),
+						_Utils_Tuple2('data', d)
+					]));
+		}
+	});
+var $author$project$Main$prepareSocketCommand = function (command) {
+	if (command.$ === 'StartCommand') {
+		return A2($author$project$Main$prepareSocketCommandJson, 'start_game', $elm$core$Maybe$Nothing);
+	} else {
+		var gameId = command.a;
+		return A2(
+			$author$project$Main$prepareSocketCommandJson,
+			'join_game',
+			$elm$core$Maybe$Just(
+				$elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'gameId',
+							$elm$json$Json$Encode$string(gameId))
+						]))));
+	}
+};
+var $author$project$Main$sendSocketCommand = function (command) {
+	return $author$project$Main$send(
+		A2(
+			$billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend,
+			$author$project$Main$wsKey,
+			A2(
+				$elm$json$Json$Encode$encode,
+				0,
+				$author$project$Main$prepareSocketCommand(command))));
+};
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -8065,7 +8116,7 @@ var $author$project$Main$update = F2(
 							gameId: $elm$core$Maybe$Just('armadillo'),
 							status: $author$project$Main$Lobby
 						}),
-					$elm$core$Platform$Cmd$none);
+					$author$project$Main$sendSocketCommand($author$project$Main$StartCommand));
 			case 'Send':
 				var value = msg.a;
 				return _Utils_Tuple2(

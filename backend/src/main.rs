@@ -4,27 +4,44 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
 };
+use std::option;
 
 use futures::{FutureExt, StreamExt};
 use tokio::sync::{mpsc, Mutex};
 use warp::ws::{Message, WebSocket};
 use warp::http::header::{HeaderMap, HeaderValue};
 use warp::Filter;
+use uuid::Uuid;
 
 use log::{info,debug};
 
+mod game;
+
+struct User {
+    uuid: Uuid,
+    tx: mpsc::UnboundedSender<Result<Message, warp::Error>>,
+    game: Option<(game::Game, game::Player)>
+}
+
 /// Our global unique user id counter.
 static NEXT_USER_ID: AtomicUsize = AtomicUsize::new(1);
+static NEXT_GAME_ID: AtomicUsize = AtomicUsize::new(1);
 
 /// Our state of currently connected users.
 ///
 /// - Key is their id
 /// - Value is a sender of `warp::ws::Message`
-type Users = Arc<Mutex<HashMap<usize, mpsc::UnboundedSender<Result<Message, warp::Error>>>>>;
+type Users = Arc<Mutex<HashMap<usize, User>>>;
+
+/// Currently active games
+type Games = Arc<Mutex<HashMap<usize, game::Game>>>;
 
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init_timed();
+
+    // Keep track of the current state of all games
+    let games : Games = Arc::new(Mutex::new(HashMap::new()));
 
     // Keep track of all connected users, key is usize, value
     // is a websocket sender.
@@ -32,6 +49,7 @@ async fn main() {
     // Turn our "state" into a new Filter...
     let users = warp::any().map(move || users.clone());
 
+    // Prepare any headers to be added to the request
     let mut headers = HeaderMap::new();
     headers.insert("Access-Control-Allow-Origin", HeaderValue::from_static("*"));
 
@@ -58,8 +76,6 @@ async fn user_connected(ws: WebSocket, users: Users) {
     // Use a counter to assign a new unique ID for this user.
     let my_id = NEXT_USER_ID.fetch_add(1, Ordering::Relaxed);
 
-    eprintln!("new ws user: {}", my_id);
-
     // Split the socket into a sender and receive of messages.
     let (user_ws_tx, mut user_ws_rx) = ws.split();
 
@@ -67,13 +83,14 @@ async fn user_connected(ws: WebSocket, users: Users) {
     // to the websocket...
     let (tx, rx) = mpsc::unbounded_channel();
     tokio::task::spawn(rx.forward(user_ws_tx).map(|result| {
-        if let Err(e) = result {
-            eprintln!("websocket send error: {}", e);
-        }
     }));
 
     // Save the sender in our list of connected users.
-    users.lock().await.insert(my_id, tx);
+    let user = User { tx, uuid: Uuid::new_v4(), game: None };
+    users.lock().await.insert(my_id, user);
+
+    // Generate a uuid
+    debug!("Time to create a new UUID! {}", Uuid::new_v4());
 
     // Return a `Future` that is basically a state machine managing
     // this specific user's connection.
@@ -87,7 +104,6 @@ async fn user_connected(ws: WebSocket, users: Users) {
         let msg = match result {
             Ok(msg) => msg,
             Err(e) => {
-                eprintln!("websocket error(uid={}): {}", my_id, e);
                 break;
             }
         };
@@ -115,15 +131,15 @@ async fn user_message(my_id: usize, msg: Message, users: &Users) {
     //
     // We use `retain` instead of a for loop so that we can reap any user that
     // appears to have disconnected.
-    for (&uid, tx) in users.lock().await.iter_mut() {
-        if my_id != uid {
-            if let Err(_disconnected) = tx.send(Ok(Message::text(new_msg.clone()))) {
-                // The tx is disconnected, our `user_disconnected` code
-                // should be happening in another task, nothing more to
-                // do here.
-            }
-        }
-    }
+    // for (&uid, tx) in users.lock().await.iter_mut() {
+    //     if my_id != uid {
+    //         if let Err(_disconnected) = tx.send(Ok(Message::text(new_msg.clone()))) {
+    //             // The tx is disconnected, our `user_disconnected` code
+    //             // should be happening in another task, nothing more to
+    //             // do here.
+    //         }
+    //     }
+    // }
 }
 
 async fn user_disconnected(my_id: usize, users: &Users) {

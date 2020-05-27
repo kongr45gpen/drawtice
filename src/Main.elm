@@ -5,7 +5,7 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Json.Encode
+import Json.Encode as JE
 import Json.Decode
 import Url
 import Debug
@@ -44,9 +44,9 @@ wsUrl = "ws://localhost:3030/ws"
 
 port errorLog : String -> Cmd msg
 
-port cmdPort : Json.Encode.Value -> Cmd msg
+port cmdPort : JE.Value -> Cmd msg
 
-port subPort : (Json.Encode.Value -> msg) -> Sub msg
+port subPort : (JE.Value -> msg) -> Sub msg
 
 
 handlers : List (Handler Model Msg)
@@ -61,6 +61,8 @@ funnelDict =
 
 
 -- MODEL
+
+type SocketCommand = StartCommand | JoinCommand String
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
@@ -116,8 +118,8 @@ type Msg
   | Tick Time.Posix
   | NoAction
   | StartGame
-  | Send Json.Encode.Value
-  | Receive Json.Encode.Value
+  | Send JE.Value
+  | Receive JE.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -151,21 +153,21 @@ update msg model =
       (model, Cmd.none)
 
     StartGame ->
-      ({model | status = Lobby, gameId = Just "armadillo", amAdministrator = True }, Cmd.none)
+      ({model | status = Lobby, gameId = Just "armadillo", amAdministrator = True }, sendSocketCommand StartCommand)
 
     Send value ->
-      (model, Debug.log ("Send " ++ Json.Encode.encode 0 value) (cmdPort value))
+      (model, Debug.log ("Send " ++ JE.encode 0 value) (cmdPort value))
 
     Receive value ->
       case
-          PortFunnels.processValue funnelDict (Debug.log ("Receive " ++ Json.Encode.encode 0 value) value) model.funnelState model
+          PortFunnels.processValue funnelDict (Debug.log ("Receive " ++ JE.encode 0 value) value) model.funnelState model
       of
           Err error ->
               (model, errorLog error)
 
           Ok res ->
               (Debug.log "OK" res)
-      -- (model, Debug.log ("Receive " ++ Json.Encode.encode 0 value) Cmd.none)
+      -- (model, Debug.log ("Receive " ++ JE.encode 0 value) Cmd.none)
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -212,6 +214,30 @@ socketHandler response state mdl =
               list ->
                 (model, Cmd.none)
 
+sendSocketCommand : SocketCommand -> Cmd Msg
+sendSocketCommand command =
+  command |> prepareSocketCommand |> JE.encode 0 |> WebSocket.makeSend wsKey |> send
+
+prepareSocketCommand : SocketCommand -> JE.Value
+prepareSocketCommand command =
+  case command of
+    StartCommand ->
+      prepareSocketCommandJson "start_game" Nothing
+    JoinCommand gameId ->
+      prepareSocketCommandJson "join_game" (Just (JE.object
+        [ ( "gameId", JE.string gameId) ]
+      ))
+
+prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value
+prepareSocketCommandJson commandType data =
+  case data of
+    Nothing ->
+      JE.object [ ( "type", JE.string commandType ) ]
+    Just d ->
+      JE.object
+        [ ( "type", JE.string commandType ),
+        ( "data", d )
+        ]
 
 
 -- SUBSCRIPTIONS
