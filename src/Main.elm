@@ -4,7 +4,7 @@ import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onSubmit, onInput)
 import Json.Encode as JE
 import Json.Decode
 import Url
@@ -62,17 +62,24 @@ funnelDict =
 
 -- MODEL
 
-type SocketCommand = StartCommand | JoinCommand String
+type SocketCommand = StartCommand | JoinCommand String | LeaveCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
 type GameStatus = NoGame | Lobby | Drawing | Understanding | GameOver
+
+type FormField = GameIdField
 
 type alias Player =
   {
     username : String,
     image : String,
     status : PlayerStatus
+  }
+
+type alias FormFields =
+  {
+    gameId : String
   }
 
 type alias Model =
@@ -84,6 +91,7 @@ type alias Model =
   , lastUpdate : Maybe Time.Posix
   , players : List Player
   , funnelState : PortFunnels.State
+  , formFields : FormFields
   , error : Maybe String
   }
 
@@ -94,7 +102,9 @@ init flags url key =
     Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 225),
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
-  ] PortFunnels.initialState Nothing, Cmd.batch [
+  ] PortFunnels.initialState {
+    gameId = ""
+  } Nothing, Cmd.batch [
     Task.perform Tick Time.now,
     WebSocket.makeOpenWithKey wsKey wsUrl |> send
   ]
@@ -118,6 +128,9 @@ type Msg
   | Tick Time.Posix
   | NoAction
   | StartGame
+  | JoinGame
+  | LeaveGame
+  | SetField FormField String
   | Send JE.Value
   | Receive JE.Value
 
@@ -155,6 +168,15 @@ update msg model =
     StartGame ->
       ({model | status = Lobby, gameId = Just "armadillo", amAdministrator = True }, sendSocketCommand StartCommand)
 
+    JoinGame ->
+      (model, sendSocketCommand (JoinCommand model.formFields.gameId))
+
+    LeaveGame ->
+      ({model | status = NoGame, gameId = Nothing, players = []}, sendSocketCommand LeaveCommand)
+
+    SetField field value ->
+      ( setField model field value, Cmd.none )
+
     Send value ->
       (model, Debug.log ("Send " ++ JE.encode 0 value) (cmdPort value))
 
@@ -168,6 +190,16 @@ update msg model =
           Ok res ->
               (Debug.log "OK" res)
       -- (model, Debug.log ("Receive " ++ JE.encode 0 value) Cmd.none)
+
+setField : Model -> FormField -> String -> Model
+setField model field value =
+  case field of
+    GameIdField ->
+      let
+        oldForm = model.formFields
+        newForm = { oldForm | gameId = value}
+      in
+        { model | formFields = newForm }
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -223,10 +255,13 @@ prepareSocketCommand command =
   case command of
     StartCommand ->
       prepareSocketCommandJson "start_game" Nothing
+    LeaveCommand ->
+      prepareSocketCommandJson "leave_game" Nothing
     JoinCommand gameId ->
       prepareSocketCommandJson "join_game" (Just (JE.object
         [ ( "gameId", JE.string gameId) ]
       ))
+
 
 prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value
 prepareSocketCommandJson commandType data =
@@ -378,11 +413,11 @@ viewLanding : Html Msg
 viewLanding =
   section [ class "landing hall" ] [
     button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ],
-    Html.form [ class "landing-join"]  [
+    Html.form [ class "landing-join", onSubmit JoinGame ]  [
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
         text "Join a running game"
       ],
-      input [ placeholder "GameId", required True ] []
+      input [ placeholder "GameId", required True, onInput <| SetField GameIdField ] []
     ]
   ]
 
@@ -404,7 +439,7 @@ viewLobby model =
           span [ class "game-link-path" ] [ text url.path ]
         ]
     ],
-    button [ class "pure-button pure-button-danger landing-button" ] [ text "Cancel Game" ]
+    button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Cancel Game" ]
   ]
 
 viewPlayerAvatar : Player -> Html msg

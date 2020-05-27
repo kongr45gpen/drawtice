@@ -5234,10 +5234,27 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Done = {$: 'Done'};
-var $author$project$Main$Model = F9(
-	function (key, url, status, gameId, amAdministrator, lastUpdate, players, funnelState, error) {
-		return {amAdministrator: amAdministrator, error: error, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
-	});
+var $author$project$Main$Model = function (key) {
+	return function (url) {
+		return function (status) {
+			return function (gameId) {
+				return function (amAdministrator) {
+					return function (lastUpdate) {
+						return function (players) {
+							return function (funnelState) {
+								return function (formFields) {
+									return function (error) {
+										return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, players: players, status: status, url: url};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var $author$project$Main$NoGame = {$: 'NoGame'};
 var $author$project$Main$Player = F3(
 	function (username, image, status) {
@@ -7230,14 +7247,7 @@ var $author$project$Main$wsUrl = 'ws://localhost:3030/ws';
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			A9(
-				$author$project$Main$Model,
-				key,
-				url,
-				$author$project$Main$NoGame,
-				$elm$core$Maybe$Nothing,
-				false,
-				$elm$core$Maybe$Nothing,
+			$author$project$Main$Model(key)(url)($author$project$Main$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)(
 				_List_fromArray(
 					[
 						A3(
@@ -7251,9 +7261,8 @@ var $author$project$Main$init = F3(
 						'https://via.placeholder.com/150x300',
 						$author$project$Main$Working(300)),
 						A3($author$project$Main$Player, 'marian', 'https://via.placeholder.com/256', $author$project$Main$Done)
-					]),
-				$author$project$PortFunnels$initialState,
-				$elm$core$Maybe$Nothing),
+					]))($author$project$PortFunnels$initialState)(
+				{gameId: ''})($elm$core$Maybe$Nothing),
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
@@ -7536,6 +7545,10 @@ var $author$project$Main$subscriptions = function (model) {
 				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model)
 			]));
 };
+var $author$project$Main$JoinCommand = function (a) {
+	return {$: 'JoinCommand', a: a};
+};
+var $author$project$Main$LeaveCommand = {$: 'LeaveCommand'};
 var $author$project$Main$Lobby = {$: 'Lobby'};
 var $author$project$Main$StartCommand = {$: 'StartCommand'};
 var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
@@ -7971,21 +7984,24 @@ var $author$project$Main$prepareSocketCommandJson = F2(
 		}
 	});
 var $author$project$Main$prepareSocketCommand = function (command) {
-	if (command.$ === 'StartCommand') {
-		return A2($author$project$Main$prepareSocketCommandJson, 'start_game', $elm$core$Maybe$Nothing);
-	} else {
-		var gameId = command.a;
-		return A2(
-			$author$project$Main$prepareSocketCommandJson,
-			'join_game',
-			$elm$core$Maybe$Just(
-				$elm$json$Json$Encode$object(
-					_List_fromArray(
-						[
-							_Utils_Tuple2(
-							'gameId',
-							$elm$json$Json$Encode$string(gameId))
-						]))));
+	switch (command.$) {
+		case 'StartCommand':
+			return A2($author$project$Main$prepareSocketCommandJson, 'start_game', $elm$core$Maybe$Nothing);
+		case 'LeaveCommand':
+			return A2($author$project$Main$prepareSocketCommandJson, 'leave_game', $elm$core$Maybe$Nothing);
+		default:
+			var gameId = command.a;
+			return A2(
+				$author$project$Main$prepareSocketCommandJson,
+				'join_game',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$object(
+						_List_fromArray(
+							[
+								_Utils_Tuple2(
+								'gameId',
+								$elm$json$Json$Encode$string(gameId))
+							]))));
 	}
 };
 var $author$project$Main$sendSocketCommand = function (command) {
@@ -7998,6 +8014,16 @@ var $author$project$Main$sendSocketCommand = function (command) {
 				0,
 				$author$project$Main$prepareSocketCommand(command))));
 };
+var $author$project$Main$setField = F3(
+	function (model, field, value) {
+		var oldForm = model.formFields;
+		var newForm = _Utils_update(
+			oldForm,
+			{gameId: value});
+		return _Utils_update(
+			model,
+			{formFields: newForm});
+	});
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -8117,6 +8143,23 @@ var $author$project$Main$update = F2(
 							status: $author$project$Main$Lobby
 						}),
 					$author$project$Main$sendSocketCommand($author$project$Main$StartCommand));
+			case 'JoinGame':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$sendSocketCommand(
+						$author$project$Main$JoinCommand(model.formFields.gameId)));
+			case 'LeaveGame':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{gameId: $elm$core$Maybe$Nothing, players: _List_Nil, status: $author$project$Main$NoGame}),
+					$author$project$Main$sendSocketCommand($author$project$Main$LeaveCommand));
+			case 'SetField':
+				var field = msg.a;
+				var value = msg.b;
+				return _Utils_Tuple2(
+					A3($author$project$Main$setField, model, field, value),
+					$elm$core$Platform$Cmd$none);
 			case 'Send':
 				var value = msg.a;
 				return _Utils_Tuple2(
@@ -8368,6 +8411,12 @@ var $author$project$Main$viewHeader = function (model) {
 						]))
 				])));
 };
+var $author$project$Main$GameIdField = {$: 'GameIdField'};
+var $author$project$Main$JoinGame = {$: 'JoinGame'};
+var $author$project$Main$SetField = F2(
+	function (a, b) {
+		return {$: 'SetField', a: a, b: b};
+	});
 var $author$project$Main$StartGame = {$: 'StartGame'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$form = _VirtualDom_node('form');
@@ -8388,6 +8437,59 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$html$Html$Events$on,
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $elm$html$Html$Events$onSubmit = function (msg) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'submit',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysPreventDefault,
+			$elm$json$Json$Decode$succeed(msg)));
 };
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -8423,7 +8525,8 @@ var $author$project$Main$viewLanding = A2(
 			$elm$html$Html$form,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('landing-join')
+					$elm$html$Html$Attributes$class('landing-join'),
+					$elm$html$Html$Events$onSubmit($author$project$Main$JoinGame)
 				]),
 			_List_fromArray(
 				[
@@ -8443,11 +8546,14 @@ var $author$project$Main$viewLanding = A2(
 					_List_fromArray(
 						[
 							$elm$html$Html$Attributes$placeholder('GameId'),
-							$elm$html$Html$Attributes$required(true)
+							$elm$html$Html$Attributes$required(true),
+							$elm$html$Html$Events$onInput(
+							$author$project$Main$SetField($author$project$Main$GameIdField))
 						]),
 					_List_Nil)
 				]))
 		]));
+var $author$project$Main$LeaveGame = {$: 'LeaveGame'};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $author$project$Main$getGameLink = function (gameId) {
 	return A2(
@@ -8550,7 +8656,8 @@ var $author$project$Main$viewLobby = function (model) {
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('pure-button pure-button-danger landing-button')
+						$elm$html$Html$Attributes$class('pure-button pure-button-danger landing-button'),
+						$elm$html$Html$Events$onClick($author$project$Main$LeaveGame)
 					]),
 				_List_fromArray(
 					[
