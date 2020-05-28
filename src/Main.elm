@@ -62,7 +62,7 @@ funnelDict =
 
 -- MODEL
 
-type SocketCommand = StartCommand | JoinCommand String | LeaveCommand
+type SocketCommand = Ping | StartCommand | JoinCommand String | LeaveCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
@@ -159,7 +159,7 @@ update msg model =
 
           Just lastUpdate ->
             List.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
-      , WebSocket.makeSend wsKey "Hello there" |> send
+      , sendSocketCommand Ping
       )
 
     NoAction ->
@@ -253,13 +253,15 @@ sendSocketCommand command =
 prepareSocketCommand : SocketCommand -> JE.Value
 prepareSocketCommand command =
   case command of
+    Ping ->
+      prepareSocketCommandJson "ping" Nothing
     StartCommand ->
       prepareSocketCommandJson "start_game" Nothing
     LeaveCommand ->
       prepareSocketCommandJson "leave_game" Nothing
     JoinCommand gameId ->
       prepareSocketCommandJson "join_game" (Just (JE.object
-        [ ( "gameId", JE.string gameId) ]
+        [ ( "game_id", JE.string gameId) ]
       ))
 
 
@@ -380,15 +382,17 @@ viewHeader model =
 viewSidebar : Model -> Html Msg
 viewSidebar model =
   aside [ class "sidebar" ] [
-    div [ class "gameId" ] [
+    div [ class "gameId" ] ([
       text "Game ID: ",
       case model.gameId of
         Nothing ->
           em [ class "text-muted" ] [ text "Not Started" ]
         Just id ->
           text id
-    ],
-    div [ class "player-list" ] (List.map (viewPlayer False) model.players)
+    ] ++ if List.isEmpty model.players
+      then []
+      else [ div [ class "player-list" ] (List.map (viewPlayer False) model.players) ]
+    )
   ]
 
 viewPlayer : Bool -> Player -> Html Msg

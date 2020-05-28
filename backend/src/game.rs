@@ -1,6 +1,6 @@
 extern crate chrono;
 extern crate uuid;
-use chrono::{DateTime, FixedOffset, Local, Utc};
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use std::vec::Vec;

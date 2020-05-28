@@ -4,7 +4,6 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
 };
-use std::option;
 
 use futures::{FutureExt, StreamExt};
 use tokio::sync::{mpsc, Mutex};
@@ -13,9 +12,10 @@ use warp::http::header::{HeaderMap, HeaderValue};
 use warp::Filter;
 use uuid::Uuid;
 
-use log::{info,debug};
+use log::{trace,debug,info,warn,error};
 
 mod game;
+mod protocol;
 
 struct User {
     uuid: Uuid,
@@ -123,9 +123,11 @@ async fn user_message(my_id: usize, msg: Message, users: &Users) {
         return;
     };
 
-    debug!("Received user [#{}] message {}", my_id, msg);
-
-    let new_msg = format!("<User#{}>: {}", my_id, msg);
+    trace!("Received user [#{}] message {}", my_id, msg);
+    match protocol::parse(msg) {
+        Err(e) => error!("Error parsing JSON: {}", e),
+        Ok(_) => (),
+    };
 
     // New message from this user, send it to everyone else (except same uid)...
     //

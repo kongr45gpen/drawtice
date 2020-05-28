@@ -7550,6 +7550,7 @@ var $author$project$Main$JoinCommand = function (a) {
 };
 var $author$project$Main$LeaveCommand = {$: 'LeaveCommand'};
 var $author$project$Main$Lobby = {$: 'Lobby'};
+var $author$project$Main$Ping = {$: 'Ping'};
 var $author$project$Main$StartCommand = {$: 'StartCommand'};
 var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
@@ -7823,11 +7824,6 @@ var $author$project$Main$funnelDict = A2(
 		}));
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Debug$log = _Debug_log;
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend = F2(
-	function (key, message) {
-		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillSend(
-			{key: key, message: message});
-	});
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
@@ -7961,6 +7957,11 @@ var $author$project$PortFunnels$processValue = F4(
 			model);
 	});
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend = F2(
+	function (key, message) {
+		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillSend(
+			{key: key, message: message});
+	});
 var $author$project$Main$prepareSocketCommandJson = F2(
 	function (commandType, data) {
 		if (data.$ === 'Nothing') {
@@ -7985,6 +7986,8 @@ var $author$project$Main$prepareSocketCommandJson = F2(
 	});
 var $author$project$Main$prepareSocketCommand = function (command) {
 	switch (command.$) {
+		case 'Ping':
+			return A2($author$project$Main$prepareSocketCommandJson, 'ping', $elm$core$Maybe$Nothing);
 		case 'StartCommand':
 			return A2($author$project$Main$prepareSocketCommandJson, 'start_game', $elm$core$Maybe$Nothing);
 		case 'LeaveCommand':
@@ -7999,7 +8002,7 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 						_List_fromArray(
 							[
 								_Utils_Tuple2(
-								'gameId',
+								'game_id',
 								$elm$json$Json$Encode$string(gameId))
 							]))));
 	}
@@ -8129,8 +8132,7 @@ var $author$project$Main$update = F2(
 								}
 							}()
 						}),
-					$author$project$Main$send(
-						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend, $author$project$Main$wsKey, 'Hello there')));
+					$author$project$Main$sendSocketCommand($author$project$Main$Ping));
 			case 'NoAction':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'StartGame':
@@ -8886,6 +8888,13 @@ var $author$project$Main$viewNav = function (model) {
 };
 var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$html$Html$em = _VirtualDom_node('em');
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$viewPlayer = F2(
@@ -8961,38 +8970,42 @@ var $author$project$Main$viewSidebar = function (model) {
 					[
 						$elm$html$Html$Attributes$class('gameId')
 					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Game ID: '),
-						function () {
-						var _v0 = model.gameId;
-						if (_v0.$ === 'Nothing') {
-							return A2(
-								$elm$html$Html$em,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('text-muted')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Not Started')
-									]));
-						} else {
-							var id = _v0.a;
-							return $elm$html$Html$text(id);
-						}
-					}()
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('player-list')
-					]),
-				A2(
-					$elm$core$List$map,
-					$author$project$Main$viewPlayer(false),
-					model.players))
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Game ID: '),
+							function () {
+							var _v0 = model.gameId;
+							if (_v0.$ === 'Nothing') {
+								return A2(
+									$elm$html$Html$em,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('text-muted')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Not Started')
+										]));
+							} else {
+								var id = _v0.a;
+								return $elm$html$Html$text(id);
+							}
+						}()
+						]),
+					$elm$core$List$isEmpty(model.players) ? _List_Nil : _List_fromArray(
+						[
+							A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('player-list')
+								]),
+							A2(
+								$elm$core$List$map,
+								$author$project$Main$viewPlayer(false),
+								model.players))
+						])))
 			]));
 };
 var $author$project$Main$view = function (model) {
