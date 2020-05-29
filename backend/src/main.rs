@@ -11,16 +11,19 @@ use warp::ws::{Message, WebSocket};
 use warp::http::header::{HeaderMap, HeaderValue};
 use warp::Filter;
 use uuid::Uuid;
+use std::iter;
 
 use log::{trace,debug,info,warn,error};
 
-mod game;
-mod protocol;
+pub(crate) mod game;
+pub(crate) mod protocol;
+use game::{Player,Game};
 
 struct User {
     uuid: Uuid,
     tx: mpsc::UnboundedSender<Result<Message, warp::Error>>,
-    game: Option<(game::Game, game::Player)>
+    /// IDs of the game and the player in the game
+    game: Option<(usize, usize)>
 }
 
 /// Our global unique user id counter.
@@ -30,18 +33,20 @@ static NEXT_GAME_ID: AtomicUsize = AtomicUsize::new(1);
 /// Our state of currently connected users.
 ///
 /// - Key is their id
-/// - Value is a sender of `warp::ws::Message`
-type Users = Arc<Mutex<HashMap<usize, User>>>;
+/// - Value is a sender of `warp::ws::Message` or a game
+type Users = HashMap<usize, User>;
+type UsersMutex = Arc<Mutex<Users>>;
 
 /// Currently active games
-type Games = Arc<Mutex<HashMap<usize, game::Game>>>;
+type Games = HashMap<usize, Game>;
+type GamesMutex = Arc<Mutex<Games>>;
 
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init_timed();
 
     // Keep track of the current state of all games
-    let games : Games = Arc::new(Mutex::new(HashMap::new()));
+    let games : GamesMutex = Arc::new(Mutex::new(HashMap::new()));
     let games = warp::any().map(move || games.clone());
 
     // Keep track of all connected users, key is usize, value
@@ -59,9 +64,10 @@ async fn main() {
         // The `ws()` filter will prepare Websocket handshake...
         .and(warp::ws())
         .and(users)
-        .map(|ws: warp::ws::Ws, users| {
+        .and(games)
+        .map(|ws: warp::ws::Ws, users, games| {
             // This will call our function if the handshake succeeds.
-            ws.on_upgrade(move |socket| user_connected(socket, users))
+            ws.on_upgrade(move |socket| user_connected(socket, users, games))
         })
         .with(warp::reply::with::headers(headers));
 
@@ -70,10 +76,10 @@ async fn main() {
 
     let routes = index.or(ws);
 
-    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
+    warp::serve(routes).run(([0, 0, 0, 0], 3030)).await;
 }
 
-async fn user_connected(ws: WebSocket, users: Users) {
+async fn user_connected(ws: WebSocket, users: UsersMutex, games: GamesMutex) {
     // Use a counter to assign a new unique ID for this user.
     let my_id = NEXT_USER_ID.fetch_add(1, Ordering::Relaxed);
 
@@ -108,7 +114,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
                 break;
             }
         };
-        user_message(my_id, msg, &users, &GAMES).await;
+        user_message(my_id, msg, &users, &games).await;
     }
 
     // user_ws_rx stream will keep processing as long as the user stays
@@ -116,7 +122,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
     user_disconnected(my_id, &users2).await;
 }
 
-async fn user_message(my_id: usize, msg: Message, users: &Users, games: &Games) {
+async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &GamesMutex) {
     // Skip any non-Text messages...
     let msg = if let Ok(s) = msg.to_str() {
         s
@@ -133,7 +139,10 @@ async fn user_message(my_id: usize, msg: Message, users: &Users, games: &Games) 
         Ok(c) => c,
     };
 
-    game_command(&games, command);
+    let mut users_locked = users.lock().await;
+    let mut games_locked = games.lock().await;
+
+    game_command(&mut users_locked, my_id,&mut games_locked, command).await;
 
     // New message from this user, send it to everyone else (except same uid)...
     //
@@ -150,18 +159,33 @@ async fn user_message(my_id: usize, msg: Message, users: &Users, games: &Games) 
     // }
 }
 
-async fn game_command(games: &Games, command: protocol::Command) {
+async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, command: protocol::Command) {
+    trace!("Command {:?} to game_command", command);
+    let user = users.get_mut(&my_id).unwrap();
+
     match command {
         protocol::Command::Ping => (),
         protocol::Command::StartGame => {
-            info!("Starting game")
+            // Create the administrator player based on the current user
+            let player = Player::new(user.uuid, "testername", true);
+
+            // Now create the game itself
+            let game_id = NEXT_GAME_ID.fetch_add(1, Ordering::Relaxed);
+            let mut game = Game::new();
+            let player_id = game.add_player(player);
+            info!("Created new game [{}] for {:?}", game.alias, user.uuid);
+
+            // Add the game to the global list of games
+            games.insert(game_id, game);
+            let game = games.get(&game_id).unwrap();
+            user.game = Some((game_id, player_id));
         },
         protocol::Command::JoinGame(c) => (),
         protocol::Command::LeaveGame => ()
     }
 }
 
-async fn user_disconnected(my_id: usize, users: &Users) {
+async fn user_disconnected(my_id: usize, users: &UsersMutex) {
     eprintln!("good bye user: {}", my_id);
 
     // Stream closed up, so remove from the user list
