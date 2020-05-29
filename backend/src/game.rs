@@ -5,6 +5,8 @@ use uuid::Uuid;
 
 use std::vec::Vec;
 
+mod protocol;
+
 pub enum PlayerStatus {
     Stuck,
     Done,
@@ -33,3 +35,9 @@ pub struct Game {
     game_status: GameStatus,
     players: Vec<Player>,
 }
+
+// impl Game {
+//     pub fn command(protocol::Command : command) {
+//
+//     }
+// }

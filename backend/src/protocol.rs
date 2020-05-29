@@ -6,7 +6,7 @@ use log::{trace, debug, info, warn, error};
 use serde_json::Map;
 
 #[derive(Debug)]
-enum Command {
+pub enum Command {
     Ping,
     StartGame,
     JoinGame(JoinCommand),
@@ -14,11 +14,11 @@ enum Command {
 }
 
 #[derive(Deserialize, Debug)]
-struct JoinCommand {
+pub struct JoinCommand {
     game_id: String,
 }
 
-pub fn parse(msg: &str) -> std::io::Result<()> {
+pub fn parse(msg: &str) -> std::io::Result<(Command)> {
     let json: Map<String, Value> = serde_json::from_str(msg)?;
     trace!("Received JSON {:?}", json);
 
@@ -42,5 +42,5 @@ pub fn parse(msg: &str) -> std::io::Result<()> {
 
     debug!("Parsed command: {:?}", command);
 
-    Ok(())
+    Ok((command))
 }

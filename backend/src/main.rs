@@ -42,6 +42,7 @@ async fn main() {
 
     // Keep track of the current state of all games
     let games : Games = Arc::new(Mutex::new(HashMap::new()));
+    let games = warp::any().map(move || games.clone());
 
     // Keep track of all connected users, key is usize, value
     // is a websocket sender.
@@ -107,7 +108,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
                 break;
             }
         };
-        user_message(my_id, msg, &users).await;
+        user_message(my_id, msg, &users, &GAMES).await;
     }
 
     // user_ws_rx stream will keep processing as long as the user stays
@@ -115,7 +116,7 @@ async fn user_connected(ws: WebSocket, users: Users) {
     user_disconnected(my_id, &users2).await;
 }
 
-async fn user_message(my_id: usize, msg: Message, users: &Users) {
+async fn user_message(my_id: usize, msg: Message, users: &Users, games: &Games) {
     // Skip any non-Text messages...
     let msg = if let Ok(s) = msg.to_str() {
         s
@@ -124,10 +125,15 @@ async fn user_message(my_id: usize, msg: Message, users: &Users) {
     };
 
     trace!("Received user [#{}] message {}", my_id, msg);
-    match protocol::parse(msg) {
-        Err(e) => error!("Error parsing JSON: {}", e),
-        Ok(_) => (),
+    let command = match protocol::parse(msg) {
+        Err(e) => {
+            error!("Error parsing JSON: {}", e);
+            return
+        },
+        Ok(c) => c,
     };
+
+    game_command(&games, command);
 
     // New message from this user, send it to everyone else (except same uid)...
     //
@@ -142,6 +148,17 @@ async fn user_message(my_id: usize, msg: Message, users: &Users) {
     //         }
     //     }
     // }
+}
+
+async fn game_command(games: &Games, command: protocol::Command) {
+    match command {
+        protocol::Command::Ping => (),
+        protocol::Command::StartGame => {
+            info!("Starting game")
+        },
+        protocol::Command::JoinGame(c) => (),
+        protocol::Command::LeaveGame => ()
+    }
 }
 
 async fn user_disconnected(my_id: usize, users: &Users) {
