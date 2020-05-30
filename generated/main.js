@@ -7800,7 +7800,21 @@ var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
 };
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
-var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
+var $author$project$Main$ShowError = function (a) {
+	return {$: 'ShowError', a: a};
+};
+var $author$project$Main$errorPort = _Platform_outgoingPort('errorPort', $elm$json$Json$Encode$string);
+var $author$project$Main$errorLog = function (message) {
+	return $elm$core$Platform$Cmd$batch(
+		_List_fromArray(
+			[
+				$author$project$Main$errorPort(message),
+				A2(
+				$elm$core$Task$perform,
+				$author$project$Main$ShowError,
+				$elm$core$Task$succeed(message))
+			]));
+};
 var $author$project$Protocol$errorParser = _Utils_Tuple2(
 	$elm$json$Json$Decode$string,
 	function (s) {
@@ -7958,6 +7972,13 @@ var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
 			A2($elm$json$Json$Decode$map, $author$project$Protocol$gameStatusFromString, $elm$json$Json$Decode$string))),
 	function (v) {
 		return A2($author$project$Protocol$GameDetailsResponse, v, _List_Nil);
+	});
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
+	function (key, _v0) {
+		var state = _v0.a;
+		return !_Utils_eq(
+			A2($elm$core$Dict$get, key, state.socketStates),
+			$elm$core$Maybe$Nothing);
 	});
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Debug$log = _Debug_log;
@@ -8485,7 +8506,7 @@ var $author$project$Main$update = F2(
 								}
 							}()
 						}),
-					$author$project$Main$sendSocketCommand($author$project$Protocol$Ping));
+					A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected, $author$project$Main$wsKey, model.funnelState.websocket) ? $author$project$Main$sendSocketCommand($author$project$Protocol$Ping) : $elm$core$Platform$Cmd$none);
 			case 'NoAction':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'StartGame':
@@ -8535,7 +8556,7 @@ var $author$project$Main$update = F2(
 					var res = _v3.a;
 					return res;
 				}
-			default:
+			case 'SocketReceive':
 				var value = msg.a;
 				switch (value.$) {
 					case 'GameDetailsResponse':
@@ -8557,6 +8578,21 @@ var $author$project$Main$update = F2(
 					default:
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
+			case 'ShowError':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							error: $elm$core$Maybe$Just(value)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{error: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 function $author$project$Main$cyclic$funnelDict() {
@@ -9083,6 +9119,7 @@ var $author$project$Main$viewLobby = function (model) {
 			]));
 };
 var $author$project$Main$NoAction = {$: 'NoAction'};
+var $author$project$Main$RemoveError = {$: 'RemoveError'};
 var $author$project$Main$hasGameStarted = function (model) {
 	var _v0 = model.gameId;
 	if (_v0.$ === 'Nothing') {
@@ -9093,6 +9130,7 @@ var $author$project$Main$hasGameStarted = function (model) {
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewNav = function (model) {
 	return A2(
@@ -9263,6 +9301,28 @@ var $author$project$Main$viewNav = function (model) {
 												_List_fromArray(
 													[
 														$elm$html$Html$text(err)
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('pure-menu-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('pure-menu-link'),
+														$elm$html$Html$Events$onClick($author$project$Main$RemoveError),
+														$elm$html$Html$Attributes$href('#'),
+														$elm$html$Html$Attributes$title('Hide error')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('❌')
 													]))
 											]))
 									]);

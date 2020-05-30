@@ -43,7 +43,7 @@ wsUrl = "ws://localhost:3030/ws"
 
 -- PORTS
 
-port errorLog : String -> Cmd msg
+port errorPort : String -> Cmd msg
 
 port cmdPort : JE.Value -> Cmd msg
 
@@ -134,6 +134,8 @@ type Msg
   | Send JE.Value
   | Receive JE.Value
   | SocketReceive Protocol.Response
+  | ShowError String
+  | RemoveError
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -160,7 +162,10 @@ update msg model =
 
           Just lastUpdate ->
             List.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
-      , sendSocketCommand Ping
+      , if WebSocket.isConnected wsKey model.funnelState.websocket then
+          sendSocketCommand Ping
+        else
+          Cmd.none
       )
 
     NoAction ->
@@ -201,6 +206,12 @@ update msg model =
         Protocol.PongResponse ->
           (model, Cmd.none)
 
+    ShowError value ->
+      ({ model | error = Just value}, Cmd.none)
+
+    RemoveError ->
+      ({ model | error = Nothing }, Cmd.none)
+
 setField : Model -> FormField -> String -> Model
 setField model field value =
   case field of
@@ -234,6 +245,13 @@ updatePlayerTime timeDifference player =
       { player | status = Working (timeLeft - timeDifference) }
     _ ->
       player
+
+errorLog : String -> Cmd Msg
+errorLog message =
+    Cmd.batch [
+      errorPort message,
+      Task.perform ShowError (Task.succeed message)
+    ]
 
 send : WebSocket.Message -> Cmd Msg
 send message =
@@ -385,7 +403,10 @@ viewNav model =
       Just err ->
         [
           li [ class "pure-menu-item" ] [ span [ class "pure-menu-heading" ] [ text "Error:" ] ],
-          li [ class "pure-menu-item" ] [ span [ class "pure-menu-link pure-menu-error" ] [ text err ] ]
+          li [ class "pure-menu-item" ] [ span [ class "pure-menu-link pure-menu-error" ] [ text err ] ],
+          li [ class "pure-menu-item" ] [
+            a [ class "pure-menu-link", onClick RemoveError, href "#", title "Hide error" ] [ text "❌" ]
+          ]
         ]
     ),
     ul [ class "pure-menu-list page-header-fin" ] [

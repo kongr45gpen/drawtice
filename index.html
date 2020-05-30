@@ -33,7 +33,7 @@ PortFunnel.subscribe(app);
 (function() {
   var ports = app.ports;
 
-  var error = ports.errorLog;
+  var error = ports.errorPort;
   if (error) {
     error.subscribe(function(string) {
       console.error(string);
