@@ -7935,43 +7935,79 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString = funct
 			return 'InvalidMessageError: ' + $billstclair$elm_websocket_client$PortFunnel$WebSocket$toString(message);
 	}
 };
-var $author$project$Protocol$GameDetails = F2(
-	function (alias, status) {
-		return {alias: alias, status: status};
+var $author$project$Protocol$GameDetails = F3(
+	function (alias, status, players) {
+		return {alias: alias, players: players, status: status};
 	});
-var $author$project$Protocol$GameDetailsResponse = F2(
-	function (a, b) {
-		return {$: 'GameDetailsResponse', a: a, b: b};
-	});
+var $author$project$Protocol$GameDetailsResponse = function (a) {
+	return {$: 'GameDetailsResponse', a: a};
+};
 var $author$project$Protocol$Drawing = {$: 'Drawing'};
 var $author$project$Protocol$GameOver = {$: 'GameOver'};
 var $author$project$Protocol$Lobby = {$: 'Lobby'};
 var $author$project$Protocol$Understanding = {$: 'Understanding'};
 var $author$project$Protocol$gameStatusFromString = function (string) {
 	switch (string) {
-		case 'lobby':
+		case 'Lobby':
 			return $author$project$Protocol$Lobby;
-		case 'drawing':
+		case 'Drawing':
 			return $author$project$Protocol$Drawing;
-		case 'understanding':
+		case 'Understanding':
 			return $author$project$Protocol$Understanding;
-		case 'game_over':
+		case 'GameOver':
 			return $author$project$Protocol$GameOver;
 		default:
 			return $author$project$Protocol$Lobby;
 	}
 };
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $author$project$Protocol$PlayerDetails = F3(
+	function (username, imageUrl, status) {
+		return {imageUrl: imageUrl, status: status, username: username};
+	});
+var $author$project$Protocol$Stuck = {$: 'Stuck'};
+var $author$project$Protocol$Uploading = function (a) {
+	return {$: 'Uploading', a: a};
+};
+var $author$project$Protocol$playerStatusFromString = function (string) {
+	switch (string) {
+		case 'Stuck':
+			return $author$project$Protocol$Stuck;
+		case 'Done':
+			return $author$project$Protocol$Done;
+		case 'Working':
+			return $author$project$Protocol$Working(0.5);
+		case 'Uploading':
+			return $author$project$Protocol$Uploading(50);
+		default:
+			return $author$project$Protocol$Stuck;
+	}
+};
+var $author$project$Protocol$playerDecoder = A4(
+	$elm$json$Json$Decode$map3,
+	$author$project$Protocol$PlayerDetails,
+	A2($elm$json$Json$Decode$field, 'username', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'image_url', $elm$json$Json$Decode$string),
+	A2(
+		$elm$json$Json$Decode$field,
+		'status',
+		A2($elm$json$Json$Decode$map, $author$project$Protocol$playerStatusFromString, $elm$json$Json$Decode$string)));
 var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
-	A3(
-		$elm$json$Json$Decode$map2,
+	A4(
+		$elm$json$Json$Decode$map3,
 		$author$project$Protocol$GameDetails,
 		A2($elm$json$Json$Decode$field, 'alias', $elm$json$Json$Decode$string),
 		A2(
 			$elm$json$Json$Decode$field,
 			'game_status',
-			A2($elm$json$Json$Decode$map, $author$project$Protocol$gameStatusFromString, $elm$json$Json$Decode$string))),
+			A2($elm$json$Json$Decode$map, $author$project$Protocol$gameStatusFromString, $elm$json$Json$Decode$string)),
+		A2(
+			$elm$json$Json$Decode$field,
+			'players',
+			$elm$json$Json$Decode$list($author$project$Protocol$playerDecoder))),
 	function (v) {
-		return A2($author$project$Protocol$GameDetailsResponse, v, _List_Nil);
+		return $author$project$Protocol$GameDetailsResponse(v);
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 	function (key, _v0) {
@@ -8132,7 +8168,6 @@ var $billstclair$elm_port_funnel$PortFunnel$decodeValue = F2(
 				$elm$json$Json$Decode$errorToString(err));
 		}
 	});
-var $elm$json$Json$Decode$map3 = _Json_map3;
 var $billstclair$elm_port_funnel$PortFunnel$genericMessageDecoder = A4(
 	$elm$json$Json$Decode$map3,
 	$billstclair$elm_port_funnel$PortFunnel$GenericMessage,
@@ -8561,12 +8596,16 @@ var $author$project$Main$update = F2(
 				switch (value.$) {
 					case 'GameDetailsResponse':
 						var details = value.a;
-						var players = value.b;
+						var playerCreator = function (player) {
+							return {image: player.imageUrl, status: player.status, username: player.username};
+						};
+						var players = A2($elm$core$List$map, playerCreator, details.players);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									gameId: $elm$core$Maybe$Just(details.alias),
+									players: players,
 									status: details.status
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -9274,6 +9313,28 @@ var $author$project$Main$viewNav = function (model) {
 										_List_fromArray(
 											[
 												A2(
+												$elm$html$Html$a,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('pure-menu-link'),
+														$elm$html$Html$Events$onClick($author$project$Main$RemoveError),
+														$elm$html$Html$Attributes$href('#'),
+														$elm$html$Html$Attributes$title('Hide error')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('❌')
+													]))
+											])),
+										A2(
+										$elm$html$Html$li,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('pure-menu-item')
+											]),
+										_List_fromArray(
+											[
+												A2(
 												$elm$html$Html$span,
 												_List_fromArray(
 													[
@@ -9301,28 +9362,6 @@ var $author$project$Main$viewNav = function (model) {
 												_List_fromArray(
 													[
 														$elm$html$Html$text(err)
-													]))
-											])),
-										A2(
-										$elm$html$Html$li,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('pure-menu-item')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$a,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('pure-menu-link'),
-														$elm$html$Html$Events$onClick($author$project$Main$RemoveError),
-														$elm$html$Html$Attributes$href('#'),
-														$elm$html$Html$Attributes$title('Hide error')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('❌')
 													]))
 											]))
 									]);

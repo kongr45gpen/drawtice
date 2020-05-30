@@ -19,11 +19,13 @@ type GameStatus = NoGame | Lobby | Drawing | Understanding | GameOver
 type alias GameDetails =
   { alias: String
   , status: GameStatus
+  , players: List PlayerDetails
   }
 
 type alias PlayerDetails =
-  {
-
+  { username: String
+  , imageUrl: String
+  , status: PlayerStatus
   }
 
 -- JSON RESPONSE, COMMAND
@@ -31,7 +33,7 @@ type alias PlayerDetails =
 type Response
   = ErrorResponse String
   | PongResponse
-  | GameDetailsResponse GameDetails (List PlayerDetails)
+  | GameDetailsResponse GameDetails
 
 
 -- JSON RESPONSE PARSERS
@@ -42,18 +44,35 @@ errorParser =
 gameDetailsParser : (Decoder GameDetails, GameDetails -> Response)
 gameDetailsParser =
   (
-    map2 GameDetails
+    map3 GameDetails
       (field "alias" string)
       (field "game_status" (map gameStatusFromString string))
+      (field "players" (list playerDecoder))
     ,
-    \v -> GameDetailsResponse v []
+    \v -> GameDetailsResponse v
   )
+
+playerDecoder : Decoder PlayerDetails
+playerDecoder =
+  map3 PlayerDetails
+    (field "username" string)
+    (field "image_url" string)
+    (field "status" (map playerStatusFromString string))
 
 gameStatusFromString : String -> GameStatus
 gameStatusFromString string =
   case string of
-    "lobby" -> Lobby
-    "drawing" -> Drawing
-    "understanding" -> Understanding
-    "game_over" -> GameOver
+    "Lobby" -> Lobby
+    "Drawing" -> Drawing
+    "Understanding" -> Understanding
+    "GameOver" -> GameOver
     _ -> Lobby
+
+playerStatusFromString : String -> PlayerStatus
+playerStatusFromString string =
+  case string of
+    "Stuck" -> Stuck
+    "Done" -> Done
+    "Working" -> Working 0.5
+    "Uploading" -> Uploading 50
+    _ -> Stuck

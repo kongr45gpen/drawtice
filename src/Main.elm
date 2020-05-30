@@ -11,7 +11,6 @@ import Url
 import Debug
 import Time
 import Task
-import Array
 import Random
 import PortFunnels
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
@@ -199,8 +198,22 @@ update msg model =
 
     SocketReceive value ->
       case value of
-        Protocol.GameDetailsResponse details players ->
-          ({ model | gameId = Just details.alias, status = details.status }, Cmd.none)
+        Protocol.GameDetailsResponse details ->
+          let
+            playerCreator : Protocol.PlayerDetails -> Player
+            playerCreator player =
+              {
+                username = player.username,
+                image = player.imageUrl,
+                status = player.status
+              }
+            players = List.map playerCreator details.players
+          in
+            ({ model
+              | gameId = Just details.alias
+              , status = details.status
+              , players = players }
+            , Cmd.none)
         Protocol.ErrorResponse error ->
           (model, errorLog error)
         Protocol.PongResponse ->
@@ -402,11 +415,11 @@ viewNav model =
       Nothing -> []
       Just err ->
         [
-          li [ class "pure-menu-item" ] [ span [ class "pure-menu-heading" ] [ text "Error:" ] ],
-          li [ class "pure-menu-item" ] [ span [ class "pure-menu-link pure-menu-error" ] [ text err ] ],
           li [ class "pure-menu-item" ] [
             a [ class "pure-menu-link", onClick RemoveError, href "#", title "Hide error" ] [ text "❌" ]
-          ]
+          ],
+          li [ class "pure-menu-item" ] [ span [ class "pure-menu-heading" ] [ text "Error:" ] ],
+          li [ class "pure-menu-item" ] [ span [ class "pure-menu-link pure-menu-error" ] [ text err ] ]
         ]
     ),
     ul [ class "pure-menu-list page-header-fin" ] [
