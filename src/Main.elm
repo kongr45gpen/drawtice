@@ -17,6 +17,7 @@ import PortFunnel.WebSocket as WebSocket exposing (Response(..))
 import PortFunnels exposing (FunnelDict, Handler(..), State)
 import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..))
 import Names
+import Cmd.Extra
 
 -- MAIN
 
@@ -44,9 +45,9 @@ wsUrl = "ws://localhost:3030/ws"
 
 port errorPort : String -> Cmd msg
 
-port cmdPort : JE.Value -> Cmd msg
-
-port subPort : (JE.Value -> msg) -> Sub msg
+cmdPort : JE.Value -> Cmd Msg
+cmdPort =
+    PortFunnels.getCmdPort Receive "" False
 
 
 handlers : List (Handler Model Msg)
@@ -104,7 +105,6 @@ init flags url key =
     usernamePlaceholder = ""
   } Nothing, Cmd.batch [
     Task.perform Tick Time.now,
-    WebSocket.makeOpenWithKey wsKey wsUrl |> send,
     Random.generate (SetField UsernamePlaceholder) Names.generator
   ]
   )
@@ -193,8 +193,12 @@ update msg model =
               (model, errorLog error)
 
           Ok res ->
-              res
-      -- (model, Debug.log ("Receive " ++ JE.encode 0 value) Cmd.none)
+              case JD.decodeValue (JD.field "tag" JD.string) value of
+                -- When the PortFunnels have all started, we can initiate connection with WebSocket
+                Ok("startup") ->
+                  res |> Cmd.Extra.addCmd (WebSocket.makeOpenWithKey wsKey wsUrl |> send)
+                _ ->
+                  res
 
     SocketReceive value ->
       case value of
@@ -307,7 +311,7 @@ socketHandler response state mdl =
           (model, Cmd.none)
 
       WebSocket.ClosedResponse { code, wasClean, expected } ->
-          (model, Cmd.none)
+          (model, errorLog "Websocket connection closed" )
 
       WebSocket.ErrorResponse error ->
           (model, errorLog (WebSocket.errorToString error))
