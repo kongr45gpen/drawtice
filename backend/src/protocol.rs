@@ -24,9 +24,9 @@ pub enum Response<'a> {
 
 #[derive(Deserialize, Debug)]
 pub struct JoinCommand {
-    game_id: String,
+    pub game_id: String,
     #[serde(deserialize_with = "de_validate_nonempty")]
-    username: String
+    pub username: String
 }
 
 #[derive(Deserialize, Debug)]
@@ -88,13 +88,4 @@ fn de_validate_nonempty<'de, D>(d: D) -> std::result::Result<String, D::Error>
     }
 
     Ok(value)
-}
-
-fn validate_nonempty(s: String) -> std::io::Result<String>
-{
-    if s.is_empty() {
-        Err(std::io::Error::new(ErrorKind::Other, "Username must not be empty"))
-    } else {
-        Ok(s)
-    }
 }

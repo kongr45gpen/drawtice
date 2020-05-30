@@ -147,20 +147,6 @@ async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &Ga
     let mut games_locked = games.lock().await;
 
     game_command(&mut users_locked, my_id,&mut games_locked, command).await;
-
-    // New message from this user, send it to everyone else (except same uid)...
-    //
-    // We use `retain` instead of a for loop so that we can reap any user that
-    // appears to have disconnected.
-    // for (&uid, tx) in users.lock().await.iter_mut() {
-    //     if my_id != uid {
-    //         if let Err(_disconnected) = tx.send(Ok(Message::text(new_msg.clone()))) {
-    //             // The tx is disconnected, our `user_disconnected` code
-    //             // should be happening in another task, nothing more to
-    //             // do here.
-    //         }
-    //     }
-    // }
 }
 
 async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, command: protocol::Command) {
@@ -188,7 +174,28 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             let response = protocol::Response::GameDetails(game);
             tx_direct(users, my_id, response).await;
         },
-        protocol::Command::JoinGame(c) => (),
+        protocol::Command::JoinGame(c) => {
+            let player = Player::new(user.uuid, c.username.as_str(), false);
+
+            // Linear search of the game by the provided alias
+            let mut game =
+                games.iter_mut()
+                    .filter(|g| g.1.alias == c.game_id)
+                    .next();
+
+
+            if let Some(game) = game {
+                // Add the player to the game, if the game exists
+                game.1.add_player(player);
+                let response = protocol::Response::GameDetails(game.1);
+
+                // Inform all the users of the new addition
+                tx_broadcast(users, my_id, response, true).await;
+            } else {
+                let response = protocol::Response::Error("I can't find a game with this name!".to_string());
+                tx_direct(users, my_id, response).await;
+            };
+        },
         protocol::Command::LeaveGame => ()
     }
 }
@@ -200,6 +207,24 @@ async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>
     debug!("Time to transmit {:?}", response);
     match response {
         Ok(r) => user.tx.send(Ok(Message::text(r))),
+        Err(e) => return error!("Could not transmit message: {:?}", e),
+    };
+}
+
+async fn tx_broadcast(users: &Users, my_id: usize, response: protocol::Response<'_>, inclusive: bool) {
+    let response = protocol::encode(response);
+    debug!("Time to broadcast {:?}", response);
+
+    match response {
+        Ok(r) => {
+            for (&uid, user) in users.iter() {
+                if my_id != uid || inclusive {
+                    if let Err(e) = user.tx.send(Ok(Message::text(r.clone()))) {
+                        error!("Could not transmit message to {}: {}", user.uuid, e.to_string());
+                    }
+                }
+            }
+        },
         Err(e) => return error!("Could not transmit message: {:?}", e),
     };
 }
