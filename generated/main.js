@@ -5233,7 +5233,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$application = _Browser_application;
-var $author$project$Main$Done = {$: 'Done'};
+var $author$project$Protocol$Done = {$: 'Done'};
 var $author$project$Main$Model = function (key) {
 	return function (url) {
 		return function (status) {
@@ -5255,7 +5255,7 @@ var $author$project$Main$Model = function (key) {
 		};
 	};
 };
-var $author$project$Main$NoGame = {$: 'NoGame'};
+var $author$project$Protocol$NoGame = {$: 'NoGame'};
 var $author$project$Main$Player = F3(
 	function (username, image, status) {
 		return {image: image, status: status, username: username};
@@ -5263,7 +5263,7 @@ var $author$project$Main$Player = F3(
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
-var $author$project$Main$Working = function (a) {
+var $author$project$Protocol$Working = function (a) {
 	return {$: 'Working', a: a};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -7247,20 +7247,20 @@ var $author$project$Main$wsUrl = 'ws://localhost:3030/ws';
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			$author$project$Main$Model(key)(url)($author$project$Main$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)(
+			$author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)(
 				_List_fromArray(
 					[
 						A3(
 						$author$project$Main$Player,
 						'kongr45gpen',
 						'https://via.placeholder.com/150x300',
-						$author$project$Main$Working(225)),
+						$author$project$Protocol$Working(225)),
 						A3(
 						$author$project$Main$Player,
 						'electrovesta',
 						'https://via.placeholder.com/150x300',
-						$author$project$Main$Working(300)),
-						A3($author$project$Main$Player, 'marian', 'https://via.placeholder.com/256', $author$project$Main$Done)
+						$author$project$Protocol$Working(300)),
+						A3($author$project$Main$Player, 'marian', 'https://via.placeholder.com/256', $author$project$Protocol$Done)
 					]))($author$project$PortFunnels$initialState)(
 				{gameId: ''})($elm$core$Maybe$Nothing),
 			$elm$core$Platform$Cmd$batch(
@@ -7545,17 +7545,29 @@ var $author$project$Main$subscriptions = function (model) {
 				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model)
 			]));
 };
-var $author$project$Main$JoinCommand = function (a) {
+var $author$project$Protocol$ErrorResponse = function (a) {
+	return {$: 'ErrorResponse', a: a};
+};
+var $author$project$Protocol$JoinCommand = function (a) {
 	return {$: 'JoinCommand', a: a};
 };
-var $author$project$Main$LeaveCommand = {$: 'LeaveCommand'};
-var $author$project$Main$Lobby = {$: 'Lobby'};
-var $author$project$Main$Ping = {$: 'Ping'};
-var $author$project$Main$StartCommand = {$: 'StartCommand'};
-var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
+var $author$project$Protocol$LeaveCommand = {$: 'LeaveCommand'};
+var $author$project$Protocol$Lobby = {$: 'Lobby'};
+var $author$project$Protocol$Ping = {$: 'Ping'};
+var $author$project$Main$SocketReceive = function (a) {
+	return {$: 'SocketReceive', a: a};
+};
+var $author$project$Protocol$StartCommand = {$: 'StartCommand'};
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
 };
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $author$project$Main$errorLog = _Platform_outgoingPort('errorLog', $elm$json$Json$Encode$string);
+var $author$project$Protocol$errorParser = _Utils_Tuple2(
+	$elm$json$Json$Decode$string,
+	function (s) {
+		return $author$project$Protocol$ErrorResponse(s);
+	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeStringToString = function (string) {
 	if (string.$ === 'Nothing') {
 		return 'Nothing';
@@ -7671,79 +7683,45 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString = funct
 			return 'InvalidMessageError: ' + $billstclair$elm_websocket_client$PortFunnel$WebSocket$toString(message);
 	}
 };
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
+var $author$project$Protocol$GameDetails = F2(
+	function (alias, status) {
+		return {alias: alias, status: status};
 	});
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse = function (response) {
-	if (response.$ === 'ReconnectedResponse') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses = function (response) {
-	switch (response.$) {
-		case 'ReconnectedResponse':
-			return _List_fromArray(
-				[response]);
-		case 'ListResponse':
-			var list = response.a;
-			return A2($elm$core$List$filter, $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse, list);
+var $author$project$Protocol$GameDetailsResponse = F2(
+	function (a, b) {
+		return {$: 'GameDetailsResponse', a: a, b: b};
+	});
+var $author$project$Protocol$Drawing = {$: 'Drawing'};
+var $author$project$Protocol$GameOver = {$: 'GameOver'};
+var $author$project$Protocol$Understanding = {$: 'Understanding'};
+var $author$project$Protocol$gameStatusFromString = function (string) {
+	switch (string) {
+		case 'lobby':
+			return $author$project$Protocol$Lobby;
+		case 'drawing':
+			return $author$project$Protocol$Drawing;
+		case 'understanding':
+			return $author$project$Protocol$Understanding;
+		case 'game_over':
+			return $author$project$Protocol$GameOver;
 		default:
-			return _List_Nil;
+			return $author$project$Protocol$Lobby;
 	}
 };
-var $author$project$Main$socketHandler = F3(
-	function (response, state, mdl) {
-		var model = _Utils_update(
-			mdl,
-			{funnelState: state});
-		switch (response.$) {
-			case 'MessageReceivedResponse':
-				var message = response.a.message;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'ConnectedResponse':
-				var r = response.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'ClosedResponse':
-				var code = response.a.code;
-				var wasClean = response.a.wasClean;
-				var expected = response.a.expected;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'ErrorResponse':
-				var error = response.a;
-				return _Utils_Tuple2(
-					model,
-					$author$project$Main$errorLog(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
-			default:
-				var _v1 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v1.b) {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					if ((_v1.a.$ === 'ReconnectedResponse') && (!_v1.b.b)) {
-						var r = _v1.a.a;
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					} else {
-						var list = _v1;
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					}
-				}
-		}
+var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
+	A3(
+		$elm$json$Json$Decode$map2,
+		$author$project$Protocol$GameDetails,
+		A2($elm$json$Json$Decode$field, 'alias', $elm$json$Json$Decode$string),
+		A2(
+			$elm$json$Json$Decode$field,
+			'game_status',
+			A2($elm$json$Json$Decode$map, $author$project$Protocol$gameStatusFromString, $elm$json$Json$Decode$string))),
+	function (v) {
+		return A2($author$project$Protocol$GameDetailsResponse, v, _List_Nil);
 	});
-var $author$project$Main$handlers = _List_fromArray(
-	[
-		$author$project$PortFunnels$WebSocketHandler($author$project$Main$socketHandler)
-	]);
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$core$Debug$log = _Debug_log;
 var $billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
 	function (accessors, moduleDesc, commander, handler) {
 		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
@@ -7756,6 +7734,7 @@ var $elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$commander = F2(
 	function (gfPort, response) {
 		switch (response.$) {
@@ -7815,15 +7794,6 @@ var $author$project$PortFunnels$makeFunnelDict = F2(
 				A2($elm$core$List$map, $author$project$PortFunnels$handlerToFunnel, handlers)),
 			portGetter);
 	});
-var $author$project$Main$funnelDict = A2(
-	$author$project$PortFunnels$makeFunnelDict,
-	$author$project$Main$handlers,
-	F2(
-		function (_v0, _v1) {
-			return $author$project$Main$cmdPort;
-		}));
-var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$core$Debug$log = _Debug_log;
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
 	return millis;
@@ -7957,6 +7927,40 @@ var $author$project$PortFunnels$processValue = F4(
 			model);
 	});
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse = function (response) {
+	if (response.$ === 'ReconnectedResponse') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses = function (response) {
+	switch (response.$) {
+		case 'ReconnectedResponse':
+			return _List_fromArray(
+				[response]);
+		case 'ListResponse':
+			var list = response.a;
+			return A2($elm$core$List$filter, $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse, list);
+		default:
+			return _List_Nil;
+	}
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend = F2(
 	function (key, message) {
 		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillSend(
@@ -8079,10 +8083,90 @@ var $author$project$Main$updatePlayerTime = F2(
 			return _Utils_update(
 				player,
 				{
-					status: $author$project$Main$Working(timeLeft - timeDifference)
+					status: $author$project$Protocol$Working(timeLeft - timeDifference)
 				});
 		} else {
 			return player;
+		}
+	});
+var $author$project$Main$socketHandler = F3(
+	function (response, state, mdl) {
+		var model = _Utils_update(
+			mdl,
+			{funnelState: state});
+		switch (response.$) {
+			case 'MessageReceivedResponse':
+				var message = response.a.message;
+				var typeDecoder = A2($elm$json$Json$Decode$field, 'type', $elm$json$Json$Decode$string);
+				var typeString = A2($elm$json$Json$Decode$decodeString, typeDecoder, message);
+				var decodeData = function (decoder) {
+					return A2(
+						$elm$json$Json$Decode$decodeString,
+						A2($elm$json$Json$Decode$field, 'data', decoder),
+						message);
+				};
+				var decodeDataUsingParser = function (parser) {
+					var _v8 = decodeData(parser.a);
+					if (_v8.$ === 'Err') {
+						var e = _v8.a;
+						return $author$project$Protocol$ErrorResponse(
+							$elm$json$Json$Decode$errorToString(e));
+					} else {
+						var v = _v8.a;
+						return A2($elm$core$Tuple$second, parser, v);
+					}
+				};
+				var received = function () {
+					if (typeString.$ === 'Err') {
+						var e = typeString.a;
+						return $author$project$Protocol$ErrorResponse(
+							$elm$json$Json$Decode$errorToString(e));
+					} else {
+						var s = typeString.a;
+						switch (s) {
+							case 'pong':
+								return $author$project$Protocol$ErrorResponse('ping');
+							case 'error':
+								return decodeDataUsingParser($author$project$Protocol$errorParser);
+							case 'game_details':
+								return decodeDataUsingParser($author$project$Protocol$gameDetailsParser);
+							default:
+								return $author$project$Protocol$ErrorResponse('Uknown response type received');
+						}
+					}
+				}();
+				return A2(
+					$author$project$Main$update,
+					$author$project$Main$SocketReceive(
+						A2($elm$core$Debug$log, 'rcvMSG', received)),
+					model);
+			case 'ConnectedResponse':
+				var r = response.a;
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'ClosedResponse':
+				var code = response.a.code;
+				var wasClean = response.a.wasClean;
+				var expected = response.a.expected;
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'ErrorResponse':
+				var error = response.a;
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$errorLog(
+						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
+			default:
+				var _v9 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v9.b) {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					if ((_v9.a.$ === 'ReconnectedResponse') && (!_v9.b.b)) {
+						var r = _v9.a.a;
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						var list = _v9;
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				}
 		}
 	});
 var $author$project$Main$update = F2(
@@ -8132,7 +8216,7 @@ var $author$project$Main$update = F2(
 								}
 							}()
 						}),
-					$author$project$Main$sendSocketCommand($author$project$Main$Ping));
+					$author$project$Main$sendSocketCommand($author$project$Protocol$Ping));
 			case 'NoAction':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'StartGame':
@@ -8142,20 +8226,20 @@ var $author$project$Main$update = F2(
 						{
 							amAdministrator: true,
 							gameId: $elm$core$Maybe$Just('armadillo'),
-							status: $author$project$Main$Lobby
+							status: $author$project$Protocol$Lobby
 						}),
-					$author$project$Main$sendSocketCommand($author$project$Main$StartCommand));
+					$author$project$Main$sendSocketCommand($author$project$Protocol$StartCommand));
 			case 'JoinGame':
 				return _Utils_Tuple2(
 					model,
 					$author$project$Main$sendSocketCommand(
-						$author$project$Main$JoinCommand(model.formFields.gameId)));
+						$author$project$Protocol$JoinCommand(model.formFields.gameId)));
 			case 'LeaveGame':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{gameId: $elm$core$Maybe$Nothing, players: _List_Nil, status: $author$project$Main$NoGame}),
-					$author$project$Main$sendSocketCommand($author$project$Main$LeaveCommand));
+						{gameId: $elm$core$Maybe$Nothing, players: _List_Nil, status: $author$project$Protocol$NoGame}),
+					$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
 			case 'SetField':
 				var field = msg.a;
 				var value = msg.b;
@@ -8170,15 +8254,12 @@ var $author$project$Main$update = F2(
 						$elm$core$Debug$log,
 						'Send ' + A2($elm$json$Json$Encode$encode, 0, value),
 						$author$project$Main$cmdPort(value)));
-			default:
+			case 'Receive':
 				var value = msg.a;
 				var _v3 = A4(
 					$author$project$PortFunnels$processValue,
-					$author$project$Main$funnelDict,
-					A2(
-						$elm$core$Debug$log,
-						'Receive ' + A2($elm$json$Json$Encode$encode, 0, value),
-						value),
+					$author$project$Main$cyclic$funnelDict(),
+					value,
 					model.funnelState,
 					model);
 				if (_v3.$ === 'Err') {
@@ -8188,10 +8269,58 @@ var $author$project$Main$update = F2(
 						$author$project$Main$errorLog(error));
 				} else {
 					var res = _v3.a;
-					return A2($elm$core$Debug$log, 'OK', res);
+					return res;
+				}
+			default:
+				var value = msg.a;
+				switch (value.$) {
+					case 'GameDetailsResponse':
+						var details = value.a;
+						var players = value.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									gameId: $elm$core$Maybe$Just(details.alias),
+									status: details.status
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 'ErrorResponse':
+						var error = value.a;
+						return _Utils_Tuple2(
+							model,
+							$author$project$Main$errorLog(error));
+					default:
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 		}
 	});
+function $author$project$Main$cyclic$funnelDict() {
+	return A2(
+		$author$project$PortFunnels$makeFunnelDict,
+		$author$project$Main$cyclic$handlers(),
+		F2(
+			function (_v10, _v11) {
+				return $author$project$Main$cmdPort;
+			}));
+}
+function $author$project$Main$cyclic$handlers() {
+	return _List_fromArray(
+		[
+			$author$project$PortFunnels$WebSocketHandler($author$project$Main$socketHandler)
+		]);
+}
+try {
+	var $author$project$Main$funnelDict = $author$project$Main$cyclic$funnelDict();
+	$author$project$Main$cyclic$funnelDict = function () {
+		return $author$project$Main$funnelDict;
+	};
+	var $author$project$Main$handlers = $author$project$Main$cyclic$handlers();
+	$author$project$Main$cyclic$handlers = function () {
+		return $author$project$Main$handlers;
+	};
+} catch ($) {
+	throw 'Some top-level definitions from `Main` are causing infinite recursion:\n\n  ┌─────┐\n  │    funnelDict\n  │     ↓\n  │    handlers\n  │     ↓\n  │    socketHandler\n  │     ↓\n  │    update\n  └─────┘\n\nThese errors are very tricky, so read https://elm-lang.org/0.19.1/bad-recursion to learn how to fix it!';}
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(

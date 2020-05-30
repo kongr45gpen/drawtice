@@ -179,6 +179,14 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             games.insert(game_id, game);
             let game = games.get(&game_id).unwrap();
             user.game = Some((game_id, player_id));
+
+            // Respond to the user that the game was created
+            let response = protocol::Response::GameDetails(game);
+            let response = protocol::encode(response);
+            match response {
+                Ok(r) => user.tx.send(Ok(Message::text(r))),
+                Err(e) => return error!("Could not transmit message: {:?}", e),
+            };
         },
         protocol::Command::JoinGame(c) => (),
         protocol::Command::LeaveGame => ()

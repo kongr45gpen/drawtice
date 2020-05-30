@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
-use serde_json::{Result, Value, from_value};
+use serde_json::{Result, Value, from_value, json};
 
 use std::io::{Error, ErrorKind};
 use log::{trace, debug, info, warn, error};
 use serde_json::Map;
+use crate::game;
+use std::any::Any;
 
 #[derive(Debug)]
 pub enum Command {
@@ -11,6 +13,13 @@ pub enum Command {
     StartGame,
     JoinGame(JoinCommand),
     LeaveGame,
+}
+
+#[derive(Debug)]
+pub enum Response<'a> {
+    Error(String),
+    Pong,
+    GameDetails(&'a game::Game),
 }
 
 #[derive(Deserialize, Debug)]
@@ -43,4 +52,19 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
     debug!("Parsed command: {:?}", command);
 
     Ok(command)
+}
+
+pub fn encode(response: Response) -> serde_json::Result<String> {
+    let (typename, data) = match response {
+        Response::Error(e) => ("error", Some(json!(e))),
+        Response::Pong => ("pong", None),
+        Response::GameDetails(g) => ("game_details", Some(json!(g)))
+    };
+
+    let json = json!({
+        "type": typename,
+        "data": data
+    });
+
+    serde_json::to_string(&json)
 }

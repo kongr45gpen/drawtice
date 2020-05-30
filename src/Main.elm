@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit, onInput)
 import Json.Encode as JE
-import Json.Decode
+import Json.Decode as JD
 import Url
 import Debug
 import Time
@@ -15,7 +15,7 @@ import Array
 import PortFunnels
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
 import PortFunnels exposing (FunnelDict, Handler(..), State)
-
+import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..))
 
 
 -- MAIN
@@ -61,12 +61,6 @@ funnelDict =
 
 
 -- MODEL
-
-type SocketCommand = Ping | StartCommand | JoinCommand String | LeaveCommand
-
-type PlayerStatus = Done | Working Float | Uploading Float | Stuck
-
-type GameStatus = NoGame | Lobby | Drawing | Understanding | GameOver
 
 type FormField = GameIdField
 
@@ -133,6 +127,7 @@ type Msg
   | SetField FormField String
   | Send JE.Value
   | Receive JE.Value
+  | SocketReceive Protocol.Response
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -182,14 +177,23 @@ update msg model =
 
     Receive value ->
       case
-          PortFunnels.processValue funnelDict (Debug.log ("Receive " ++ JE.encode 0 value) value) model.funnelState model
+          PortFunnels.processValue funnelDict value model.funnelState model
       of
           Err error ->
               (model, errorLog error)
 
           Ok res ->
-              (Debug.log "OK" res)
+              res
       -- (model, Debug.log ("Receive " ++ JE.encode 0 value) Cmd.none)
+
+    SocketReceive value ->
+      case value of
+        Protocol.GameDetailsResponse details players ->
+          ({ model | gameId = Just details.alias, status = details.status }, Cmd.none)
+        Protocol.ErrorResponse error ->
+          (model, errorLog error)
+        Protocol.PongResponse ->
+          (model, Cmd.none)
 
 setField : Model -> FormField -> String -> Model
 setField model field value =
@@ -224,7 +228,35 @@ socketHandler response state mdl =
   in
   case response of
       WebSocket.MessageReceivedResponse { message } ->
-        (model, Cmd.none)
+        let
+          typeDecoder = JD.field "type" JD.string
+          decodeData decoder = JD.decodeString (JD.field "data" decoder) message
+          decodeDataUsingParser parser = case decodeData (Tuple.first parser) of
+            Err e ->
+              Protocol.ErrorResponse (JD.errorToString e)
+            Ok v ->
+              Tuple.second parser v
+          -- errorDecoder = JD.string
+          -- gameDetailsDecoder = JD.map2 Protocol.GameDetails
+          --   (JD.field "alias" JD.string)
+          --   (JD.field "game_status" JD.string)
+          typeString = JD.decodeString typeDecoder message
+          received = case typeString of
+            Err e ->
+              Protocol.ErrorResponse (JD.errorToString e)
+            Ok s ->
+              case s of
+                "pong" ->
+                  Protocol.ErrorResponse "ping"
+                "error" ->
+                  decodeDataUsingParser Protocol.errorParser
+                "game_details" ->
+                  decodeDataUsingParser Protocol.gameDetailsParser
+                _ ->
+                  Protocol.ErrorResponse "Uknown response type received"
+
+        in
+          model |> update (SocketReceive (Debug.log "rcvMSG" received))
 
       WebSocket.ConnectedResponse r ->
           (model, Cmd.none)

@@ -5,10 +5,12 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
+use serde::{Deserialize, Serialize};
 
 use std::vec::Vec;
 use std::iter;
 
+#[derive(Serialize, Debug)]
 pub enum PlayerStatus {
     Stuck,
     Done,
@@ -16,6 +18,7 @@ pub enum PlayerStatus {
     Uploading
 }
 
+#[derive(Serialize, Debug)]
 pub enum GameStatus {
     Lobby,
     Drawing,
@@ -23,15 +26,22 @@ pub enum GameStatus {
     GameOver
 }
 
+#[derive(Serialize, Debug)]
 pub struct Player {
+    #[serde(skip_serializing)]
     pub uuid: Uuid,
+
     pub username: String,
     image_url: String,
     pub status: PlayerStatus,
+
+    #[serde(skip_serializing)]
     deadline: Option<DateTime<Utc>>,
+
     pub is_admin: bool,
 }
 
+#[derive(Serialize, Debug)]
 pub struct Game {
     pub alias: String,
     pub game_status: GameStatus,
