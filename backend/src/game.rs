@@ -53,7 +53,7 @@ impl Player {
         Player {
             uuid,
             username: username.to_string(),
-            image_url: "https://via.placeholder.com/150x300".to_string(),
+            image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg", username),
             status: PlayerStatus::Done,
             deadline: None,
             is_admin
