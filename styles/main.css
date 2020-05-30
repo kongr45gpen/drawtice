@@ -221,6 +221,10 @@ body {
   min-width: 100px;
 }
 
+.landing-join label {
+  align-self: center;
+}
+
 .game-link-presentation {
   text-align: center;
   font-size: 125%;

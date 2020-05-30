@@ -10,7 +10,7 @@ use std::any::Any;
 #[derive(Debug)]
 pub enum Command {
     Ping,
-    StartGame,
+    StartGame(StartCommand),
     JoinGame(JoinCommand),
     LeaveGame,
 }
@@ -25,6 +25,14 @@ pub enum Response<'a> {
 #[derive(Deserialize, Debug)]
 pub struct JoinCommand {
     game_id: String,
+    #[serde(deserialize_with = "de_validate_nonempty")]
+    username: String
+}
+
+#[derive(Deserialize, Debug)]
+pub struct StartCommand {
+    #[serde(deserialize_with = "de_validate_nonempty")]
+    pub username: String,
 }
 
 pub fn parse(msg: &str) -> std::io::Result<Command> {
@@ -43,7 +51,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
 
     let command = match command {
         "ping" => Command::Ping,
-        "start_game" => Command::StartGame,
+        "start_game" => Command::StartGame(StartCommand::deserialize(data?)?),
         "join_game" => Command::JoinGame(JoinCommand::deserialize(data?)?),
         "leave_game" => Command::LeaveGame,
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
@@ -67,4 +75,26 @@ pub fn encode(response: Response) -> serde_json::Result<String> {
     });
 
     serde_json::to_string(&json)
+}
+
+fn de_validate_nonempty<'de, D>(d: D) -> std::result::Result<String, D::Error>
+    where D: serde::de::Deserializer<'de>
+{
+    let value = String::deserialize(d)?;
+
+    if value.is_empty() {
+        return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(value.as_str()),
+                                            &"a non-empty username"));
+    }
+
+    Ok(value)
+}
+
+fn validate_nonempty(s: String) -> std::io::Result<String>
+{
+    if s.is_empty() {
+        Err(std::io::Error::new(ErrorKind::Other, "Username must not be empty"))
+    } else {
+        Ok(s)
+    }
 }

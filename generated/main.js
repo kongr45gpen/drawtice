@@ -4358,6 +4358,43 @@ function _Browser_load(url)
 
 
 
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
+
+
+
 function _Time_now(millisToPosix)
 {
 	return _Scheduler_binding(function(callback)
@@ -4401,43 +4438,6 @@ function _Time_getZoneName()
 		callback(_Scheduler_succeed(name));
 	});
 }
-
-
-
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
 var $author$project$Main$LinkClicked = function (a) {
 	return {$: 'LinkClicked', a: a};
 };
@@ -5260,13 +5260,270 @@ var $author$project$Main$Player = F3(
 	function (username, image, status) {
 		return {image: image, status: status, username: username};
 	});
+var $author$project$Main$SetField = F2(
+	function (a, b) {
+		return {$: 'SetField', a: a, b: b};
+	});
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
+var $author$project$Main$UsernamePlaceholder = {$: 'UsernamePlaceholder'};
 var $author$project$Protocol$Working = function (a) {
 	return {$: 'Working', a: a};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $author$project$Names$names = $elm$core$Array$fromList(
+	_List_fromArray(
+		['Mary', 'John', 'Aliakmonas', 'Alkistis', 'alej', 'virr', 'dojo', 'doggo', 'hojo', 'baktu', 'James', 'Jamie', 'Alex', 'Antidisestablishmentarianism', 'Llanfair­pwllgwyngyll­gogery­chwyrn­drobwll­llan­tysilio­gogo­goch', 'L', 'Professor', 'admin', 'user', 'Nameless', 'Horan', 'Dolores', 'root', 'Picasso', 'Caesar', 'Gleich', 'Mash']));
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Names$generator = A2(
+	$elm$random$Random$map,
+	function (n) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			'Null',
+			A2($elm$core$Array$get, n, $author$project$Names$names));
+	},
+	A2(
+		$elm$random$Random$int,
+		0,
+		$elm$core$Array$length($author$project$Names$names) - 1));
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$State = function (a) {
 	return {$: 'State', a: a};
 };
@@ -5287,22 +5544,6 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeOpenWithKey = F2(
 		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillOpen(
 			{keepAlive: false, key: key, url: url});
 	});
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $author$project$Main$cmdPort = _Platform_outgoingPort('cmdPort', $elm$core$Basics$identity);
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyBufferedAmount = F2(
 	function (key, bufferedAmount) {
@@ -6280,15 +6521,6 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCode = function (code) {
 	return A2(
 		$elm$core$Maybe$withDefault,
@@ -7262,13 +7494,17 @@ var $author$project$Main$init = F3(
 						$author$project$Protocol$Working(300)),
 						A3($author$project$Main$Player, 'marian', 'https://via.placeholder.com/256', $author$project$Protocol$Done)
 					]))($author$project$PortFunnels$initialState)(
-				{gameId: ''})($elm$core$Maybe$Nothing),
+				{gameId: '', username: '', usernamePlaceholder: ''})($elm$core$Maybe$Nothing),
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
 						A2($elm$core$Task$perform, $author$project$Main$Tick, $elm$time$Time$now),
 						$author$project$Main$send(
-						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$makeOpenWithKey, $author$project$Main$wsKey, $author$project$Main$wsUrl))
+						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$makeOpenWithKey, $author$project$Main$wsKey, $author$project$Main$wsUrl)),
+						A2(
+						$elm$random$Random$generate,
+						$author$project$Main$SetField($author$project$Main$UsernamePlaceholder),
+						$author$project$Names$generator)
 					])));
 	});
 var $author$project$Main$Receive = function (a) {
@@ -7548,16 +7784,18 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Protocol$ErrorResponse = function (a) {
 	return {$: 'ErrorResponse', a: a};
 };
-var $author$project$Protocol$JoinCommand = function (a) {
-	return {$: 'JoinCommand', a: a};
-};
+var $author$project$Protocol$JoinCommand = F2(
+	function (a, b) {
+		return {$: 'JoinCommand', a: a, b: b};
+	});
 var $author$project$Protocol$LeaveCommand = {$: 'LeaveCommand'};
-var $author$project$Protocol$Lobby = {$: 'Lobby'};
 var $author$project$Protocol$Ping = {$: 'Ping'};
 var $author$project$Main$SocketReceive = function (a) {
 	return {$: 'SocketReceive', a: a};
 };
-var $author$project$Protocol$StartCommand = {$: 'StartCommand'};
+var $author$project$Protocol$StartCommand = function (a) {
+	return {$: 'StartCommand', a: a};
+};
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
 };
@@ -7693,6 +7931,7 @@ var $author$project$Protocol$GameDetailsResponse = F2(
 	});
 var $author$project$Protocol$Drawing = {$: 'Drawing'};
 var $author$project$Protocol$GameOver = {$: 'GameOver'};
+var $author$project$Protocol$Lobby = {$: 'Lobby'};
 var $author$project$Protocol$Understanding = {$: 'Understanding'};
 var $author$project$Protocol$gameStatusFromString = function (string) {
 	switch (string) {
@@ -7794,10 +8033,6 @@ var $author$project$PortFunnels$makeFunnelDict = F2(
 				A2($elm$core$List$map, $author$project$PortFunnels$handlerToFunnel, handlers)),
 			portGetter);
 	});
-var $elm$time$Time$posixToMillis = function (_v0) {
-	var millis = _v0.a;
-	return millis;
-};
 var $author$project$Main$posixTimeDifferenceSeconds = F2(
 	function (a, b) {
 		return ($elm$time$Time$posixToMillis(a) - $elm$time$Time$posixToMillis(b)) / 1000;
@@ -7993,11 +8228,23 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 		case 'Ping':
 			return A2($author$project$Main$prepareSocketCommandJson, 'ping', $elm$core$Maybe$Nothing);
 		case 'StartCommand':
-			return A2($author$project$Main$prepareSocketCommandJson, 'start_game', $elm$core$Maybe$Nothing);
+			var username = command.a;
+			return A2(
+				$author$project$Main$prepareSocketCommandJson,
+				'start_game',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$object(
+						_List_fromArray(
+							[
+								_Utils_Tuple2(
+								'username',
+								$elm$json$Json$Encode$string(username))
+							]))));
 		case 'LeaveCommand':
 			return A2($author$project$Main$prepareSocketCommandJson, 'leave_game', $elm$core$Maybe$Nothing);
 		default:
 			var gameId = command.a;
+			var username = command.b;
 			return A2(
 				$author$project$Main$prepareSocketCommandJson,
 				'join_game',
@@ -8007,7 +8254,10 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 							[
 								_Utils_Tuple2(
 								'game_id',
-								$elm$json$Json$Encode$string(gameId))
+								$elm$json$Json$Encode$string(gameId)),
+								_Utils_Tuple2(
+								'username',
+								$elm$json$Json$Encode$string(username))
 							]))));
 	}
 };
@@ -8023,13 +8273,32 @@ var $author$project$Main$sendSocketCommand = function (command) {
 };
 var $author$project$Main$setField = F3(
 	function (model, field, value) {
-		var oldForm = model.formFields;
-		var newForm = _Utils_update(
-			oldForm,
-			{gameId: value});
-		return _Utils_update(
-			model,
-			{formFields: newForm});
+		switch (field.$) {
+			case 'GameIdField':
+				var oldForm = model.formFields;
+				var newForm = _Utils_update(
+					oldForm,
+					{gameId: value});
+				return _Utils_update(
+					model,
+					{formFields: newForm});
+			case 'UsernameField':
+				var oldForm = model.formFields;
+				var newForm = _Utils_update(
+					oldForm,
+					{username: value, usernamePlaceholder: value});
+				return _Utils_update(
+					model,
+					{formFields: newForm});
+			default:
+				var oldForm = model.formFields;
+				var newForm = _Utils_update(
+					oldForm,
+					{usernamePlaceholder: value});
+				return _Utils_update(
+					model,
+					{formFields: newForm});
+		}
 	});
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
@@ -8221,19 +8490,14 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'StartGame':
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							amAdministrator: true,
-							gameId: $elm$core$Maybe$Just('armadillo'),
-							status: $author$project$Protocol$Lobby
-						}),
-					$author$project$Main$sendSocketCommand($author$project$Protocol$StartCommand));
+					model,
+					$author$project$Main$sendSocketCommand(
+						$author$project$Protocol$StartCommand(model.formFields.username)));
 			case 'JoinGame':
 				return _Utils_Tuple2(
 					model,
 					$author$project$Main$sendSocketCommand(
-						$author$project$Protocol$JoinCommand(model.formFields.gameId)));
+						A2($author$project$Protocol$JoinCommand, model.formFields.gameId, model.formFields.username)));
 			case 'LeaveGame':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -8333,9 +8597,6 @@ var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
@@ -8343,7 +8604,6 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
 var $elm$core$String$repeatHelp = F3(
 	function (n, chunk, result) {
@@ -8544,14 +8804,12 @@ var $author$project$Main$viewHeader = function (model) {
 };
 var $author$project$Main$GameIdField = {$: 'GameIdField'};
 var $author$project$Main$JoinGame = {$: 'JoinGame'};
-var $author$project$Main$SetField = F2(
-	function (a, b) {
-		return {$: 'SetField', a: a, b: b};
-	});
 var $author$project$Main$StartGame = {$: 'StartGame'};
+var $author$project$Main$UsernameField = {$: 'UsernameField'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -8633,57 +8891,85 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$section = _VirtualDom_node('section');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Main$viewLanding = A2(
-	$elm$html$Html$section,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$class('landing hall')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$button,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button'),
-					$elm$html$Html$Events$onClick($author$project$Main$StartGame)
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Start a New Game')
-				])),
-			A2(
-			$elm$html$Html$form,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('landing-join'),
-					$elm$html$Html$Events$onSubmit($author$project$Main$JoinGame)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('submit'),
-							$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Join a running game')
-						])),
-					A2(
-					$elm$html$Html$input,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$placeholder('GameId'),
-							$elm$html$Html$Attributes$required(true),
-							$elm$html$Html$Events$onInput(
-							$author$project$Main$SetField($author$project$Main$GameIdField))
-						]),
-					_List_Nil)
-				]))
-		]));
+var $author$project$Main$viewLanding = function (model) {
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('landing hall')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('landing-join')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('People usually call me:')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder(model.formFields.usernamePlaceholder),
+								$elm$html$Html$Attributes$required(true),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$SetField($author$project$Main$UsernameField))
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button'),
+						$elm$html$Html$Events$onClick($author$project$Main$StartGame)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Start a New Game')
+					])),
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('landing-join'),
+						$elm$html$Html$Events$onSubmit($author$project$Main$JoinGame)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('submit'),
+								$elm$html$Html$Attributes$class('pure-button pure-button-primary landing-button')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Join a running game')
+							])),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('GameId'),
+								$elm$html$Html$Attributes$required(true),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$SetField($author$project$Main$GameIdField))
+							]),
+						_List_Nil)
+					]))
+			]));
+};
 var $author$project$Main$LeaveGame = {$: 'LeaveGame'};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $author$project$Main$getGameLink = function (gameId) {
@@ -9164,7 +9450,7 @@ var $author$project$Main$view = function (model) {
 								var _v0 = model.status;
 								switch (_v0.$) {
 									case 'NoGame':
-										return $author$project$Main$viewLanding;
+										return $author$project$Main$viewLanding(model);
 									case 'Lobby':
 										return $author$project$Main$viewLobby(model);
 									default:

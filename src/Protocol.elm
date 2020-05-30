@@ -4,7 +4,11 @@ import Json.Decode exposing (..)
 
 -- BASIC DEFINITIONS
 
-type SocketCommand = Ping | StartCommand | JoinCommand String | LeaveCommand
+type SocketCommand
+  = Ping
+  | StartCommand String
+  | JoinCommand String String
+  | LeaveCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 

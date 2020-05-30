@@ -12,11 +12,12 @@ import Debug
 import Time
 import Task
 import Array
+import Random
 import PortFunnels
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
 import PortFunnels exposing (FunnelDict, Handler(..), State)
 import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..))
-
+import Names
 
 -- MAIN
 
@@ -62,7 +63,7 @@ funnelDict =
 
 -- MODEL
 
-type FormField = GameIdField
+type FormField = GameIdField | UsernameField | UsernamePlaceholder
 
 type alias Player =
   {
@@ -73,7 +74,9 @@ type alias Player =
 
 type alias FormFields =
   {
-    gameId : String
+    gameId : String,
+    username : String,
+    usernamePlaceholder : String
   }
 
 type alias Model =
@@ -97,10 +100,13 @@ init flags url key =
     Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
     Player "marian" "https://via.placeholder.com/256" Done
   ] PortFunnels.initialState {
-    gameId = ""
+    gameId = "",
+    username = "",
+    usernamePlaceholder = ""
   } Nothing, Cmd.batch [
     Task.perform Tick Time.now,
-    WebSocket.makeOpenWithKey wsKey wsUrl |> send
+    WebSocket.makeOpenWithKey wsKey wsUrl |> send,
+    Random.generate (SetField UsernamePlaceholder) Names.generator
   ]
   )
 
@@ -161,10 +167,10 @@ update msg model =
       (model, Cmd.none)
 
     StartGame ->
-      ({model | status = Lobby, gameId = Just "armadillo", amAdministrator = True }, sendSocketCommand StartCommand)
+      (model, sendSocketCommand (StartCommand model.formFields.username))
 
     JoinGame ->
-      (model, sendSocketCommand (JoinCommand model.formFields.gameId))
+      (model, sendSocketCommand (JoinCommand model.formFields.gameId model.formFields.username))
 
     LeaveGame ->
       ({model | status = NoGame, gameId = Nothing, players = []}, sendSocketCommand LeaveCommand)
@@ -204,6 +210,18 @@ setField model field value =
         newForm = { oldForm | gameId = value}
       in
         { model | formFields = newForm }
+    UsernameField ->
+      let
+        oldForm = model.formFields
+        newForm = { oldForm | username = value, usernamePlaceholder = value}
+      in
+        { model | formFields = newForm }
+    UsernamePlaceholder ->
+      let
+        oldForm = model.formFields
+        newForm = { oldForm | usernamePlaceholder = value}
+      in
+        { model | formFields = newForm }
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -236,10 +254,6 @@ socketHandler response state mdl =
               Protocol.ErrorResponse (JD.errorToString e)
             Ok v ->
               Tuple.second parser v
-          -- errorDecoder = JD.string
-          -- gameDetailsDecoder = JD.map2 Protocol.GameDetails
-          --   (JD.field "alias" JD.string)
-          --   (JD.field "game_status" JD.string)
           typeString = JD.decodeString typeDecoder message
           received = case typeString of
             Err e ->
@@ -287,13 +301,17 @@ prepareSocketCommand command =
   case command of
     Ping ->
       prepareSocketCommandJson "ping" Nothing
-    StartCommand ->
-      prepareSocketCommandJson "start_game" Nothing
+    StartCommand username ->
+      prepareSocketCommandJson "start_game" (Just (JE.object
+        [ ( "username", JE.string username ) ]
+      ))
     LeaveCommand ->
       prepareSocketCommandJson "leave_game" Nothing
-    JoinCommand gameId ->
+    JoinCommand gameId username ->
       prepareSocketCommandJson "join_game" (Just (JE.object
-        [ ( "game_id", JE.string gameId) ]
+        [ ( "game_id", JE.string gameId)
+        , ( "username", JE.string username )
+        ]
       ))
 
 
@@ -336,7 +354,7 @@ view model =
           main_ [ class "page" ] [
             case model.status of
               NoGame ->
-                viewLanding
+                viewLanding model
               Lobby ->
                 viewLobby model
               _ ->
@@ -445,9 +463,13 @@ viewPlayer isMe player =
     a [ href "#" ] [ text "❌" ]
   ]
 
-viewLanding : Html Msg
-viewLanding =
+viewLanding : Model -> Html Msg
+viewLanding model =
   section [ class "landing hall" ] [
+    div [ class "landing-join" ] [
+      label [] [ text "People usually call me:" ],
+      input [ placeholder model.formFields.usernamePlaceholder, required True, onInput <| SetField UsernameField ] []
+    ],
     button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ],
     Html.form [ class "landing-join", onSubmit JoinGame ]  [
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [

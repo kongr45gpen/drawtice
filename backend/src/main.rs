@@ -130,16 +130,20 @@ async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &Ga
         return;
     };
 
+    let mut users_locked = users.lock().await;
+
     trace!("Received user [#{}] message {}", my_id, msg);
     let command = match protocol::parse(msg) {
         Err(e) => {
             error!("Error parsing JSON: {}", e);
+            tx_direct(&users_locked, my_id,
+                      protocol::Response::Error(format!("Invalid data: {}", e.to_string())))
+                .await;
             return
         },
         Ok(c) => c,
     };
 
-    let mut users_locked = users.lock().await;
     let mut games_locked = games.lock().await;
 
     game_command(&mut users_locked, my_id,&mut games_locked, command).await;
@@ -165,9 +169,9 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
     match command {
         protocol::Command::Ping => (),
-        protocol::Command::StartGame => {
+        protocol::Command::StartGame(c) => {
             // Create the administrator player based on the current user
-            let player = Player::new(user.uuid, "testername", true);
+            let player = Player::new(user.uuid, c.username.as_str(), true);
 
             // Now create the game itself
             let game_id = NEXT_GAME_ID.fetch_add(1, Ordering::Relaxed);
@@ -182,15 +186,22 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             // Respond to the user that the game was created
             let response = protocol::Response::GameDetails(game);
-            let response = protocol::encode(response);
-            match response {
-                Ok(r) => user.tx.send(Ok(Message::text(r))),
-                Err(e) => return error!("Could not transmit message: {:?}", e),
-            };
+            tx_direct(users, my_id, response).await;
         },
         protocol::Command::JoinGame(c) => (),
         protocol::Command::LeaveGame => ()
     }
+}
+
+async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>) {
+    let user = users.get(&my_id).unwrap();
+
+    let response = protocol::encode(response);
+    debug!("Time to transmit {:?}", response);
+    match response {
+        Ok(r) => user.tx.send(Ok(Message::text(r))),
+        Err(e) => return error!("Could not transmit message: {:?}", e),
+    };
 }
 
 async fn user_disconnected(my_id: usize, users: &UsersMutex) {
