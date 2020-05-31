@@ -12,6 +12,7 @@ import Debug
 import Time
 import Task
 import Random
+import Array
 import PortFunnels
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
 import PortFunnels exposing (FunnelDict, Handler(..), State)
@@ -69,7 +70,9 @@ type alias Player =
   {
     username : String,
     image : String,
-    status : PlayerStatus
+    status : PlayerStatus,
+    isMe : Bool,
+    isAdministrator: Bool
   }
 
 type alias FormFields =
@@ -86,7 +89,8 @@ type alias Model =
   , gameId : Maybe String
   , amAdministrator : Bool
   , lastUpdate : Maybe Time.Posix
-  , players : List Player
+  , players : Array.Array Player
+  , myId : Maybe Int
   , funnelState : PortFunnels.State
   , formFields : FormFields
   , error : Maybe String
@@ -95,11 +99,7 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url NoGame Nothing False Nothing [
-    Player "kongr45gpen" "https://via.placeholder.com/150x300" (Working 225),
-    Player "electrovesta" "https://via.placeholder.com/150x300" (Working 300),
-    Player "marian" "https://via.placeholder.com/256" Done
-  ] PortFunnels.initialState {
+  ( Model key url NoGame Nothing False Nothing Array.empty Nothing PortFunnels.initialState {
     gameId = "",
     username = "",
     usernamePlaceholder = ""
@@ -160,9 +160,9 @@ update msg model =
             model.players
 
           Just lastUpdate ->
-            List.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
+            Array.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
       , if WebSocket.isConnected wsKey model.funnelState.websocket then
-          sendSocketCommand Ping
+          Cmd.none
         else
           Cmd.none
       )
@@ -177,7 +177,7 @@ update msg model =
       (model, sendSocketCommand (JoinCommand model.formFields.gameId model.formFields.username))
 
     LeaveGame ->
-      ({model | status = NoGame, gameId = Nothing, players = []}, sendSocketCommand LeaveCommand)
+      ({model | status = NoGame, gameId = Nothing, players = Array.empty, myId = Nothing}, sendSocketCommand LeaveCommand)
 
     SetField field value ->
       ( setField model field value, Cmd.none )
@@ -204,14 +204,16 @@ update msg model =
       case value of
         Protocol.GameDetailsResponse details ->
           let
-            playerCreator : Protocol.PlayerDetails -> Player
-            playerCreator player =
+            playerCreator : Int -> Protocol.PlayerDetails -> Player
+            playerCreator id player =
               {
                 username = player.username,
                 image = player.imageUrl,
-                status = player.status
+                status = player.status,
+                isMe = model.myId |> Maybe.map (\i -> i == id) |> Maybe.withDefault False,
+                isAdministrator = player.isAdmin
               }
-            players = List.map playerCreator details.players
+            players = Array.indexedMap playerCreator (Array.fromList details.players)
           in
             ({ model
               | gameId = Just details.alias
@@ -221,6 +223,18 @@ update msg model =
         Protocol.ErrorResponse error ->
           (model, errorLog error)
         Protocol.PongResponse ->
+          (model, Cmd.none)
+        Protocol.PersonalDetailsResponse details ->
+          let
+            -- Set isMe = True on the current player
+            player = Array.get details.myId model.players |> Maybe.map (\p -> {p | isMe = True})
+          in
+            ({ model
+            | myId = Just details.myId
+            , amAdministrator = details.amAdministrator
+            , players = Maybe.map (\p -> Array.set details.myId p model.players) player |> Maybe.withDefault model.players
+            }, Cmd.none)
+        Protocol.UuidResponse uuid ->
           (model, Cmd.none)
 
     ShowError value ->
@@ -301,9 +315,12 @@ socketHandler response state mdl =
                   decodeDataUsingParser Protocol.errorParser
                 "game_details" ->
                   decodeDataUsingParser Protocol.gameDetailsParser
+                "personal_details" ->
+                  decodeDataUsingParser Protocol.personalDetailsParser
+                "your_uuid" ->
+                  decodeDataUsingParser Protocol.uuidParser
                 _ ->
                   Protocol.ErrorResponse "Uknown response type received"
-
         in
           model |> update (SocketReceive (Debug.log "rcvMSG" received))
 
@@ -433,7 +450,7 @@ viewNav model =
 
 viewHeader : Model -> Html Msg
 viewHeader model =
-  header [ class "game-header" ] ((case List.head model.players of
+  header [ class "game-header" ] ((case model.myId |> Maybe.andThen (\i -> Array.get i model.players) of
       Nothing ->
         []
       Just me ->
@@ -477,18 +494,18 @@ viewSidebar model =
           em [ class "text-muted" ] [ text "Not Started" ]
         Just id ->
           text id
-    ] ++ if List.isEmpty model.players
+    ] ++ if Array.isEmpty model.players
       then []
-      else [ div [ class "player-list" ] (List.map (viewPlayer False) model.players) ]
+      else [ div [ class "player-list" ] (Array.map (viewPlayer model) model.players |> Array.toList) ]
     )
   ]
 
-viewPlayer : Bool -> Player -> Html Msg
-viewPlayer isMe player =
-  div [ class ("player" ++ if isMe then " me" else "") ] [
+viewPlayer : Model -> Player -> Html Msg
+viewPlayer model player =
+  div [ class ("player" ++ if player.isMe then " me" else "") ] [
     viewPlayerAvatar player,
     span [ class "username" ] [ text player.username ],
-    span [] [ case player.status of
+    span [] ( (case player.status of
       Done ->
         (text "Done")
       Working timeLeft ->
@@ -497,8 +514,10 @@ viewPlayer isMe player =
         (text ("Uploading (" ++ String.fromFloat (fraction * 100) ++ "% done)"))
       Stuck ->
         (text "Hit a wall")
-    ],
-    a [ href "#" ] [ text "❌" ]
+    ) :: (if model.amAdministrator then
+      [ a [ href "#" ] [ text "❌" ] ]
+      else []
+    ))
   ]
 
 viewLanding : Model -> Html Msg
@@ -506,15 +525,20 @@ viewLanding model =
   section [ class "landing hall" ] [
     div [ class "landing-join" ] [
       label [] [ text "People usually call me:" ],
-      input [ placeholder model.formFields.usernamePlaceholder, required True, onInput <| SetField UsernameField ] []
+      input [
+        placeholder model.formFields.usernamePlaceholder,
+        required True,
+        onInput <| SetField UsernameField,
+        autocomplete True
+      ] []
     ],
-    button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ],
     Html.form [ class "landing-join", onSubmit JoinGame ]  [
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
         text "Join a running game"
       ],
       input [ placeholder "GameId", required True, onInput <| SetField GameIdField ] []
-    ]
+    ],
+    button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ]
   ]
 
 viewLobby : Model -> Html Msg

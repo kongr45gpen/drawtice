@@ -26,6 +26,12 @@ type alias PlayerDetails =
   { username: String
   , imageUrl: String
   , status: PlayerStatus
+  , isAdmin: Bool
+  }
+
+type alias PersonalDetails =
+  { myId: Int
+  , amAdministrator: Bool
   }
 
 -- JSON RESPONSE, COMMAND
@@ -34,6 +40,8 @@ type Response
   = ErrorResponse String
   | PongResponse
   | GameDetailsResponse GameDetails
+  | PersonalDetailsResponse PersonalDetails
+  | UuidResponse String
 
 
 -- JSON RESPONSE PARSERS
@@ -54,10 +62,25 @@ gameDetailsParser =
 
 playerDecoder : Decoder PlayerDetails
 playerDecoder =
-  map3 PlayerDetails
+  map4 PlayerDetails
     (field "username" string)
     (field "image_url" string)
     (field "status" (map playerStatusFromString string))
+    (field "is_admin" bool)
+
+personalDetailsParser : (Decoder PersonalDetails, PersonalDetails -> Response)
+personalDetailsParser =
+  (
+    map2 PersonalDetails
+      (field "my_id" int)
+      (field "am_administrator" bool)
+    ,
+    \v -> PersonalDetailsResponse v
+  )
+
+uuidParser : (Decoder String, String -> Response)
+uuidParser =
+  (string, \s -> UuidResponse s)
 
 gameStatusFromString : String -> GameStatus
 gameStatusFromString string =

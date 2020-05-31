@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 use std::iter;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub enum PlayerStatus {
     Stuck,
     Done,
@@ -26,7 +26,7 @@ pub enum GameStatus {
     GameOver
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct Player {
     #[serde(skip_serializing)]
     pub uuid: Uuid,
@@ -53,7 +53,7 @@ impl Player {
         Player {
             uuid,
             username: username.to_string(),
-            image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg", username),
+            image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg?background=%23559", username),
             status: PlayerStatus::Done,
             deadline: None,
             is_admin

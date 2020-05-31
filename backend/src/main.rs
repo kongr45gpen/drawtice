@@ -158,6 +158,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         protocol::Command::StartGame(c) => {
             // Create the administrator player based on the current user
             let player = Player::new(user.uuid, c.username.as_str(), true);
+            let player2 = player.clone();
 
             // Now create the game itself
             let game_id = NEXT_GAME_ID.fetch_add(1, Ordering::Relaxed);
@@ -173,6 +174,15 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             // Respond to the user that the game was created
             let response = protocol::Response::GameDetails(game);
             tx_direct(users, my_id, response).await;
+
+            // Respond to the user about some interesting personal information
+            tx_direct(users, my_id,
+                      protocol::Response::PersonalDetails(
+                          protocol::PersonalDetailsResponse::new(player_id, &player2)
+                      )
+            ).await;
+            tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
+                .await;
         },
         protocol::Command::JoinGame(c) => {
             let player = Player::new(user.uuid, c.username.as_str(), false);
@@ -186,11 +196,21 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             if let Some(game) = game {
                 // Add the player to the game, if the game exists
-                game.1.add_player(player);
+                let player2 = player.clone();
+                let player_id = game.1.add_player(player);
                 let response = protocol::Response::GameDetails(game.1);
+
+                info!("User {:?} joined [{}]", user.uuid, game.1.alias);
 
                 // Inform all the users of the new addition
                 tx_broadcast(users, my_id, response, true).await;
+                tx_direct(users, my_id,
+                          protocol::Response::PersonalDetails(
+                              protocol::PersonalDetailsResponse::new(player_id, &player2)
+                          )
+                ).await;
+                tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
+                    .await;
             } else {
                 let response = protocol::Response::Error("I can't find a game with this name!".to_string());
                 tx_direct(users, my_id, response).await;
@@ -203,8 +223,8 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>) {
     let user = users.get(&my_id).unwrap();
 
-    let response = protocol::encode(response);
     debug!("Time to transmit {:?}", response);
+    let response = protocol::encode(response);
     match response {
         Ok(r) => user.tx.send(Ok(Message::text(r))),
         Err(e) => return error!("Could not transmit message: {:?}", e),
@@ -212,8 +232,8 @@ async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>
 }
 
 async fn tx_broadcast(users: &Users, my_id: usize, response: protocol::Response<'_>, inclusive: bool) {
-    let response = protocol::encode(response);
     debug!("Time to broadcast {:?}", response);
+    let response = protocol::encode(response);
 
     match response {
         Ok(r) => {

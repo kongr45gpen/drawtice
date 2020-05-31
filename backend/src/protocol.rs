@@ -20,6 +20,8 @@ pub enum Response<'a> {
     Error(String),
     Pong,
     GameDetails(&'a game::Game),
+    PersonalDetails(PersonalDetailsResponse),
+    YourUuid(String)
 }
 
 #[derive(Deserialize, Debug)]
@@ -33,6 +35,21 @@ pub struct JoinCommand {
 pub struct StartCommand {
     #[serde(deserialize_with = "de_validate_nonempty")]
     pub username: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct PersonalDetailsResponse {
+    my_id: usize,
+    am_administrator: bool,
+}
+
+impl PersonalDetailsResponse {
+    pub fn new(my_id: usize, player: &game::Player) -> Self {
+        PersonalDetailsResponse {
+            my_id,
+            am_administrator: player.is_admin
+        }
+    }
 }
 
 pub fn parse(msg: &str) -> std::io::Result<Command> {
@@ -66,7 +83,9 @@ pub fn encode(response: Response) -> serde_json::Result<String> {
     let (typename, data) = match response {
         Response::Error(e) => ("error", Some(json!(e))),
         Response::Pong => ("pong", None),
-        Response::GameDetails(g) => ("game_details", Some(json!(g)))
+        Response::GameDetails(g) => ("game_details", Some(json!(g))),
+        Response::PersonalDetails(r) => ("personal_details", Some(json!(r))),
+        Response::YourUuid(s) => ("your_uuid", Some(json!(s))),
     };
 
     let json = json!({
