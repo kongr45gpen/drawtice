@@ -6,6 +6,7 @@ use uuid::Uuid;
 use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use std::vec::Vec;
 use std::iter;
@@ -30,6 +31,8 @@ pub enum GameStatus {
 pub struct Player {
     #[serde(skip_serializing)]
     pub uuid: Uuid,
+    #[serde(skip_serializing)]
+    pub user_id: usize,
 
     pub username: String,
     image_url: String,
@@ -43,15 +46,19 @@ pub struct Player {
 
 #[derive(Serialize, Debug)]
 pub struct Game {
+    #[serde(skip_serializing)]
+    pub id: usize,
+
     pub alias: String,
     pub game_status: GameStatus,
     pub players: Vec<Player>,
 }
 
 impl Player {
-    pub fn new(uuid: Uuid, username: &str, is_admin: bool) -> Player {
+    pub fn new(uuid: Uuid, user_id: usize, username: &str, is_admin: bool) -> Player {
         Player {
             uuid,
+            user_id,
             username: username.to_string(),
             image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg?background=%23559", username),
             status: PlayerStatus::Done,
@@ -62,7 +69,7 @@ impl Player {
 }
 
 impl Game {
-    pub fn new() -> Game {
+    pub fn new(id: usize) -> Game {
         // Generate random name
         let mut rng = thread_rng();
         let alias: String = iter::repeat(())
@@ -71,6 +78,7 @@ impl Game {
             .collect();
 
         Game {
+            id,
             alias,
             game_status: GameStatus::Lobby,
             players: vec![],
@@ -81,5 +89,21 @@ impl Game {
     pub fn add_player(&mut self, player: Player) -> usize {
         self.players.push(player);
         self.players.len() - 1
+    }
+
+    /// Remove one player from the game
+    /// Warning: This function reassigns all player IDs
+    pub fn remove_player(&mut self, player_id: usize) {
+        if player_id < self.players.len() {
+            self.players.remove(player_id);
+        }
+    }
+
+    pub fn get_player_uuids(&self) -> HashMap<Uuid, usize> {
+        self.players
+            .iter()
+            .enumerate()
+            .map(|player| (player.1.uuid, player.0))
+            .collect()
     }
 }

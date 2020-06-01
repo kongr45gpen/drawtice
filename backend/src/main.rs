@@ -41,6 +41,99 @@ type UsersMutex = Arc<Mutex<Users>>;
 type Games = HashMap<usize, Game>;
 type GamesMutex = Arc<Mutex<Games>>;
 
+impl User {
+    //noinspection RsNeedlessLifetimes
+    fn fetch_game<'a>(self: &User, games: &'a Games) -> protocol::Result<&'a Game> {
+        self.game
+            .and_then(|g| games.get(&(g.0)))
+            .ok_or(protocol::Error::new("User not in an active game".to_string()))
+    }
+
+    //noinspection RsNeedlessLifetimes
+    fn fetch_game_mut<'a>(self: &User, games: &'a mut Games) -> protocol::Result<&'a mut Game> {
+        self.game
+            .and_then(move |g| games.get_mut(&(g.0)))
+            .ok_or(protocol::Error::new("User not in an active game".to_string()))
+    }
+
+    fn fetch_player<'a>(self: &User, game: &'a Game) -> protocol::Result<&'a Player> {
+        self.game
+            .and_then(move |g| game.players.get(g.1))
+            .ok_or(protocol::Error::new("Could not find user in their game".to_string()))
+    }
+
+    fn fetch_by_player<'a>(users: &'a mut Users, player: &Player) -> protocol::Result<&'a mut User> {
+        users.get_mut(&player.user_id)
+            .ok_or(protocol::Error::from("Could not find user for player"))
+    }
+
+    async fn tx_direct(self: &User, response: protocol::Response<'_>) {
+        let response = protocol::encode(response);
+        match response {
+            Ok(r) => self.tx_direct_str(r).await,
+            Err(e) => return error!("Could not encode message: {:?}", e),
+        };
+    }
+
+    async fn tx_direct_str(self: &User, response: String) {
+        let send = self.tx.send(Ok(Message::text(response)));
+
+        if let Err(e) = send {
+            error!("Could not transmit message to {}: {:?}", self.uuid, e);
+        }
+    }
+}
+
+impl Game {
+    async fn tx_game(self: &Game, users: &Users, my_id: usize, response: protocol::Response<'_>, inclusive: bool) {
+        tx_game(users, my_id, self.id, response, inclusive).await
+    }
+
+    async fn tx_game_details(self: &Game, users: &Users, include_personal_details: bool) {
+        let response_game = protocol::encode(protocol::Response::GameDetails(self));
+        let response_game = match response_game {
+            Ok(r) => r,
+            Err(e) => return error!("Could not encode message: {:?}", e),
+        };
+
+        for (&uid, user) in users.iter() {
+            let game = user.game;
+
+            if let Some(g) = game {
+                if g.0 == self.id {
+                    user.tx_direct_str(response_game.clone()).await;
+
+                    if include_personal_details {
+                        let player = self.players.get(g.1);
+                        if let Some(p) = player {
+                            let response_details = protocol::Response::PersonalDetails(
+                                protocol::PersonalDetailsResponse::new(g.1, p)
+                            );
+                            user.tx_direct(response_details).await;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn reassign_users(self: &Game, users: &mut Users) {
+        // Reassign player IDs#[serde(skip_serializing)]
+        let uuids = self.get_player_uuids();
+
+        // We need to reassign all user IDs when a user goes away!
+        for (_, user) in users.iter_mut() {
+            if let Some(g) = user.game {
+                if g.0 == self.id { // only users that are in this game
+                    let index = uuids.get(&user.uuid);
+                    // Also makes sure to "None" users not belonging in the game anymore
+                    user.game = index.map(|i| (g.0, *i));
+                }
+            }
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init_timed();
@@ -146,10 +239,16 @@ async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &Ga
 
     let mut games_locked = games.lock().await;
 
-    game_command(&mut users_locked, my_id,&mut games_locked, command).await;
+    let result = game_command(&mut users_locked, my_id,&mut games_locked, command).await;
+    if let Err(e) = result {
+        let error_response = protocol::Response::Error(e.to_string());
+        warn!("Sending error: {:?}", e);
+        tx_direct(&users_locked, my_id, error_response).await;
+    }
 }
 
-async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, command: protocol::Command) {
+async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, command: protocol::Command)
+    -> protocol::Result<()> {
     trace!("Command {:?} to game_command", command);
     let user = users.get_mut(&my_id).unwrap();
 
@@ -157,12 +256,12 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         protocol::Command::Ping => (),
         protocol::Command::StartGame(c) => {
             // Create the administrator player based on the current user
-            let player = Player::new(user.uuid, c.username.as_str(), true);
+            let player = Player::new(user.uuid, my_id,c.username.as_str(), true);
             let player2 = player.clone();
 
             // Now create the game itself
             let game_id = NEXT_GAME_ID.fetch_add(1, Ordering::Relaxed);
-            let mut game = Game::new();
+            let mut game = Game::new(game_id);
             let player_id = game.add_player(player);
             info!("Created new game [{}] for {:?}", game.alias, user.uuid);
 
@@ -185,48 +284,96 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 .await;
         },
         protocol::Command::JoinGame(c) => {
-            let player = Player::new(user.uuid, c.username.as_str(), false);
+            let player = Player::new(user.uuid, my_id,c.username.as_str(), false);
 
             // Linear search of the game by the provided alias
-            let mut game =
+            let game =
                 games.iter_mut()
                     .filter(|g| g.1.alias == c.game_id)
-                    .next();
+                    .next()
+                    .ok_or("Could not find a game with this name!")?;
 
+            // Add the player to the game, if the game exists
+            let player2 = player.clone();
+            let player_id = game.1.add_player(player);
+            let response = protocol::Response::GameDetails(game.1);
+            user.game = Some((*game.0, player_id));
 
-            if let Some(game) = game {
-                // Add the player to the game, if the game exists
-                let player2 = player.clone();
-                let player_id = game.1.add_player(player);
-                let response = protocol::Response::GameDetails(game.1);
+            info!("User {:?} joined [{}]", user.uuid, game.1.alias);
 
-                info!("User {:?} joined [{}]", user.uuid, game.1.alias);
-
-                // Inform all the users of the new addition
-                tx_broadcast(users, my_id, response, true).await;
-                tx_direct(users, my_id,
-                          protocol::Response::PersonalDetails(
-                              protocol::PersonalDetailsResponse::new(player_id, &player2)
-                          )
-                ).await;
-                tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
-                    .await;
-            } else {
-                let response = protocol::Response::Error("I can't find a game with this name!".to_string());
-                tx_direct(users, my_id, response).await;
-            };
+            // Inform all the users of the new addition
+            game.1.tx_game(users, my_id, response, true).await;
+            tx_direct(users, my_id,
+                      protocol::Response::PersonalDetails(
+                          protocol::PersonalDetailsResponse::new(player_id, &player2)
+                      )
+            ).await;
+            tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
+                .await;
         },
+        protocol::Command::KickPlayer(c) => {
+            let game = user.fetch_game_mut(games)?;
+            let kicker = user.fetch_player(game)?;
+
+            if !kicker.is_admin {
+                return Err(protocol::Error::from("You don't have permission to kick that player"));
+            }
+
+            // Let the user know they've been kicked
+            let kicked = game.players.get(c.player_id)
+                .ok_or(protocol::Error::from("Player not in the game"))?;
+            User::fetch_by_player(users, kicked)?
+                .tx_direct(protocol::Response::LeftGame).await;
+
+            game.remove_player(c.player_id);
+            game.reassign_users(users);
+            game.tx_game_details(users, true).await;
+        }
         protocol::Command::LeaveGame => ()
     }
+
+    Ok(())
 }
+
+// async fn game_function_single(users: &mut Users, my_id: usize, games: &mut Games, function: fn(&Game)) {
+//     let game = user.game.and_then(|g| games.get(&(g.0)));
+//
+//     if let game = Some(game) {
+//         function(game);
+//     } else {
+//         let response = protocol::Response::Error("User not in a game".to_string());
+//         tx_direct(users, my_id, response).await;
+//     }
+// }
+
+// async fn game_function_single_mut(users: &mut Users, my_id: usize, games: &mut Games, function: fn(&mut Users, usize, &mut Game)) {
+//     let mut game = user.game.and_then(|g| games.get_mut(&(g.0)));
+//     function(users, my_id, game);
+// }
 
 async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>) {
     let user = users.get(&my_id).unwrap();
 
     debug!("Time to transmit {:?}", response);
+    user.tx_direct(response).await;
+}
+
+async fn tx_game(users: &Users, my_id: usize, game_id: usize, response: protocol::Response<'_>, inclusive: bool) {
+    debug!("Time to game-broadcast {:?}", response);
     let response = protocol::encode(response);
+
     match response {
-        Ok(r) => user.tx.send(Ok(Message::text(r))),
+        Ok(r) => {
+            for (&uid, user) in users.iter() {
+                let game = user.game;
+
+                if let Some(g) = game {
+                    if g.0 == game_id && (my_id != uid || inclusive) {
+                        user.tx_direct_str(r.clone()).await;
+                    }
+                }
+            }
+        },
         Err(e) => return error!("Could not transmit message: {:?}", e),
     };
 }
@@ -239,9 +386,7 @@ async fn tx_broadcast(users: &Users, my_id: usize, response: protocol::Response<
         Ok(r) => {
             for (&uid, user) in users.iter() {
                 if my_id != uid || inclusive {
-                    if let Err(e) = user.tx.send(Ok(Message::text(r.clone()))) {
-                        error!("Could not transmit message to {}: {}", user.uuid, e.to_string());
-                    }
+                    user.tx_direct_str(r.clone()).await;
                 }
             }
         },

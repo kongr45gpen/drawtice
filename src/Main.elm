@@ -39,7 +39,7 @@ main =
 wsKey : String
 wsKey = "mainws"
 wsUrl : String
-wsUrl = "ws://localhost:3030/ws"
+wsUrl = "ws://192.168.1.11:3030/ws"
 
 
 -- PORTS
@@ -91,6 +91,7 @@ type alias Model =
   , lastUpdate : Maybe Time.Posix
   , players : Array.Array Player
   , myId : Maybe Int
+  , uuid : Maybe String
   , funnelState : PortFunnels.State
   , formFields : FormFields
   , error : Maybe String
@@ -99,7 +100,7 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url NoGame Nothing False Nothing Array.empty Nothing PortFunnels.initialState {
+  ( Model key url NoGame Nothing False Nothing Array.empty Nothing Nothing PortFunnels.initialState {
     gameId = "",
     username = "",
     usernamePlaceholder = ""
@@ -129,6 +130,7 @@ type Msg
   | StartGame
   | JoinGame
   | LeaveGame
+  | KickPlayer Int
   | SetField FormField String
   | Send JE.Value
   | Receive JE.Value
@@ -177,7 +179,10 @@ update msg model =
       (model, sendSocketCommand (JoinCommand model.formFields.gameId model.formFields.username))
 
     LeaveGame ->
-      ({model | status = NoGame, gameId = Nothing, players = Array.empty, myId = Nothing}, sendSocketCommand LeaveCommand)
+      (leaveGame model, sendSocketCommand LeaveCommand)
+
+    KickPlayer value ->
+      (model, sendSocketCommand (KickCommand value))
 
     SetField field value ->
       ( setField model field value, Cmd.none )
@@ -225,17 +230,16 @@ update msg model =
         Protocol.PongResponse ->
           (model, Cmd.none)
         Protocol.PersonalDetailsResponse details ->
-          let
-            -- Set isMe = True on the current player
-            player = Array.get details.myId model.players |> Maybe.map (\p -> {p | isMe = True})
-          in
-            ({ model
-            | myId = Just details.myId
-            , amAdministrator = details.amAdministrator
-            , players = Maybe.map (\p -> Array.set details.myId p model.players) player |> Maybe.withDefault model.players
-            }, Cmd.none)
+          ({ model
+          | myId = Just details.myId
+          , amAdministrator = details.amAdministrator
+          , players = Array.indexedMap (\i -> \p -> { p | isMe = i == details.myId}) model.players
+          }, Cmd.none)
         Protocol.UuidResponse uuid ->
-          (model, Cmd.none)
+          ({model | uuid = Just uuid}, Cmd.none)
+        Protocol.LeftGameResponse ->
+          (leaveGame model, Cmd.none)
+
 
     ShowError value ->
       ({ model | error = Just value}, Cmd.none)
@@ -276,6 +280,10 @@ updatePlayerTime timeDifference player =
       { player | status = Working (timeLeft - timeDifference) }
     _ ->
       player
+
+leaveGame : Model -> Model
+leaveGame model =
+  {model | status = NoGame, gameId = Nothing, players = Array.empty, myId = Nothing}
 
 errorLog : String -> Cmd Msg
 errorLog message =
@@ -319,6 +327,8 @@ socketHandler response state mdl =
                   decodeDataUsingParser Protocol.personalDetailsParser
                 "your_uuid" ->
                   decodeDataUsingParser Protocol.uuidParser
+                "left_game" ->
+                  Protocol.LeftGameResponse
                 _ ->
                   Protocol.ErrorResponse "Uknown response type received"
         in
@@ -364,6 +374,10 @@ prepareSocketCommand command =
         [ ( "game_id", JE.string gameId)
         , ( "username", JE.string username )
         ]
+      ))
+    KickCommand playerId ->
+      prepareSocketCommandJson "kick_player" (Just (JE.object
+        [ ( "player_id", JE.int playerId ) ]
       ))
 
 
@@ -496,12 +510,12 @@ viewSidebar model =
           text id
     ] ++ if Array.isEmpty model.players
       then []
-      else [ div [ class "player-list" ] (Array.map (viewPlayer model) model.players |> Array.toList) ]
+      else [ div [ class "player-list" ] (Array.indexedMap (viewPlayer model) model.players |> Array.toList) ]
     )
   ]
 
-viewPlayer : Model -> Player -> Html Msg
-viewPlayer model player =
+viewPlayer : Model -> Int -> Player -> Html Msg
+viewPlayer model id player =
   div [ class ("player" ++ if player.isMe then " me" else "") ] [
     viewPlayerAvatar player,
     span [ class "username" ] [ text player.username ],
@@ -515,7 +529,7 @@ viewPlayer model player =
       Stuck ->
         (text "Hit a wall")
     ) :: (if model.amAdministrator then
-      [ a [ href "#" ] [ text "❌" ] ]
+      [ a [ href "#", onClick (KickPlayer id) ] [ text "❌" ] ]
       else []
     ))
   ]
@@ -559,7 +573,10 @@ viewLobby model =
           span [ class "game-link-path" ] [ text url.path ]
         ]
     ],
-    button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Cancel Game" ]
+    if model.amAdministrator then
+      button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Cancel Game" ]
+    else
+      button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Leave Game" ]
   ]
 
 viewPlayerAvatar : Player -> Html msg

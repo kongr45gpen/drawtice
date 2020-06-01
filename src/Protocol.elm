@@ -8,6 +8,7 @@ type SocketCommand
   = Ping
   | StartCommand String
   | JoinCommand String String
+  | KickCommand Int
   | LeaveCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
@@ -42,6 +43,7 @@ type Response
   | GameDetailsResponse GameDetails
   | PersonalDetailsResponse PersonalDetails
   | UuidResponse String
+  | LeftGameResponse
 
 
 -- JSON RESPONSE PARSERS

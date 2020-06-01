@@ -5241,10 +5241,12 @@ var $author$project$Main$Model = function (key) {
 					return function (lastUpdate) {
 						return function (players) {
 							return function (myId) {
-								return function (funnelState) {
-									return function (formFields) {
-										return function (error) {
-											return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, myId: myId, players: players, status: status, url: url};
+								return function (uuid) {
+									return function (funnelState) {
+										return function (formFields) {
+											return function (error) {
+												return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, myId: myId, players: players, status: status, url: url, uuid: uuid};
+											};
 										};
 									};
 								};
@@ -5533,7 +5535,7 @@ var $author$project$PortFunnels$initialState = {websocket: $billstclair$elm_webs
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		return _Utils_Tuple2(
-			$author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($author$project$PortFunnels$initialState)(
+			$author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($author$project$PortFunnels$initialState)(
 				{gameId: '', username: '', usernamePlaceholder: ''})($elm$core$Maybe$Nothing),
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
@@ -5967,7 +5969,11 @@ var $author$project$Protocol$JoinCommand = F2(
 	function (a, b) {
 		return {$: 'JoinCommand', a: a, b: b};
 	});
+var $author$project$Protocol$KickCommand = function (a) {
+	return {$: 'KickCommand', a: a};
+};
 var $author$project$Protocol$LeaveCommand = {$: 'LeaveCommand'};
+var $author$project$Protocol$LeftGameResponse = {$: 'LeftGameResponse'};
 var $author$project$Main$SocketReceive = function (a) {
 	return {$: 'SocketReceive', a: a};
 };
@@ -8159,6 +8165,11 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 			A2($elm$core$Dict$get, key, state.socketStates),
 			$elm$core$Maybe$Nothing);
 	});
+var $author$project$Main$leaveGame = function (model) {
+	return _Utils_update(
+		model,
+		{gameId: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, status: $author$project$Protocol$NoGame});
+};
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Debug$log = _Debug_log;
 var $billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
@@ -8490,7 +8501,7 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 							]))));
 		case 'LeaveCommand':
 			return A2($author$project$Main$prepareSocketCommandJson, 'leave_game', $elm$core$Maybe$Nothing);
-		default:
+		case 'JoinCommand':
 			var gameId = command.a;
 			var username = command.b;
 			return A2(
@@ -8507,6 +8518,19 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 								'username',
 								$elm$json$Json$Encode$string(username))
 							]))));
+		default:
+			var playerId = command.a;
+			return A2(
+				$author$project$Main$prepareSocketCommandJson,
+				'kick_player',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$object(
+						_List_fromArray(
+							[
+								_Utils_Tuple2(
+								'player_id',
+								$elm$json$Json$Encode$int(playerId))
+							]))));
 	}
 };
 var $author$project$Main$wsKey = 'mainws';
@@ -8520,49 +8544,6 @@ var $author$project$Main$sendSocketCommand = function (command) {
 				0,
 				$author$project$Main$prepareSocketCommand(command))));
 };
-var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
-var $elm$core$Array$setHelp = F4(
-	function (shift, index, value, tree) {
-		var pos = $elm$core$Array$bitMask & (index >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-		if (_v0.$ === 'SubTree') {
-			var subTree = _v0.a;
-			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
-			return A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				pos,
-				$elm$core$Array$SubTree(newSub),
-				tree);
-		} else {
-			var values = _v0.a;
-			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
-			return A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				pos,
-				$elm$core$Array$Leaf(newLeaf),
-				tree);
-		}
-	});
-var $elm$core$Array$set = F3(
-	function (index, value, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			tree,
-			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A4($elm$core$Array$setHelp, startShift, index, value, tree),
-			tail));
-	});
 var $author$project$Main$setField = F3(
 	function (model, field, value) {
 		switch (field.$) {
@@ -8658,7 +8639,7 @@ var $author$project$Protocol$uuidParser = _Utils_Tuple2(
 	function (s) {
 		return $author$project$Protocol$UuidResponse(s);
 	});
-var $author$project$Main$wsUrl = 'ws://localhost:3030/ws';
+var $author$project$Main$wsUrl = 'ws://192.168.1.11:3030/ws';
 var $author$project$Main$socketHandler = F3(
 	function (response, state, mdl) {
 		var model = _Utils_update(
@@ -8704,6 +8685,8 @@ var $author$project$Main$socketHandler = F3(
 								return decodeDataUsingParser($author$project$Protocol$personalDetailsParser);
 							case 'your_uuid':
 								return decodeDataUsingParser($author$project$Protocol$uuidParser);
+							case 'left_game':
+								return $author$project$Protocol$LeftGameResponse;
 							default:
 								return $author$project$Protocol$ErrorResponse('Uknown response type received');
 						}
@@ -8807,10 +8790,14 @@ var $author$project$Main$update = F2(
 						A2($author$project$Protocol$JoinCommand, model.formFields.gameId, model.formFields.username)));
 			case 'LeaveGame':
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{gameId: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, status: $author$project$Protocol$NoGame}),
+					$author$project$Main$leaveGame(model),
 					$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
+			case 'KickPlayer':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$sendSocketCommand(
+						$author$project$Protocol$KickCommand(value)));
 			case 'SetField':
 				var field = msg.a;
 				var value = msg.b;
@@ -8899,14 +8886,6 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					case 'PersonalDetailsResponse':
 						var details = value.a;
-						var player = A2(
-							$elm$core$Maybe$map,
-							function (p) {
-								return _Utils_update(
-									p,
-									{isMe: true});
-							},
-							A2($elm$core$Array$get, details.myId, model.players));
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -8914,19 +8893,32 @@ var $author$project$Main$update = F2(
 									amAdministrator: details.amAdministrator,
 									myId: $elm$core$Maybe$Just(details.myId),
 									players: A2(
-										$elm$core$Maybe$withDefault,
-										model.players,
-										A2(
-											$elm$core$Maybe$map,
-											function (p) {
-												return A3($elm$core$Array$set, details.myId, p, model.players);
-											},
-											player))
+										$elm$core$Array$indexedMap,
+										function (i) {
+											return function (p) {
+												return _Utils_update(
+													p,
+													{
+														isMe: _Utils_eq(i, details.myId)
+													});
+											};
+										},
+										model.players)
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 'UuidResponse':
+						var uuid = value.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									uuid: $elm$core$Maybe$Just(uuid)
 								}),
 							$elm$core$Platform$Cmd$none);
 					default:
-						var uuid = value.a;
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						return _Utils_Tuple2(
+							$author$project$Main$leaveGame(model),
+							$elm$core$Platform$Cmd$none);
 				}
 			case 'ShowError':
 				var value = msg.a;
@@ -9467,7 +9459,7 @@ var $author$project$Main$viewLobby = function (model) {
 								]));
 					}()
 					])),
-				A2(
+				model.amAdministrator ? A2(
 				$elm$html$Html$button,
 				_List_fromArray(
 					[
@@ -9477,6 +9469,16 @@ var $author$project$Main$viewLobby = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Cancel Game')
+					])) : A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-button pure-button-danger landing-button'),
+						$elm$html$Html$Events$onClick($author$project$Main$LeaveGame)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Leave Game')
 					]))
 			]));
 };
@@ -9729,10 +9731,13 @@ var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
 };
+var $author$project$Main$KickPlayer = function (a) {
+	return {$: 'KickPlayer', a: a};
+};
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$viewPlayer = F2(
-	function (model, player) {
+var $author$project$Main$viewPlayer = F3(
+	function (model, id, player) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -9782,7 +9787,9 @@ var $author$project$Main$viewPlayer = F2(
 								$elm$html$Html$a,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$href('#')
+										$elm$html$Html$Attributes$href('#'),
+										$elm$html$Html$Events$onClick(
+										$author$project$Main$KickPlayer(id))
 									]),
 								_List_fromArray(
 									[
@@ -9839,7 +9846,7 @@ var $author$project$Main$viewSidebar = function (model) {
 								]),
 							$elm$core$Array$toList(
 								A2(
-									$elm$core$Array$map,
+									$elm$core$Array$indexedMap,
 									$author$project$Main$viewPlayer(model),
 									model.players)))
 						])))
