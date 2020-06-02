@@ -91,7 +91,7 @@ impl Game {
         self.players.len() - 1
     }
 
-    /// Remove one player from the game
+    /// Remove one player from the game by ID, if exists
     /// Warning: This function reassigns all player IDs
     pub fn remove_player(&mut self, player_id: usize) {
         if player_id < self.players.len() {
@@ -105,5 +105,15 @@ impl Game {
             .enumerate()
             .map(|player| (player.1.uuid, player.0))
             .collect()
+    }
+
+    /// End the game, removing all players
+    pub fn end(&mut self) {
+        self.players.clear();
+    }
+
+    /// Return whether the game has ended
+    pub fn is_over(&self) -> bool {
+        return self.players.is_empty()
     }
 }

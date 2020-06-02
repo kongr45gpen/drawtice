@@ -56,9 +56,12 @@ impl User {
             .ok_or(protocol::Error::new("User not in an active game".to_string()))
     }
 
-    fn fetch_player<'a>(self: &User, game: &'a Game) -> protocol::Result<&'a Player> {
+    fn fetch_player<'a>(self: &User, game: &'a Game) -> protocol::Result<(&'a Player, usize)> {
         self.game
-            .and_then(move |g| game.players.get(g.1))
+            .and_then(move |g| game.players
+                .get(g.1)// Get the player from the game based on their index
+                .map(|p| (p, g.1))
+            )
             .ok_or(protocol::Error::new("Could not find user in their game".to_string()))
     }
 
@@ -313,7 +316,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         },
         protocol::Command::KickPlayer(c) => {
             let game = user.fetch_game_mut(games)?;
-            let kicker = user.fetch_player(game)?;
+            let (kicker, _) = user.fetch_player(game)?;
 
             if !kicker.is_admin {
                 return Err(protocol::Error::from("You don't have permission to kick that player"));
@@ -329,7 +332,22 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             game.reassign_users(users);
             game.tx_game_details(users, true).await;
         }
-        protocol::Command::LeaveGame => ()
+        protocol::Command::LeaveGame => {
+            let game = user.fetch_game_mut(games)?;
+            let (player, player_id) = user.fetch_player(game)?;
+
+            if player.is_admin {
+                // Destroy the game
+                game.tx_game(users, my_id, protocol::Response::LeftGame, true).await;
+                game.end();
+            } else {
+                game.remove_player(player_id);
+                user.tx_direct(protocol::Response::LeftGame).await;
+            }
+
+            game.reassign_users(users);
+            game.tx_game_details(users, true).await;
+        }
     }
 
     Ok(())
