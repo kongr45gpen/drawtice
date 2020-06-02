@@ -17,6 +17,8 @@ use log::{trace,debug,info,warn,error};
 
 pub(crate) mod game;
 pub(crate) mod protocol;
+pub(crate) mod names;
+
 use game::{Player,Game};
 
 struct User {

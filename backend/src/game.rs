@@ -7,6 +7,7 @@ use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use crate::names;
 
 use std::vec::Vec;
 use std::iter;
@@ -71,11 +72,7 @@ impl Player {
 impl Game {
     pub fn new(id: usize) -> Game {
         // Generate random name
-        let mut rng = thread_rng();
-        let alias: String = iter::repeat(())
-            .map(|()| rng.sample(Alphanumeric))
-            .take(7)
-            .collect();
+        let alias: String = names::generate_random_name();
 
         Game {
             id,
