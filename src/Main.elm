@@ -213,13 +213,14 @@ update msg model =
 
           Ok res ->
             let
-              mod = JD.decodeValue (JD.field "module" JD.string) value |> Result.withDefault "none"
+              modul = JD.decodeValue (JD.field "module" JD.string) value |> Result.withDefault "none"
             in
-              if mod == "WebSocket" then
+              if modul == "WebSocket" then
                 case JD.decodeValue (JD.field "tag" JD.string) value of
                   -- When the PortFunnels have all started, we can initiate connection with WebSocket
                   Ok("startup") ->
-                    res |> Cmd.Extra.addCmd (WebSocket.makeOpenWithKey wsKey wsUrl |> sendWebSocket)
+                    res
+                      |> Cmd.Extra.addCmd (WebSocket.makeOpenWithKey wsKey wsUrl |> sendWebSocket)
                   _ ->
                     res
               else
@@ -233,6 +234,12 @@ update msg model =
             formFieldsNew = { formFieldsOld | username = value |> Maybe.withDefault ""}
           in
             ({ model | formFields = formFieldsNew }, Cmd.none)
+        "uuid" ->
+          case value of
+            Just uuid ->
+              ({ model | uuid = Just uuid}, sendSocketCommand <| UuidCommand uuid)
+            Nothing ->
+              (model, Cmd.none)
         _ ->
           (model, Cmd.none)
 
@@ -267,7 +274,7 @@ update msg model =
           , players = Array.indexedMap (\i -> \p -> { p | isMe = i == details.myId}) model.players
           }, Cmd.none)
         Protocol.UuidResponse uuid ->
-          ({model | uuid = Just uuid}, Cmd.none)
+          ({model | uuid = Just uuid}, putLocalStorageString model "uuid" uuid)
         Protocol.LeftGameResponse ->
           (leaveGame model, Cmd.none)
 
@@ -386,7 +393,7 @@ socketHandler response state mdl =
         model |> update (SocketReceive (Debug.log "rcvMSG" received))
 
     WebSocket.ConnectedResponse _ ->
-        (model, Cmd.none)
+        (model, getLocalStorageString model "uuid")
 
     WebSocket.ClosedResponse { code } ->
         (model, errorLog ("Websocket connection closed: " ++ WebSocket.closedCodeToString code) )
@@ -437,6 +444,10 @@ prepareSocketCommand command =
     KickCommand playerId ->
       prepareSocketCommandJson "kick_player" (Just (JE.object
         [ ( "player_id", JE.int playerId ) ]
+      ))
+    UuidCommand uuid ->
+      prepareSocketCommandJson "my_uuid" (Just (JE.string
+        uuid
       ))
 
 

@@ -10,6 +10,7 @@ type SocketCommand
   | JoinCommand String String
   | KickCommand Int
   | LeaveCommand
+  | UuidCommand String
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 

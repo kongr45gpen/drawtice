@@ -7153,6 +7153,9 @@ var $author$project$Main$StorageReceive = F2(
 	function (a, b) {
 		return {$: 'StorageReceive', a: a, b: b};
 	});
+var $author$project$Protocol$UuidCommand = function (a) {
+	return {$: 'UuidCommand', a: a};
+};
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
 };
@@ -9216,7 +9219,7 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 								'username',
 								$elm$json$Json$Encode$string(username))
 							]))));
-		default:
+		case 'KickCommand':
 			var playerId = command.a;
 			return A2(
 				$author$project$Main$prepareSocketCommandJson,
@@ -9229,6 +9232,13 @@ var $author$project$Main$prepareSocketCommand = function (command) {
 								'player_id',
 								$elm$json$Json$Encode$int(playerId))
 							]))));
+		default:
+			var uuid = command.a;
+			return A2(
+				$author$project$Main$prepareSocketCommandJson,
+				'my_uuid',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$string(uuid)));
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$send = $billstclair$elm_port_funnel$PortFunnel$sendMessage($billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleDesc);
@@ -9376,13 +9386,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v12 = decodeData(parser.a);
-					if (_v12.$ === 'Err') {
-						var e = _v12.a;
+					var _v13 = decodeData(parser.a);
+					if (_v13.$ === 'Err') {
+						var e = _v13.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v12.a;
+						var v = _v13.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9417,7 +9427,9 @@ var $author$project$Main$socketHandler = F3(
 						A2($elm$core$Debug$log, 'rcvMSG', received)),
 					model);
 			case 'ConnectedResponse':
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				return _Utils_Tuple2(
+					model,
+					A2($author$project$Main$getLocalStorageString, model, 'uuid'));
 			case 'ClosedResponse':
 				var code = response.a.code;
 				return _Utils_Tuple2(
@@ -9431,15 +9443,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v13 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v13.b) {
+				var _v14 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v14.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v13.a.$ === 'ReconnectedResponse') && (!_v13.b.b)) {
-						var r = _v13.a.a;
+					if ((_v14.a.$ === 'ReconnectedResponse') && (!_v14.b.b)) {
+						var r = _v14.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v13;
+						var list = _v14;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -9580,14 +9592,14 @@ var $author$project$Main$update = F2(
 						$author$project$Main$errorLog(error));
 				} else {
 					var res = _v3.a;
-					var mod = A2(
+					var modul = A2(
 						$elm$core$Result$withDefault,
 						'none',
 						A2(
 							$elm$json$Json$Decode$decodeValue,
 							A2($elm$json$Json$Decode$field, 'module', $elm$json$Json$Decode$string),
 							value));
-					if (mod === 'WebSocket') {
+					if (modul === 'WebSocket') {
 						var _v4 = A2(
 							$elm$json$Json$Decode$decodeValue,
 							A2($elm$json$Json$Decode$field, 'tag', $elm$json$Json$Decode$string),
@@ -9608,20 +9620,35 @@ var $author$project$Main$update = F2(
 			case 'StorageReceive':
 				var key = msg.a;
 				var value = msg.b;
-				if (key === 'username') {
-					var formFieldsOld = model.formFields;
-					var formFieldsNew = _Utils_update(
-						formFieldsOld,
-						{
-							username: A2($elm$core$Maybe$withDefault, '', value)
-						});
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{formFields: formFieldsNew}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				switch (key) {
+					case 'username':
+						var formFieldsOld = model.formFields;
+						var formFieldsNew = _Utils_update(
+							formFieldsOld,
+							{
+								username: A2($elm$core$Maybe$withDefault, '', value)
+							});
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{formFields: formFieldsNew}),
+							$elm$core$Platform$Cmd$none);
+					case 'uuid':
+						if (value.$ === 'Just') {
+							var uuid = value.a;
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										uuid: $elm$core$Maybe$Just(uuid)
+									}),
+								$author$project$Main$sendSocketCommand(
+									$author$project$Protocol$UuidCommand(uuid)));
+						} else {
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						}
+					default:
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 			case 'SocketReceive':
 				var value = msg.a;
@@ -9696,7 +9723,7 @@ var $author$project$Main$update = F2(
 								{
 									uuid: $elm$core$Maybe$Just(uuid)
 								}),
-							$elm$core$Platform$Cmd$none);
+							A3($author$project$Main$putLocalStorageString, model, 'uuid', uuid));
 					default:
 						return _Utils_Tuple2(
 							$author$project$Main$leaveGame(model),
@@ -9724,7 +9751,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v14, _v15) {
+			function (_v15, _v16) {
 				return $author$project$Main$cmdPort;
 			}));
 }

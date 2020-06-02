@@ -47,7 +47,8 @@ pub enum Command {
     StartGame(StartCommand),
     JoinGame(JoinCommand),
     LeaveGame,
-    KickPlayer(KickCommand)
+    KickPlayer(KickCommand),
+    MyUuid(String)
 }
 
 #[derive(Debug)]
@@ -113,6 +114,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         "join_game" => Command::JoinGame(JoinCommand::deserialize(data?)?),
         "leave_game" => Command::LeaveGame,
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
+        "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
 

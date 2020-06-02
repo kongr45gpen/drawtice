@@ -349,6 +349,30 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             game.reassign_users(users);
             game.tx_game_details(users, true).await;
+        },
+        protocol::Command::MyUuid(s) => {
+            let uuid = Uuid::parse_str(s.as_str())
+                .map_err(|_| protocol::Error::from("Invalid UUID provided"))?;
+            user.uuid = uuid;
+
+            // Search for this user in all our games
+            'outer: for (&gid, game) in games.iter_mut() {
+                for (pid, player) in game.players.iter_mut().enumerate() {
+                    if player.uuid == uuid {
+                        // Found the player!
+                        player.user_id = my_id;
+                        user.game = Some((gid, pid));
+
+                        // Announce the game to the user
+                        user.tx_direct(protocol::Response::PersonalDetails(
+                            protocol::PersonalDetailsResponse::new(pid, &player)
+                        )).await;
+                        user.tx_direct(protocol::Response::GameDetails(game)).await;
+
+                        break 'outer;
+                    }
+                }
+            }
         }
     }
 
