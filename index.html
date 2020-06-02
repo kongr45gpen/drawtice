@@ -16,6 +16,7 @@
 <body>
   <script type='text/javascript' src='lib/PortFunnel.js'></script>
   <script type='text/javascript' src='lib/PortFunnel/WebSocket.js'></script>
+  <script type='text/javascript' src='lib/PortFunnel/LocalStorage.js'></script>
   <script>
 
 var app = Elm.Main.init();
@@ -39,6 +40,11 @@ PortFunnel.subscribe(app);
       console.error(string);
     });
   }
+
+  // Debugging
+  ports.cmdPort.subscribe(function (string) {
+      console.log(string);
+  })
 })();
 
     </script>

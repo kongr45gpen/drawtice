@@ -13,8 +13,8 @@ import Time
 import Task
 import Random
 import Array
-import PortFunnels
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
+import PortFunnel.LocalStorage as LocalStorage
 import PortFunnels exposing (FunnelDict, Handler(..), State)
 import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..))
 import Names
@@ -54,6 +54,7 @@ cmdPort =
 handlers : List (Handler Model Msg)
 handlers =
     [ WebSocketHandler socketHandler
+    , LocalStorageHandler storageHandler
     ]
 
 
@@ -103,28 +104,27 @@ init flags url key =
   let
     formFields : FormFields
     formFields = {
-      gameId = (case url.fragment of
+      gameId = case url.fragment of
         Just f -> f
         Nothing -> ""
-      ),
+      ,
       username = "",
       usernamePlaceholder = ""
       }
+
+    model = Model
+      key url NoGame Nothing False Nothing
+      Array.empty Nothing Nothing (PortFunnels.initialState "drawtice")
+      formFields Nothing
   in
-    ( Model key url NoGame Nothing False Nothing Array.empty Nothing Nothing PortFunnels.initialState formFields Nothing, Cmd.batch [
+    ( model, Cmd.batch [
       Task.perform Tick Time.now,
-      Random.generate (SetField UsernamePlaceholder) Names.generator
+      Random.generate (SetField UsernamePlaceholder) Names.generator,
+      getLocalStorageString model "username"
     ]
     )
 
 
-reportError : String -> Model -> Model
-reportError err model =
-  case model.error of
-    Nothing ->
-      { model | error = Just err }
-    Just _ ->
-      model
 
 -- UPDATE
 
@@ -142,6 +142,7 @@ type Msg
   | Send JE.Value
   | Receive JE.Value
   | SocketReceive Protocol.Response
+  | StorageReceive String (Maybe String)
   | ShowError String
   | RemoveError
 
@@ -180,10 +181,16 @@ update msg model =
       (model, Cmd.none)
 
     StartGame ->
-      (model, sendSocketCommand (StartCommand model.formFields.username))
+      (model, Cmd.batch [
+        sendSocketCommand (StartCommand model.formFields.username),
+        putLocalStorageString model "username" model.formFields.username
+      ])
 
     JoinGame ->
-      (model, sendSocketCommand (JoinCommand model.formFields.gameId model.formFields.username))
+      (model, Cmd.batch [
+        sendSocketCommand (JoinCommand model.formFields.gameId model.formFields.username),
+        putLocalStorageString model "username" model.formFields.username
+      ])
 
     LeaveGame ->
       (leaveGame model, sendSocketCommand LeaveCommand)
@@ -205,12 +212,29 @@ update msg model =
               (model, errorLog error)
 
           Ok res ->
-              case JD.decodeValue (JD.field "tag" JD.string) value of
-                -- When the PortFunnels have all started, we can initiate connection with WebSocket
-                Ok("startup") ->
-                  res |> Cmd.Extra.addCmd (WebSocket.makeOpenWithKey wsKey wsUrl |> send)
-                _ ->
-                  res
+            let
+              mod = JD.decodeValue (JD.field "module" JD.string) value |> Result.withDefault "none"
+            in
+              if mod == "WebSocket" then
+                case JD.decodeValue (JD.field "tag" JD.string) value of
+                  -- When the PortFunnels have all started, we can initiate connection with WebSocket
+                  Ok("startup") ->
+                    res |> Cmd.Extra.addCmd (WebSocket.makeOpenWithKey wsKey wsUrl |> sendWebSocket)
+                  _ ->
+                    res
+              else
+                res
+
+    StorageReceive key value ->
+      case key of
+        "username" ->
+          let
+            formFieldsOld = model.formFields
+            formFieldsNew = { formFieldsOld | username = value |> Maybe.withDefault ""}
+          in
+            ({ model | formFields = formFieldsNew }, Cmd.none)
+        _ ->
+          (model, Cmd.none)
 
     SocketReceive value ->
       case value of
@@ -299,9 +323,29 @@ errorLog message =
       Task.perform ShowError (Task.succeed message)
     ]
 
-send : WebSocket.Message -> Cmd Msg
-send message =
+sendWebSocket : WebSocket.Message -> Cmd Msg
+sendWebSocket message =
     WebSocket.send cmdPort message
+
+sendLocalStorage : Model -> LocalStorage.Message -> Cmd Msg
+sendLocalStorage model message =
+    LocalStorage.send cmdPort message model.funnelState.storage
+
+storageHandler : LocalStorage.Response -> PortFunnels.State -> Model -> ( Model, Cmd Msg )
+storageHandler response state mdl =
+  let
+    model = { mdl | funnelState = state }
+  in
+  case response of
+    LocalStorage.GetResponse { label, key, value } ->
+      let
+        string =
+          case value of
+            Nothing -> Nothing
+            Just v -> Result.toMaybe <| JD.decodeValue JD.string v
+      in
+        update (StorageReceive key string) model
+    _ -> (model, Cmd.none)
 
 socketHandler : Response -> State -> Model -> ( Model, Cmd Msg )
 socketHandler response state mdl =
@@ -309,61 +353,69 @@ socketHandler response state mdl =
       model = { mdl | funnelState = state }
   in
   case response of
-      WebSocket.MessageReceivedResponse { message } ->
-        let
-          typeDecoder = JD.field "type" JD.string
-          decodeData decoder = JD.decodeString (JD.field "data" decoder) message
-          decodeDataUsingParser parser = case decodeData (Tuple.first parser) of
-            Err e ->
-              Protocol.ErrorResponse (JD.errorToString e)
-            Ok v ->
-              Tuple.second parser v
-          typeString = JD.decodeString typeDecoder message
-          received = case typeString of
-            Err e ->
-              Protocol.ErrorResponse (JD.errorToString e)
-            Ok s ->
-              case s of
-                "pong" ->
-                  Protocol.ErrorResponse "ping"
-                "error" ->
-                  decodeDataUsingParser Protocol.errorParser
-                "game_details" ->
-                  decodeDataUsingParser Protocol.gameDetailsParser
-                "personal_details" ->
-                  decodeDataUsingParser Protocol.personalDetailsParser
-                "your_uuid" ->
-                  decodeDataUsingParser Protocol.uuidParser
-                "left_game" ->
-                  Protocol.LeftGameResponse
-                _ ->
-                  Protocol.ErrorResponse "Uknown response type received"
-        in
-          model |> update (SocketReceive (Debug.log "rcvMSG" received))
+    WebSocket.MessageReceivedResponse { message } ->
+      let
+        typeDecoder = JD.field "type" JD.string
+        decodeData decoder = JD.decodeString (JD.field "data" decoder) message
+        decodeDataUsingParser parser = case decodeData (Tuple.first parser) of
+          Err e ->
+            Protocol.ErrorResponse (JD.errorToString e)
+          Ok v ->
+            Tuple.second parser v
+        typeString = JD.decodeString typeDecoder message
+        received = case typeString of
+          Err e ->
+            Protocol.ErrorResponse (JD.errorToString e)
+          Ok s ->
+            case s of
+              "pong" ->
+                Protocol.ErrorResponse "ping"
+              "error" ->
+                decodeDataUsingParser Protocol.errorParser
+              "game_details" ->
+                decodeDataUsingParser Protocol.gameDetailsParser
+              "personal_details" ->
+                decodeDataUsingParser Protocol.personalDetailsParser
+              "your_uuid" ->
+                decodeDataUsingParser Protocol.uuidParser
+              "left_game" ->
+                Protocol.LeftGameResponse
+              _ ->
+                Protocol.ErrorResponse "Uknown response type received"
+      in
+        model |> update (SocketReceive (Debug.log "rcvMSG" received))
 
-      WebSocket.ConnectedResponse r ->
-          (model, Cmd.none)
+    WebSocket.ConnectedResponse _ ->
+        (model, Cmd.none)
 
-      WebSocket.ClosedResponse { code, wasClean, expected } ->
-          (model, errorLog "Websocket connection closed" )
+    WebSocket.ClosedResponse { code } ->
+        (model, errorLog ("Websocket connection closed: " ++ WebSocket.closedCodeToString code) )
 
-      WebSocket.ErrorResponse error ->
-          (model, errorLog (WebSocket.errorToString error))
+    WebSocket.ErrorResponse error ->
+        (model, errorLog (WebSocket.errorToString error))
 
-      _ ->
-          case WebSocket.reconnectedResponses response of
-              [] ->
-                  (model, Cmd.none)
-
-              [ ReconnectedResponse r ] ->
-                  (model, Cmd.none)
-
-              list ->
+    _ ->
+        case WebSocket.reconnectedResponses response of
+            [] ->
                 (model, Cmd.none)
+
+            [ ReconnectedResponse r ] ->
+                (model, Cmd.none)
+
+            list ->
+              (model, Cmd.none)
 
 sendSocketCommand : SocketCommand -> Cmd Msg
 sendSocketCommand command =
-  command |> prepareSocketCommand |> JE.encode 0 |> WebSocket.makeSend wsKey |> send
+  command |> prepareSocketCommand |> JE.encode 0 |> WebSocket.makeSend wsKey |> sendWebSocket
+
+getLocalStorageString : Model -> String -> Cmd Msg
+getLocalStorageString model key =
+  LocalStorage.get key |> sendLocalStorage model
+
+putLocalStorageString : Model -> String -> String -> Cmd Msg
+putLocalStorageString model key value =
+  LocalStorage.put key (Just <| JE.string value) |> sendLocalStorage model
 
 prepareSocketCommand : SocketCommand -> JE.Value
 prepareSocketCommand command =
@@ -446,7 +498,7 @@ viewNav model =
       li [ class ("pure-menu-item" ++ if hasGameStarted model then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
     ] ++ (case model.gameId of
       Nothing -> []
-      Just id ->
+      Just _ ->
         [
           li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "Share this link to invite other people to join:" ] ],
           let url = model |> getGameLink |> Url.toString
