@@ -5534,9 +5534,21 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$initialState = $bills
 var $author$project$PortFunnels$initialState = {websocket: $billstclair$elm_websocket_client$PortFunnel$WebSocket$initialState};
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
+		var formFields = {
+			gameId: function () {
+				var _v0 = url.fragment;
+				if (_v0.$ === 'Just') {
+					var f = _v0.a;
+					return f;
+				} else {
+					return '';
+				}
+			}(),
+			username: '',
+			usernamePlaceholder: ''
+		};
 		return _Utils_Tuple2(
-			$author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($author$project$PortFunnels$initialState)(
-				{gameId: '', username: '', usernamePlaceholder: ''})($elm$core$Maybe$Nothing),
+			$author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($author$project$PortFunnels$initialState)(formFields)($elm$core$Maybe$Nothing),
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
@@ -9280,6 +9292,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$section = _VirtualDom_node('section');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewLanding = function (model) {
 	return A2(
 		$elm$html$Html$section,
@@ -9312,7 +9325,8 @@ var $author$project$Main$viewLanding = function (model) {
 								$elm$html$Html$Attributes$required(true),
 								$elm$html$Html$Events$onInput(
 								$author$project$Main$SetField($author$project$Main$UsernameField)),
-								$elm$html$Html$Attributes$autocomplete(true)
+								$elm$html$Html$Attributes$autocomplete(true),
+								$elm$html$Html$Attributes$value(model.formFields.username)
 							]),
 						_List_Nil)
 					])),
@@ -9343,7 +9357,8 @@ var $author$project$Main$viewLanding = function (model) {
 								$elm$html$Html$Attributes$placeholder('GameId'),
 								$elm$html$Html$Attributes$required(true),
 								$elm$html$Html$Events$onInput(
-								$author$project$Main$SetField($author$project$Main$GameIdField))
+								$author$project$Main$SetField($author$project$Main$GameIdField)),
+								$elm$html$Html$Attributes$value(model.formFields.gameId)
 							]),
 						_List_Nil)
 					])),
@@ -9362,11 +9377,19 @@ var $author$project$Main$viewLanding = function (model) {
 };
 var $author$project$Main$LeaveGame = {$: 'LeaveGame'};
 var $elm$html$Html$a = _VirtualDom_node('a');
-var $author$project$Main$getGameLink = function (gameId) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		A6($elm$url$Url$Url, $elm$url$Url$Https, '', $elm$core$Maybe$Nothing, '', $elm$core$Maybe$Nothing, $elm$core$Maybe$Nothing),
-		$elm$url$Url$fromString('https://game.dev/' + gameId));
+var $author$project$Main$getGameLink = function (model) {
+	var url = model.url;
+	var _v0 = model.gameId;
+	if (_v0.$ === 'Just') {
+		var gameId = _v0.a;
+		return _Utils_update(
+			url,
+			{
+				fragment: $elm$core$Maybe$Just(gameId)
+			});
+	} else {
+		return url;
+	}
 };
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
@@ -9404,8 +9427,7 @@ var $author$project$Main$viewLobby = function (model) {
 								$elm$html$Html$text('Share the following link to let other people join:')
 							])),
 						function () {
-						var url = $author$project$Main$getGameLink(
-							A2($elm$core$Maybe$withDefault, '???', model.gameId));
+						var url = $author$project$Main$getGameLink(model);
 						return A2(
 							$elm$html$Html$a,
 							_List_fromArray(
@@ -9444,7 +9466,8 @@ var $author$project$Main$viewLobby = function (model) {
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text(url.host)
+											$elm$html$Html$text(
+											_Utils_ap(url.host, url.path))
 										])),
 									A2(
 									$elm$html$Html$span,
@@ -9454,7 +9477,8 @@ var $author$project$Main$viewLobby = function (model) {
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text(url.path)
+											$elm$html$Html$text(
+											'#' + A2($elm$core$Maybe$withDefault, '', url.fragment))
 										]))
 								]));
 					}()
@@ -9595,7 +9619,7 @@ var $author$project$Main$viewNav = function (model) {
 											])),
 										function () {
 										var url = $elm$url$Url$toString(
-											$author$project$Main$getGameLink(id));
+											$author$project$Main$getGameLink(model));
 										return A2(
 											$elm$html$Html$li,
 											_List_fromArray(

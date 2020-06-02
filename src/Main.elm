@@ -100,15 +100,22 @@ type alias Model =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-  ( Model key url NoGame Nothing False Nothing Array.empty Nothing Nothing PortFunnels.initialState {
-    gameId = "",
-    username = "",
-    usernamePlaceholder = ""
-  } Nothing, Cmd.batch [
-    Task.perform Tick Time.now,
-    Random.generate (SetField UsernamePlaceholder) Names.generator
-  ]
-  )
+  let
+    formFields : FormFields
+    formFields = {
+      gameId = (case url.fragment of
+        Just f -> f
+        Nothing -> ""
+      ),
+      username = "",
+      usernamePlaceholder = ""
+      }
+  in
+    ( Model key url NoGame Nothing False Nothing Array.empty Nothing Nothing PortFunnels.initialState formFields Nothing, Cmd.batch [
+      Task.perform Tick Time.now,
+      Random.generate (SetField UsernamePlaceholder) Names.generator
+    ]
+    )
 
 
 reportError : String -> Model -> Model
@@ -442,7 +449,7 @@ viewNav model =
       Just id ->
         [
           li [ class "pure-menu-item" ] [ span [ class "pure-menu-link" ] [ text "Share this link to invite other people to join:" ] ],
-          let url = id |> getGameLink |> Url.toString
+          let url = model |> getGameLink |> Url.toString
           in
             li [ class "pure-menu-item pure-menu-selected" ] [ a [ class "pure-menu-link", href url, onClick NoAction ] [ text url ] ]
         ])
@@ -543,14 +550,15 @@ viewLanding model =
         placeholder model.formFields.usernamePlaceholder,
         required True,
         onInput <| SetField UsernameField,
-        autocomplete True
+        autocomplete True,
+        value model.formFields.username
       ] []
     ],
     Html.form [ class "landing-join", onSubmit JoinGame ]  [
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
         text "Join a running game"
       ],
-      input [ placeholder "GameId", required True, onInput <| SetField GameIdField ] []
+      input [ placeholder "GameId", required True, onInput <| SetField GameIdField, value model.formFields.gameId ] []
     ],
     button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ]
   ]
@@ -561,7 +569,7 @@ viewLobby model =
     div [ class "game-link-presentation" ] [
       div [ class "text-muted" ] [ text "Share the following link to let other people join:" ],
       let
-        url = getGameLink (Maybe.withDefault "???" model.gameId)
+        url = getGameLink model
       in
         a [ class "game-link-large text-tt", href (Url.toString url), target "_blank", rel "noopener noreferrer" ] [
           span [ class "game-link-protocol" ] [ text (
@@ -569,8 +577,8 @@ viewLobby model =
             Url.Http -> "http://"
             Url.Https -> "https://"
           ) ],
-          span [ class "game-link-host" ] [ text url.host ],
-          span [ class "game-link-path" ] [ text url.path ]
+          span [ class "game-link-host" ] [ text (url.host ++ url.path) ],
+          span [ class "game-link-path" ] [ text ("#" ++ (url.fragment |> Maybe.withDefault "")) ]
         ]
     ],
     if model.amAdministrator then
@@ -590,9 +598,19 @@ formatTimeDifference seconds =
   ++ ":"
   ++ String.padLeft 2 '0' (String.fromInt (remainderBy 60 seconds |> abs))
 
-getGameLink : String -> Url.Url
-getGameLink gameId =
-  ("https://game.dev/" ++ gameId) |> Url.fromString |> Maybe.withDefault (Url.Url Url.Https "" Nothing "" Nothing Nothing)
+getGameLink : Model -> Url.Url
+getGameLink model =
+  let
+    url = model.url
+  in
+    case model.gameId of
+      Just gameId ->
+        { url | fragment = Just gameId }
+      Nothing ->
+        url
+  -- ("https://game.dev/#" ++ Maybe.withDefault gameId "")
+  --   |> Url.fromString
+  --   |> Maybe.withDefault (Url.Url Url.Https "" Nothing "" Nothing Nothing)
 
 hasGameStarted : Model -> Bool
 hasGameStarted model =
