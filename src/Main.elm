@@ -8,6 +8,7 @@ import Html.Events exposing (onClick, onSubmit, onInput)
 import Json.Encode as JE
 import Json.Decode as JD
 import Url
+import Dict exposing (Dict)
 import Debug
 import Time
 import Task
@@ -45,6 +46,10 @@ wsUrl = "ws://192.168.1.11:3030/ws"
 -- PORTS
 
 port errorPort : String -> Cmd msg
+
+port confirmPort : (String, Int) -> Cmd msg
+
+port confirmReturnPort : ((Bool, Int) -> msg) -> Sub msg
 
 cmdPort : JE.Value -> Cmd Msg
 cmdPort =
@@ -95,6 +100,8 @@ type alias Model =
   , uuid : Maybe String
   , funnelState : PortFunnels.State
   , formFields : FormFields
+  , pendingDialogs : Dict Int Msg
+  , nextDialogId : Int
   , error : Maybe String
   }
 
@@ -115,7 +122,7 @@ init flags url key =
     model = Model
       key url NoGame Nothing False Nothing
       Array.empty Nothing Nothing (PortFunnels.initialState "drawtice")
-      formFields Nothing
+      formFields Dict.empty 0 Nothing
   in
     ( model, Cmd.batch [
       Task.perform Tick Time.now,
@@ -146,6 +153,8 @@ type Msg
   | StorageReceive String (Maybe String)
   | ShowError String
   | RemoveError
+  | ShowConfirmDialog String Msg
+  | ShownConfirmDialog (Bool, Int)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -302,6 +311,31 @@ update msg model =
     RemoveError ->
       ({ model | error = Nothing }, Cmd.none)
 
+    ShowConfirmDialog message newMsg ->
+      let
+        nextDialogId = model.nextDialogId
+        dict = model.pendingDialogs |> Dict.insert nextDialogId newMsg
+      in
+        (
+          { model | pendingDialogs = dict, nextDialogId = nextDialogId + 1 },
+          confirmPort (message, nextDialogId)
+        )
+
+    ShownConfirmDialog (pressed, dialogId) ->
+      let
+        dict = model.pendingDialogs |> Dict.remove dialogId
+        newMsg = model.pendingDialogs |> Dict.get dialogId
+        mdl = { model | pendingDialogs = dict }
+      in
+        if pressed then
+          case newMsg of
+            Just m ->
+              update m mdl
+            Nothing ->
+              (mdl, Cmd.none)
+        else
+          (mdl, Cmd.none)
+
 setField : Model -> FormField -> String -> Model
 setField model field value =
   case field of
@@ -448,7 +482,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch [
     Time.every 1000 Tick,
-    PortFunnels.subscriptions Receive model
+    PortFunnels.subscriptions Receive model,
+    confirmReturnPort ShownConfirmDialog
   ]
 
 
@@ -577,7 +612,11 @@ viewPlayer model id player =
       Stuck ->
         (text "Hit a wall")
     ) :: (if model.amAdministrator then
-      [ a [ class "kick-button", href "#", onClick (KickPlayer id) ] [ text "❌" ] ]
+      [ a
+        [ class "kick-button"
+        , href "#"
+        , onClick (KickPlayer id |> ShowConfirmDialog ("Are you sure you want to kick " ++ player.username ++ "?"))
+         ] [ text "❌" ] ]
       else []
     ))
   ]

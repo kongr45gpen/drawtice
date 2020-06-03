@@ -5244,8 +5244,12 @@ var $author$project$Main$Model = function (key) {
 								return function (uuid) {
 									return function (funnelState) {
 										return function (formFields) {
-											return function (error) {
-												return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, myId: myId, players: players, status: status, url: url, uuid: uuid};
+											return function (pendingDialogs) {
+												return function (nextDialogId) {
+													return function (error) {
+														return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, status: status, url: url, uuid: uuid};
+													};
+												};
 											};
 										};
 									};
@@ -5268,6 +5272,8 @@ var $author$project$Main$Tick = function (a) {
 };
 var $author$project$Main$UsernamePlaceholder = {$: 'UsernamePlaceholder'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
 };
@@ -5562,8 +5568,6 @@ var $elm$core$Dict$get = F2(
 		}
 	});
 var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -6868,7 +6872,7 @@ var $author$project$Main$init = F3(
 			usernamePlaceholder: ''
 		};
 		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
-			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Maybe$Nothing);
+			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
 			$elm$core$Platform$Cmd$batch(
@@ -6882,7 +6886,28 @@ var $author$project$Main$init = F3(
 						A2($author$project$Main$getLocalStorageString, model, 'username')
 					])));
 	});
+var $author$project$Main$ShownConfirmDialog = function (a) {
+	return {$: 'ShownConfirmDialog', a: a};
+};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$json$Json$Decode$index = _Json_decodeIndex;
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $author$project$Main$confirmReturnPort = _Platform_incomingPort(
+	'confirmReturnPort',
+	A2(
+		$elm$json$Json$Decode$andThen,
+		function (_v0) {
+			return A2(
+				$elm$json$Json$Decode$andThen,
+				function (_v1) {
+					return $elm$json$Json$Decode$succeed(
+						_Utils_Tuple2(_v0, _v1));
+				},
+				A2($elm$json$Json$Decode$index, 1, $elm$json$Json$Decode$int));
+		},
+		A2($elm$json$Json$Decode$index, 0, $elm$json$Json$Decode$bool)));
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -7125,7 +7150,8 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[
 				A2($elm$time$Time$every, 1000, $author$project$Main$Tick),
-				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model)
+				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model),
+				$author$project$Main$confirmReturnPort($author$project$Main$ShownConfirmDialog)
 			]));
 };
 var $author$project$Protocol$ErrorResponse = function (a) {
@@ -7217,6 +7243,21 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeToString = 
 			return 'UnknownClosureCode';
 	}
 };
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $author$project$Main$confirmPort = _Platform_outgoingPort(
+	'confirmPort',
+	function ($) {
+		var a = $.a;
+		var b = $.b;
+		return A2(
+			$elm$json$Json$Encode$list,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					$elm$json$Json$Encode$string(a),
+					$elm$json$Json$Encode$int(b)
+				]));
+	});
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Main$ShowError = function (a) {
 	return {$: 'ShowError', a: a};
@@ -7382,7 +7423,6 @@ var $author$project$Protocol$PlayerDetails = F4(
 	function (username, imageUrl, status, isAdmin) {
 		return {imageUrl: imageUrl, isAdmin: isAdmin, status: status, username: username};
 	});
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$map4 = _Json_map4;
 var $author$project$Protocol$Done = {$: 'Done'};
 var $author$project$Protocol$Stuck = {$: 'Stuck'};
@@ -7517,7 +7557,6 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $elm$json$Json$Encode$int = _Json_wrap;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleName = 'WebSocket';
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (mess) {
 	var gm = F2(
@@ -7931,9 +7970,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWill
 	return {$: 'PWillSend', a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$Startup = {$: 'Startup'};
-var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
-var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$fail = _Json_fail;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3(
 	function (pathDecoder, valDecoder, fallback) {
@@ -9398,13 +9435,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v15 = decodeData(parser.a);
-					if (_v15.$ === 'Err') {
-						var e = _v15.a;
+					var _v17 = decodeData(parser.a);
+					if (_v17.$ === 'Err') {
+						var e = _v17.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v15.a;
+						var v = _v17.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9455,15 +9492,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v16 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v16.b) {
+				var _v18 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v18.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v16.a.$ === 'ReconnectedResponse') && (!_v16.b.b)) {
-						var r = _v16.a.a;
+					if ((_v18.a.$ === 'ReconnectedResponse') && (!_v18.b.b)) {
+						var r = _v18.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v16;
+						var list = _v18;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -9497,160 +9534,269 @@ var $author$project$Main$storageHandler = F3(
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'LinkClicked':
-				var urlRequest = msg.a;
-				if (urlRequest.$ === 'Internal') {
-					var url = urlRequest.a;
+		update:
+		while (true) {
+			switch (msg.$) {
+				case 'LinkClicked':
+					var urlRequest = msg.a;
+					if (urlRequest.$ === 'Internal') {
+						var url = urlRequest.a;
+						return _Utils_Tuple2(
+							model,
+							A2(
+								$elm$browser$Browser$Navigation$pushUrl,
+								model.key,
+								$elm$url$Url$toString(url)));
+					} else {
+						var href = urlRequest.a;
+						return _Utils_Tuple2(
+							model,
+							$elm$browser$Browser$Navigation$load(href));
+					}
+				case 'UrlChanged':
+					var url = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{url: url}),
+						$elm$core$Platform$Cmd$none);
+				case 'Tick':
+					var newTime = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								lastUpdate: $elm$core$Maybe$Just(newTime),
+								players: function () {
+									var _v2 = model.lastUpdate;
+									if (_v2.$ === 'Nothing') {
+										return model.players;
+									} else {
+										var lastUpdate = _v2.a;
+										return A2(
+											$elm$core$Array$map,
+											$author$project$Main$updatePlayerTime(
+												A2($author$project$Main$posixTimeDifferenceSeconds, newTime, lastUpdate)),
+											model.players);
+									}
+								}()
+							}),
+						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected, $author$project$Main$wsKey, model.funnelState.websocket) ? $elm$core$Platform$Cmd$none : $elm$core$Platform$Cmd$none);
+				case 'NoAction':
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'NewGame':
+					return _Utils_Tuple2(
+						model,
+						$elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									$author$project$Main$sendSocketCommand(
+									$author$project$Protocol$NewGameCommand(model.formFields.username)),
+									A3($author$project$Main$putLocalStorageString, model, 'username', model.formFields.username)
+								])));
+				case 'JoinGame':
+					return _Utils_Tuple2(
+						model,
+						$elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									$author$project$Main$sendSocketCommand(
+									A2($author$project$Protocol$JoinCommand, model.formFields.gameId, model.formFields.username)),
+									A3($author$project$Main$putLocalStorageString, model, 'username', model.formFields.username)
+								])));
+				case 'StartGame':
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand($author$project$Protocol$StartCommand));
+				case 'LeaveGame':
+					return _Utils_Tuple2(
+						$author$project$Main$leaveGame(model),
+						$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
+				case 'KickPlayer':
+					var value = msg.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand(
+							$author$project$Protocol$KickCommand(value)));
+				case 'SetField':
+					var field = msg.a;
+					var value = msg.b;
+					return _Utils_Tuple2(
+						A3($author$project$Main$setField, model, field, value),
+						$elm$core$Platform$Cmd$none);
+				case 'Send':
+					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
 						A2(
-							$elm$browser$Browser$Navigation$pushUrl,
-							model.key,
-							$elm$url$Url$toString(url)));
-				} else {
-					var href = urlRequest.a;
-					return _Utils_Tuple2(
-						model,
-						$elm$browser$Browser$Navigation$load(href));
-				}
-			case 'UrlChanged':
-				var url = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{url: url}),
-					$elm$core$Platform$Cmd$none);
-			case 'Tick':
-				var newTime = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							lastUpdate: $elm$core$Maybe$Just(newTime),
-							players: function () {
-								var _v2 = model.lastUpdate;
-								if (_v2.$ === 'Nothing') {
-									return model.players;
-								} else {
-									var lastUpdate = _v2.a;
-									return A2(
-										$elm$core$Array$map,
-										$author$project$Main$updatePlayerTime(
-											A2($author$project$Main$posixTimeDifferenceSeconds, newTime, lastUpdate)),
-										model.players);
-								}
-							}()
-						}),
-					A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected, $author$project$Main$wsKey, model.funnelState.websocket) ? $elm$core$Platform$Cmd$none : $elm$core$Platform$Cmd$none);
-			case 'NoAction':
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'NewGame':
-				return _Utils_Tuple2(
-					model,
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								$author$project$Main$sendSocketCommand(
-								$author$project$Protocol$NewGameCommand(model.formFields.username)),
-								A3($author$project$Main$putLocalStorageString, model, 'username', model.formFields.username)
-							])));
-			case 'JoinGame':
-				return _Utils_Tuple2(
-					model,
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								$author$project$Main$sendSocketCommand(
-								A2($author$project$Protocol$JoinCommand, model.formFields.gameId, model.formFields.username)),
-								A3($author$project$Main$putLocalStorageString, model, 'username', model.formFields.username)
-							])));
-			case 'StartGame':
-				return _Utils_Tuple2(
-					model,
-					$author$project$Main$sendSocketCommand($author$project$Protocol$StartCommand));
-			case 'LeaveGame':
-				return _Utils_Tuple2(
-					$author$project$Main$leaveGame(model),
-					$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
-			case 'KickPlayer':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					model,
-					$author$project$Main$sendSocketCommand(
-						$author$project$Protocol$KickCommand(value)));
-			case 'SetField':
-				var field = msg.a;
-				var value = msg.b;
-				return _Utils_Tuple2(
-					A3($author$project$Main$setField, model, field, value),
-					$elm$core$Platform$Cmd$none);
-			case 'Send':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					model,
-					A2(
-						$elm$core$Debug$log,
-						'Send ' + A2($elm$json$Json$Encode$encode, 0, value),
-						$author$project$Main$cmdPort(value)));
-			case 'Receive':
-				var value = msg.a;
-				var _v3 = A4(
-					$author$project$PortFunnels$processValue,
-					$author$project$Main$cyclic$funnelDict(),
-					value,
-					model.funnelState,
-					model);
-				if (_v3.$ === 'Err') {
-					var error = _v3.a;
-					return _Utils_Tuple2(
-						model,
-						$author$project$Main$errorLog(error));
-				} else {
-					var res = _v3.a;
-					var modul = A2(
-						$elm$core$Result$withDefault,
-						'none',
-						A2(
-							$elm$json$Json$Decode$decodeValue,
-							A2($elm$json$Json$Decode$field, 'module', $elm$json$Json$Decode$string),
-							value));
-					if (modul === 'WebSocket') {
-						var _v4 = A2(
-							$elm$json$Json$Decode$decodeValue,
-							A2($elm$json$Json$Decode$field, 'tag', $elm$json$Json$Decode$string),
-							value);
-						if ((_v4.$ === 'Ok') && (_v4.a === 'startup')) {
-							return A2(
-								$Janiczek$cmd_extra$Cmd$Extra$addCmd,
-								$author$project$Main$sendWebSocket(
-									A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$makeOpenWithKey, $author$project$Main$wsKey, $author$project$Main$wsUrl)),
-								res);
+							$elm$core$Debug$log,
+							'Send ' + A2($elm$json$Json$Encode$encode, 0, value),
+							$author$project$Main$cmdPort(value)));
+				case 'Receive':
+					var value = msg.a;
+					var _v3 = A4(
+						$author$project$PortFunnels$processValue,
+						$author$project$Main$cyclic$funnelDict(),
+						value,
+						model.funnelState,
+						model);
+					if (_v3.$ === 'Err') {
+						var error = _v3.a;
+						return _Utils_Tuple2(
+							model,
+							$author$project$Main$errorLog(error));
+					} else {
+						var res = _v3.a;
+						var modul = A2(
+							$elm$core$Result$withDefault,
+							'none',
+							A2(
+								$elm$json$Json$Decode$decodeValue,
+								A2($elm$json$Json$Decode$field, 'module', $elm$json$Json$Decode$string),
+								value));
+						if (modul === 'WebSocket') {
+							var _v4 = A2(
+								$elm$json$Json$Decode$decodeValue,
+								A2($elm$json$Json$Decode$field, 'tag', $elm$json$Json$Decode$string),
+								value);
+							if ((_v4.$ === 'Ok') && (_v4.a === 'startup')) {
+								return A2(
+									$Janiczek$cmd_extra$Cmd$Extra$addCmd,
+									$author$project$Main$sendWebSocket(
+										A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$makeOpenWithKey, $author$project$Main$wsKey, $author$project$Main$wsUrl)),
+									res);
+							} else {
+								return res;
+							}
 						} else {
 							return res;
 						}
-					} else {
-						return res;
 					}
-				}
-			case 'StorageReceive':
-				var key = msg.a;
-				var value = msg.b;
-				switch (key) {
-					case 'username':
-						var formFieldsOld = model.formFields;
-						var formFieldsNew = _Utils_update(
-							formFieldsOld,
-							{
-								username: A2($elm$core$Maybe$withDefault, '', value)
-							});
-						return _Utils_Tuple2(
-							_Utils_update(
+				case 'StorageReceive':
+					var key = msg.a;
+					var value = msg.b;
+					switch (key) {
+						case 'username':
+							var formFieldsOld = model.formFields;
+							var formFieldsNew = _Utils_update(
+								formFieldsOld,
+								{
+									username: A2($elm$core$Maybe$withDefault, '', value)
+								});
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{formFields: formFieldsNew}),
+								$elm$core$Platform$Cmd$none);
+						case 'uuid':
+							if (value.$ === 'Just') {
+								var uuid = value.a;
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											uuid: $elm$core$Maybe$Just(uuid)
+										}),
+									$author$project$Main$sendSocketCommand(
+										$author$project$Protocol$UuidCommand(uuid)));
+							} else {
+								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+							}
+						default:
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				case 'SocketReceive':
+					var value = msg.a;
+					switch (value.$) {
+						case 'GameDetailsResponse':
+							var details = value.a;
+							var playerCreator = F2(
+								function (id, player) {
+									return {
+										image: player.imageUrl,
+										isAdministrator: player.isAdmin,
+										isMe: A2(
+											$elm$core$Maybe$withDefault,
+											false,
+											A2(
+												$elm$core$Maybe$map,
+												function (i) {
+													return _Utils_eq(i, id);
+												},
+												model.myId)),
+										status: player.status,
+										username: player.username
+									};
+								});
+							var players = A2(
+								$elm$core$Array$indexedMap,
+								playerCreator,
+								$elm$core$Array$fromList(details.players));
+							var me = A2(
+								$elm$core$Maybe$andThen,
+								function (id) {
+									return A2($elm$core$Array$get, id, players);
+								},
+								model.myId);
+							var formFieldsOld = model.formFields;
+							var formFieldsNew = function () {
+								if (me.$ === 'Just') {
+									var player = me.a;
+									return _Utils_update(
+										formFieldsOld,
+										{username: player.username});
+								} else {
+									return formFieldsOld;
+								}
+							}();
+							var mdl = _Utils_update(
 								model,
-								{formFields: formFieldsNew}),
-							$elm$core$Platform$Cmd$none);
-					case 'uuid':
-						if (value.$ === 'Just') {
+								{
+									formFields: formFieldsNew,
+									gameId: $elm$core$Maybe$Just(details.alias),
+									players: players,
+									status: details.status
+								});
+							return _Utils_Tuple2(
+								mdl,
+								function () {
+									if (me.$ === 'Just') {
+										var player = me.a;
+										return A3($author$project$Main$putLocalStorageString, mdl, 'username', player.username);
+									} else {
+										return $elm$core$Platform$Cmd$none;
+									}
+								}());
+						case 'ErrorResponse':
+							var error = value.a;
+							return _Utils_Tuple2(
+								model,
+								$author$project$Main$errorLog(error));
+						case 'PongResponse':
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						case 'PersonalDetailsResponse':
+							var details = value.a;
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										amAdministrator: details.amAdministrator,
+										myId: $elm$core$Maybe$Just(details.myId),
+										players: A2(
+											$elm$core$Array$indexedMap,
+											function (i) {
+												return function (p) {
+													return _Utils_update(
+														p,
+														{
+															isMe: _Utils_eq(i, details.myId)
+														});
+												};
+											},
+											model.players)
+									}),
+								$elm$core$Platform$Cmd$none);
+						case 'UuidResponse':
 							var uuid = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
@@ -9658,134 +9804,62 @@ var $author$project$Main$update = F2(
 									{
 										uuid: $elm$core$Maybe$Just(uuid)
 									}),
-								$author$project$Main$sendSocketCommand(
-									$author$project$Protocol$UuidCommand(uuid)));
-						} else {
-							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-						}
-					default:
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
-			case 'SocketReceive':
-				var value = msg.a;
-				switch (value.$) {
-					case 'GameDetailsResponse':
-						var details = value.a;
-						var playerCreator = F2(
-							function (id, player) {
-								return {
-									image: player.imageUrl,
-									isAdministrator: player.isAdmin,
-									isMe: A2(
-										$elm$core$Maybe$withDefault,
-										false,
-										A2(
-											$elm$core$Maybe$map,
-											function (i) {
-												return _Utils_eq(i, id);
-											},
-											model.myId)),
-									status: player.status,
-									username: player.username
-								};
-							});
-						var players = A2(
-							$elm$core$Array$indexedMap,
-							playerCreator,
-							$elm$core$Array$fromList(details.players));
-						var me = A2(
-							$elm$core$Maybe$andThen,
-							function (id) {
-								return A2($elm$core$Array$get, id, players);
-							},
-							model.myId);
-						var formFieldsOld = model.formFields;
-						var formFieldsNew = function () {
-							if (me.$ === 'Just') {
-								var player = me.a;
-								return _Utils_update(
-									formFieldsOld,
-									{username: player.username});
-							} else {
-								return formFieldsOld;
-							}
-						}();
-						var mdl = _Utils_update(
+								A3($author$project$Main$putLocalStorageString, model, 'uuid', uuid));
+						default:
+							return _Utils_Tuple2(
+								$author$project$Main$leaveGame(model),
+								$elm$core$Platform$Cmd$none);
+					}
+				case 'ShowError':
+					var value = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
 							model,
 							{
-								formFields: formFieldsNew,
-								gameId: $elm$core$Maybe$Just(details.alias),
-								players: players,
-								status: details.status
-							});
-						return _Utils_Tuple2(
-							mdl,
-							function () {
-								if (me.$ === 'Just') {
-									var player = me.a;
-									return A3($author$project$Main$putLocalStorageString, mdl, 'username', player.username);
-								} else {
-									return $elm$core$Platform$Cmd$none;
-								}
-							}());
-					case 'ErrorResponse':
-						var error = value.a;
-						return _Utils_Tuple2(
+								error: $elm$core$Maybe$Just(value)
+							}),
+						$elm$core$Platform$Cmd$none);
+				case 'RemoveError':
+					return _Utils_Tuple2(
+						_Utils_update(
 							model,
-							$author$project$Main$errorLog(error));
-					case 'PongResponse':
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					case 'PersonalDetailsResponse':
-						var details = value.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									amAdministrator: details.amAdministrator,
-									myId: $elm$core$Maybe$Just(details.myId),
-									players: A2(
-										$elm$core$Array$indexedMap,
-										function (i) {
-											return function (p) {
-												return _Utils_update(
-													p,
-													{
-														isMe: _Utils_eq(i, details.myId)
-													});
-											};
-										},
-										model.players)
-								}),
-							$elm$core$Platform$Cmd$none);
-					case 'UuidResponse':
-						var uuid = value.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									uuid: $elm$core$Maybe$Just(uuid)
-								}),
-							A3($author$project$Main$putLocalStorageString, model, 'uuid', uuid));
-					default:
-						return _Utils_Tuple2(
-							$author$project$Main$leaveGame(model),
-							$elm$core$Platform$Cmd$none);
-				}
-			case 'ShowError':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
+							{error: $elm$core$Maybe$Nothing}),
+						$elm$core$Platform$Cmd$none);
+				case 'ShowConfirmDialog':
+					var message = msg.a;
+					var newMsg = msg.b;
+					var nextDialogId = model.nextDialogId;
+					var dict = A3($elm$core$Dict$insert, nextDialogId, newMsg, model.pendingDialogs);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{nextDialogId: nextDialogId + 1, pendingDialogs: dict}),
+						$author$project$Main$confirmPort(
+							_Utils_Tuple2(message, nextDialogId)));
+				default:
+					var _v10 = msg.a;
+					var pressed = _v10.a;
+					var dialogId = _v10.b;
+					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
+					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
+					var mdl = _Utils_update(
 						model,
-						{
-							error: $elm$core$Maybe$Just(value)
-						}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{error: $elm$core$Maybe$Nothing}),
-					$elm$core$Platform$Cmd$none);
+						{pendingDialogs: dict});
+					if (pressed) {
+						if (newMsg.$ === 'Just') {
+							var m = newMsg.a;
+							var $temp$msg = m,
+								$temp$model = mdl;
+							msg = $temp$msg;
+							model = $temp$model;
+							continue update;
+						} else {
+							return _Utils_Tuple2(mdl, $elm$core$Platform$Cmd$none);
+						}
+					} else {
+						return _Utils_Tuple2(mdl, $elm$core$Platform$Cmd$none);
+					}
+			}
 		}
 	});
 function $author$project$Main$cyclic$funnelDict() {
@@ -9793,7 +9867,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v17, _v18) {
+			function (_v19, _v20) {
 				return $author$project$Main$cmdPort;
 			}));
 }
@@ -10620,6 +10694,10 @@ var $elm$core$Array$isEmpty = function (_v0) {
 var $author$project$Main$KickPlayer = function (a) {
 	return {$: 'KickPlayer', a: a};
 };
+var $author$project$Main$ShowConfirmDialog = F2(
+	function (a, b) {
+		return {$: 'ShowConfirmDialog', a: a, b: b};
+	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$viewPlayer = F3(
@@ -10676,7 +10754,10 @@ var $author$project$Main$viewPlayer = F3(
 										$elm$html$Html$Attributes$class('kick-button'),
 										$elm$html$Html$Attributes$href('#'),
 										$elm$html$Html$Events$onClick(
-										$author$project$Main$KickPlayer(id))
+										A2(
+											$author$project$Main$ShowConfirmDialog,
+											'Are you sure you want to kick ' + (player.username + '?'),
+											$author$project$Main$KickPlayer(id)))
 									]),
 								_List_fromArray(
 									[

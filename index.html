@@ -41,10 +41,18 @@ PortFunnel.subscribe(app);
     });
   }
 
+  app.ports.confirmPort.subscribe(function(data) {
+    text = data[0];
+    id = data[1];
+
+    app.ports.confirmReturnPort.send([window.confirm(text), id])
+  });
+
   // Debugging
-  ports.cmdPort.subscribe(function (string) {
-      console.log(string);
-  })
+//   ports.cmdPort.subscribe(function (string) {
+//       console.log(string);
+//   })
+
 })();
 
     </script>
