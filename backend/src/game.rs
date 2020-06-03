@@ -104,6 +104,14 @@ impl Game {
             .collect()
     }
 
+    /// Start the game, letting all players play
+    pub fn start(&mut self) {
+        self.game_status = GameStatus::Understanding;
+        for player in self.players.iter_mut() {
+            player.status = PlayerStatus::Working;
+        }
+    }
+
     /// End the game, removing all players
     pub fn end(&mut self) {
         self.players.clear();

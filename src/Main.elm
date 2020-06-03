@@ -134,8 +134,9 @@ type Msg
   | UrlChanged Url.Url
   | Tick Time.Posix
   | NoAction
-  | StartGame
+  | NewGame
   | JoinGame
+  | StartGame
   | LeaveGame
   | KickPlayer Int
   | SetField FormField String
@@ -180,9 +181,9 @@ update msg model =
     NoAction ->
       (model, Cmd.none)
 
-    StartGame ->
+    NewGame ->
       (model, Cmd.batch [
-        sendSocketCommand (StartCommand model.formFields.username),
+        sendSocketCommand (NewGameCommand model.formFields.username),
         putLocalStorageString model "username" model.formFields.username
       ])
 
@@ -191,6 +192,9 @@ update msg model =
         sendSocketCommand (JoinCommand model.formFields.gameId model.formFields.username),
         putLocalStorageString model "username" model.formFields.username
       ])
+
+    StartGame ->
+      (model, sendSocketCommand StartCommand)
 
     LeaveGame ->
       (leaveGame model, sendSocketCommand LeaveCommand)
@@ -257,12 +261,25 @@ update msg model =
                 isAdministrator = player.isAdmin
               }
             players = Array.indexedMap playerCreator (Array.fromList details.players)
-          in
-            ({ model
+            me = model.myId |> Maybe.andThen (\id -> Array.get id players)
+            formFieldsOld = model.formFields
+            formFieldsNew = case me of
+              Just player ->
+                { formFieldsOld | username = player.username }
+              Nothing ->
+                formFieldsOld
+            mdl = { model
               | gameId = Just details.alias
               , status = details.status
-              , players = players }
-            , Cmd.none)
+              , players = players
+              , formFields = formFieldsNew }
+          in
+            ( mdl, case me of
+              Just player ->
+                putLocalStorageString mdl "username" player.username
+              Nothing ->
+                Cmd.none
+            )
         Protocol.ErrorResponse error ->
           (model, errorLog error)
         Protocol.PongResponse ->
@@ -414,7 +431,7 @@ socketHandler response state mdl =
 
 sendSocketCommand : SocketCommand -> Cmd Msg
 sendSocketCommand command =
-  command |> prepareSocketCommand |> JE.encode 0 |> WebSocket.makeSend wsKey |> sendWebSocket
+  command |> Protocol.prepareSocketCommand |> JE.encode 0 |> WebSocket.makeSend wsKey |> sendWebSocket
 
 getLocalStorageString : Model -> String -> Cmd Msg
 getLocalStorageString model key =
@@ -423,45 +440,6 @@ getLocalStorageString model key =
 putLocalStorageString : Model -> String -> String -> Cmd Msg
 putLocalStorageString model key value =
   LocalStorage.put key (Just <| JE.string value) |> sendLocalStorage model
-
-prepareSocketCommand : SocketCommand -> JE.Value
-prepareSocketCommand command =
-  case command of
-    Ping ->
-      prepareSocketCommandJson "ping" Nothing
-    StartCommand username ->
-      prepareSocketCommandJson "start_game" (Just (JE.object
-        [ ( "username", JE.string username ) ]
-      ))
-    LeaveCommand ->
-      prepareSocketCommandJson "leave_game" Nothing
-    JoinCommand gameId username ->
-      prepareSocketCommandJson "join_game" (Just (JE.object
-        [ ( "game_id", JE.string gameId)
-        , ( "username", JE.string username )
-        ]
-      ))
-    KickCommand playerId ->
-      prepareSocketCommandJson "kick_player" (Just (JE.object
-        [ ( "player_id", JE.int playerId ) ]
-      ))
-    UuidCommand uuid ->
-      prepareSocketCommandJson "my_uuid" (Just (JE.string
-        uuid
-      ))
-
-
-prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value
-prepareSocketCommandJson commandType data =
-  case data of
-    Nothing ->
-      JE.object [ ( "type", JE.string commandType ) ]
-    Just d ->
-      JE.object
-        [ ( "type", JE.string commandType ),
-        ( "data", d )
-        ]
-
 
 -- SUBSCRIPTIONS
 
@@ -599,7 +577,7 @@ viewPlayer model id player =
       Stuck ->
         (text "Hit a wall")
     ) :: (if model.amAdministrator then
-      [ a [ href "#", onClick (KickPlayer id) ] [ text "❌" ] ]
+      [ a [ class "kick-button", href "#", onClick (KickPlayer id) ] [ text "❌" ] ]
       else []
     ))
   ]
@@ -623,12 +601,12 @@ viewLanding model =
       ],
       input [ placeholder "GameId", required True, onInput <| SetField GameIdField, value model.formFields.gameId ] []
     ],
-    button [ class "pure-button pure-button-primary landing-button", onClick StartGame ] [ text "Start a New Game" ]
+    button [ class "pure-button pure-button-primary landing-button", onClick NewGame ] [ text "Start a New Game" ]
   ]
 
 viewLobby : Model -> Html Msg
 viewLobby model =
-  section [ class "lobby hall" ] [
+  section [ class "lobby hall" ] (
     div [ class "game-link-presentation" ] [
       div [ class "text-muted" ] [ text "Share the following link to let other people join:" ],
       let
@@ -640,15 +618,19 @@ viewLobby model =
             Url.Http -> "http://"
             Url.Https -> "https://"
           ) ],
-          span [ class "game-link-host" ] [ text (url.host ++ url.path) ],
+          span [ class "game-link-host" ] [ text (url.host ++ (url.port_ |> Maybe.map (\p -> ":" ++ String.fromInt p) |> Maybe.withDefault "") ++ url.path ) ],
           span [ class "game-link-path" ] [ text ("#" ++ (url.fragment |> Maybe.withDefault "")) ]
         ]
-    ],
+    ]
+   ::
     if model.amAdministrator then
-      button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Cancel Game" ]
+      [
+        button [ class "pure-button pure-button landing-button", onClick LeaveGame ] [ text "Cancel Game" ],
+        button [ class "pure-button pure-button-success landing-button", disabled (Array.length model.players <= 1), onClick StartGame ] [ text "Start Game" ]
+      ]
     else
-      button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Leave Game" ]
-  ]
+      [ button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Leave Game" ] ]
+  )
 
 viewPlayerAvatar : Player -> Html msg
 viewPlayerAvatar player =

@@ -1,14 +1,16 @@
 module Protocol exposing (..)
 
 import Json.Decode exposing (..)
+import Json.Encode as JE
 
 -- BASIC DEFINITIONS
 
 type SocketCommand
   = Ping
-  | StartCommand String
+  | NewGameCommand String
   | JoinCommand String String
   | KickCommand Int
+  | StartCommand
   | LeaveCommand
   | UuidCommand String
 
@@ -45,6 +47,47 @@ type Response
   | PersonalDetailsResponse PersonalDetails
   | UuidResponse String
   | LeftGameResponse
+
+-- JSON COMMAND ENCODERS
+prepareSocketCommand : SocketCommand -> JE.Value
+prepareSocketCommand command =
+  case command of
+    Ping ->
+      prepareSocketCommandJson "ping" Nothing
+    NewGameCommand username ->
+      prepareSocketCommandJson "new_game" (Just (JE.object
+        [ ( "username", JE.string username ) ]
+      ))
+    LeaveCommand ->
+      prepareSocketCommandJson "leave_game" Nothing
+    JoinCommand gameId username ->
+      prepareSocketCommandJson "join_game" (Just (JE.object
+        [ ( "game_id", JE.string gameId)
+        , ( "username", JE.string username )
+        ]
+      ))
+    StartCommand ->
+      prepareSocketCommandJson "start_game" Nothing
+    KickCommand playerId ->
+      prepareSocketCommandJson "kick_player" (Just (JE.object
+        [ ( "player_id", JE.int playerId ) ]
+      ))
+    UuidCommand uuid ->
+      prepareSocketCommandJson "my_uuid" (Just (JE.string
+        uuid
+      ))
+
+
+prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value
+prepareSocketCommandJson commandType data =
+  case data of
+    Nothing ->
+      JE.object [ ( "type", JE.string commandType ) ]
+    Just d ->
+      JE.object
+        [ ( "type", JE.string commandType ),
+        ( "data", d )
+        ]
 
 
 -- JSON RESPONSE PARSERS

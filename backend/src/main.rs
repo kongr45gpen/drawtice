@@ -97,6 +97,16 @@ impl User {
     }
 }
 
+impl Player {
+    #[must_use]
+    fn expect_admin(self: &Player) -> Result<(), protocol::Error> {
+        match self.is_admin {
+            true => Ok(()),
+            false => Err(protocol::Error::from("You do not have the permission to perform this action"))
+        }
+    }
+}
+
 impl Game {
     async fn tx_game(self: &Game, users: &Users, my_id: usize, response: protocol::Response<'_>, inclusive: bool) {
         tx_game(users, my_id, self.id, response, inclusive).await
@@ -267,7 +277,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
     match command {
         protocol::Command::Ping => (),
-        protocol::Command::StartGame(c) => {
+        protocol::Command::NewGame(c) => {
             // Create the administrator player based on the current user
             let player = Player::new(user.uuid, my_id,c.username.as_str(), true);
             let player2 = player.clone();
@@ -328,9 +338,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             let game = user.fetch_game_mut(games)?;
             let (kicker, _) = user.fetch_player(game)?;
 
-            if !kicker.is_admin {
-                return Err(protocol::Error::from("You don't have permission to kick that player"));
-            }
+            kicker.expect_admin()?;
 
             // Let the user(s) know they've been kicked
             // Alerts multiple user sessions
@@ -383,6 +391,14 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                     }
                 }
             }
+        },
+        protocol::Command::StartGame => {
+            let game = user.fetch_game_mut(games)?;
+            let (player, _) = user.fetch_player(game)?;
+            player.expect_admin()?;
+
+            game.start();
+            game.tx_game_details(users, false).await;
         }
     }
 

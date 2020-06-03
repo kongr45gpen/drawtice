@@ -44,8 +44,9 @@ impl std::error::Error for Error {
 #[derive(Debug)]
 pub enum Command {
     Ping,
-    StartGame(StartCommand),
+    NewGame(NewGameCommand),
     JoinGame(JoinCommand),
+    StartGame,
     LeaveGame,
     KickPlayer(KickCommand),
     MyUuid(String)
@@ -69,7 +70,7 @@ pub struct JoinCommand {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct StartCommand {
+pub struct NewGameCommand {
     #[serde(deserialize_with = "de_validate_nonempty")]
     pub username: String,
 }
@@ -110,9 +111,10 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
 
     let command = match command {
         "ping" => Command::Ping,
-        "start_game" => Command::StartGame(StartCommand::deserialize(data?)?),
+        "new_game" => Command::NewGame(NewGameCommand::deserialize(data?)?),
         "join_game" => Command::JoinGame(JoinCommand::deserialize(data?)?),
         "leave_game" => Command::LeaveGame,
+        "start_game" => Command::StartGame,
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
         "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
