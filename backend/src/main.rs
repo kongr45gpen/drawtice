@@ -323,6 +323,10 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                     .next()
                     .ok_or("Could not find a game with this name!")?;
 
+            if game.1.game_status != game::GameStatus::Lobby {
+                return Err(protocol::Error::from("I'm sorry, but this game is already running :/"));
+            }
+
             // Add the player to the game, if the game exists
             let player2 = player.clone();
             let player_id = game.1.add_player(player);

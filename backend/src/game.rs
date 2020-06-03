@@ -12,7 +12,7 @@ use crate::names;
 use std::vec::Vec;
 use std::iter;
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub enum PlayerStatus {
     Stuck,
     Done,
@@ -20,7 +20,7 @@ pub enum PlayerStatus {
     Uploading
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, PartialEq)]
 pub enum GameStatus {
     Lobby,
     Drawing,
