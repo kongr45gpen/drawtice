@@ -9435,13 +9435,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v17 = decodeData(parser.a);
-					if (_v17.$ === 'Err') {
-						var e = _v17.a;
+					var _v18 = decodeData(parser.a);
+					if (_v18.$ === 'Err') {
+						var e = _v18.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v17.a;
+						var v = _v18.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9492,15 +9492,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v18 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v18.b) {
+				var _v19 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v19.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v18.a.$ === 'ReconnectedResponse') && (!_v18.b.b)) {
-						var r = _v18.a.a;
+					if ((_v19.a.$ === 'ReconnectedResponse') && (!_v19.b.b)) {
+						var r = _v19.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v18;
+						var list = _v19;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -9555,10 +9555,22 @@ var $author$project$Main$update = F2(
 					}
 				case 'UrlChanged':
 					var url = msg.a;
+					var formFieldsOld = model.formFields;
+					var formFieldsNew = function () {
+						var _v2 = url.fragment;
+						if (_v2.$ === 'Just') {
+							var f = _v2.a;
+							return _Utils_update(
+								formFieldsOld,
+								{gameId: f});
+						} else {
+							return formFieldsOld;
+						}
+					}();
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{url: url}),
+							{formFields: formFieldsNew, url: url}),
 						$elm$core$Platform$Cmd$none);
 				case 'Tick':
 					var newTime = msg.a;
@@ -9568,11 +9580,11 @@ var $author$project$Main$update = F2(
 							{
 								lastUpdate: $elm$core$Maybe$Just(newTime),
 								players: function () {
-									var _v2 = model.lastUpdate;
-									if (_v2.$ === 'Nothing') {
+									var _v3 = model.lastUpdate;
+									if (_v3.$ === 'Nothing') {
 										return model.players;
 									} else {
-										var lastUpdate = _v2.a;
+										var lastUpdate = _v3.a;
 										return A2(
 											$elm$core$Array$map,
 											$author$project$Main$updatePlayerTime(
@@ -9634,19 +9646,19 @@ var $author$project$Main$update = F2(
 							$author$project$Main$cmdPort(value)));
 				case 'Receive':
 					var value = msg.a;
-					var _v3 = A4(
+					var _v4 = A4(
 						$author$project$PortFunnels$processValue,
 						$author$project$Main$cyclic$funnelDict(),
 						value,
 						model.funnelState,
 						model);
-					if (_v3.$ === 'Err') {
-						var error = _v3.a;
+					if (_v4.$ === 'Err') {
+						var error = _v4.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$Main$errorLog(error));
 					} else {
-						var res = _v3.a;
+						var res = _v4.a;
 						var modul = A2(
 							$elm$core$Result$withDefault,
 							'none',
@@ -9655,11 +9667,11 @@ var $author$project$Main$update = F2(
 								A2($elm$json$Json$Decode$field, 'module', $elm$json$Json$Decode$string),
 								value));
 						if (modul === 'WebSocket') {
-							var _v4 = A2(
+							var _v5 = A2(
 								$elm$json$Json$Decode$decodeValue,
 								A2($elm$json$Json$Decode$field, 'tag', $elm$json$Json$Decode$string),
 								value);
-							if ((_v4.$ === 'Ok') && (_v4.a === 'startup')) {
+							if ((_v5.$ === 'Ok') && (_v5.a === 'startup')) {
 								return A2(
 									$Janiczek$cmd_extra$Cmd$Extra$addCmd,
 									$author$project$Main$sendWebSocket(
@@ -9837,9 +9849,9 @@ var $author$project$Main$update = F2(
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
 				default:
-					var _v10 = msg.a;
-					var pressed = _v10.a;
-					var dialogId = _v10.b;
+					var _v11 = msg.a;
+					var pressed = _v11.a;
+					var dialogId = _v11.b;
 					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
 					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
 					var mdl = _Utils_update(
@@ -9867,7 +9879,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v19, _v20) {
+			function (_v20, _v21) {
 				return $author$project$Main$cmdPort;
 			}));
 }

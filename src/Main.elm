@@ -169,9 +169,15 @@ update msg model =
           ( model, Nav.load href )
 
     UrlChanged url ->
-      ( { model | url = url }
-      , Cmd.none
-      )
+      let
+        formFieldsOld = model.formFields
+        formFieldsNew = case url.fragment of
+          Just f ->
+            { formFieldsOld | gameId = f }
+          Nothing ->
+            formFieldsOld
+      in
+        ( { model | url = url, formFields = formFieldsNew }, Cmd.none )
 
     Tick newTime ->
       ( { model | lastUpdate = Just newTime, players =
@@ -692,9 +698,6 @@ getGameLink model =
         { url | fragment = Just gameId }
       Nothing ->
         url
-  -- ("https://game.dev/#" ++ Maybe.withDefault gameId "")
-  --   |> Url.fromString
-  --   |> Maybe.withDefault (Url.Url Url.Https "" Nothing "" Nothing Nothing)
 
 hasGameStarted : Model -> Bool
 hasGameStarted model =
