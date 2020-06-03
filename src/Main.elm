@@ -597,9 +597,18 @@ viewSidebar model =
           em [ class "text-muted" ] [ text "Not Started" ]
         Just id ->
           text id
-    ] ++ if Array.isEmpty model.players
-      then []
-      else [ div [ class "player-list" ] (Array.indexedMap (viewPlayer model) model.players |> Array.toList) ]
+    ] ++ (if Array.isEmpty model.players
+        then []
+        else [ div [ class "player-list" ] (Array.indexedMap (viewPlayer model) model.players |> Array.toList) ]
+    )
+      ++ if model.amAdministrator && hasGameStarted model
+        then [
+          div [ class "admin-actions" ] [
+            button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
+            button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
+          ]
+        ]
+        else []
     )
   ]
 

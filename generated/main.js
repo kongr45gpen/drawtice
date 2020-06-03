@@ -10697,6 +10697,10 @@ var $author$project$Main$viewNav = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$ShowConfirmDialog = F2(
+	function (a, b) {
+		return {$: 'ShowConfirmDialog', a: a, b: b};
+	});
 var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$html$Html$em = _VirtualDom_node('em');
 var $elm$core$Array$isEmpty = function (_v0) {
@@ -10706,10 +10710,6 @@ var $elm$core$Array$isEmpty = function (_v0) {
 var $author$project$Main$KickPlayer = function (a) {
 	return {$: 'KickPlayer', a: a};
 };
-var $author$project$Main$ShowConfirmDialog = F2(
-	function (a, b) {
-		return {$: 'ShowConfirmDialog', a: a, b: b};
-	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$viewPlayer = F3(
@@ -10816,20 +10816,57 @@ var $author$project$Main$viewSidebar = function (model) {
 							}
 						}()
 						]),
-					$elm$core$Array$isEmpty(model.players) ? _List_Nil : _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('player-list')
-								]),
-							$elm$core$Array$toList(
+					_Utils_ap(
+						$elm$core$Array$isEmpty(model.players) ? _List_Nil : _List_fromArray(
+							[
 								A2(
-									$elm$core$Array$indexedMap,
-									$author$project$Main$viewPlayer(model),
-									model.players)))
-						])))
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('player-list')
+									]),
+								$elm$core$Array$toList(
+									A2(
+										$elm$core$Array$indexedMap,
+										$author$project$Main$viewPlayer(model),
+										model.players)))
+							]),
+						(model.amAdministrator && $author$project$Main$hasGameStarted(model)) ? _List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('admin-actions')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('pure-button'),
+												$elm$html$Html$Events$onClick(
+												A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to prematurely end this game for all players?', $author$project$Main$LeaveGame))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Cancel Game')
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('pure-button'),
+												$elm$html$Html$Events$onClick(
+												A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to quickly end this round?', $author$project$Main$LeaveGame))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('End Round')
+											]))
+									]))
+							]) : _List_Nil)))
 			]));
 };
 var $author$project$Main$view = function (model) {

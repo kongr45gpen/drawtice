@@ -127,6 +127,15 @@ body {
   background: rgb(202, 60, 60);
 }
 
+.admin-actions {
+  margin-top: 0.5rem;
+}
+
+.admin-actions .pure-button {
+  font-size: 85%;
+  margin: 0.5rem;
+}
+
 /*
  * GAME HEADER
  */
