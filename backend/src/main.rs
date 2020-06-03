@@ -72,6 +72,14 @@ impl User {
             .ok_or(protocol::Error::from("Could not find user for player"))
     }
 
+    fn fetch_many_by_player<'a>(users: &'a mut Users, player: &Player) -> HashMap<&'a usize, &'a mut User> {
+        let uuid = player.uuid;
+
+        users.iter_mut()
+            .filter(|u| u.1.uuid == uuid)
+            .collect()
+    }
+
     async fn tx_direct(self: &User, response: protocol::Response<'_>) {
         let response = protocol::encode(response);
         match response {
@@ -324,11 +332,13 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 return Err(protocol::Error::from("You don't have permission to kick that player"));
             }
 
-            // Let the user know they've been kicked
+            // Let the user(s) know they've been kicked
+            // Alerts multiple user sessions
             let kicked = game.players.get(c.player_id)
                 .ok_or(protocol::Error::from("Player not in the game"))?;
-            User::fetch_by_player(users, kicked)?
-                .tx_direct(protocol::Response::LeftGame).await;
+            for (_, user) in User::fetch_many_by_player(users, kicked) {
+                user.tx_direct(protocol::Response::LeftGame).await;
+            }
 
             game.remove_player(c.player_id);
             game.reassign_users(users);
