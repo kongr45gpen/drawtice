@@ -7472,6 +7472,20 @@ var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
 	function (v) {
 		return $author$project$Protocol$GameDetailsResponse(v);
 	});
+var $author$project$Main$getGameLink = function (model) {
+	var url = model.url;
+	var _v0 = model.gameId;
+	if (_v0.$ === 'Just') {
+		var gameId = _v0.a;
+		return _Utils_update(
+			url,
+			{
+				fragment: $elm$core$Maybe$Just(gameId)
+			});
+	} else {
+		return url;
+	}
+};
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
 var $elm$core$Array$indexedMap = F2(
@@ -9320,7 +9334,7 @@ var $author$project$Main$setField = F3(
 				var oldForm = model.formFields;
 				var newForm = _Utils_update(
 					oldForm,
-					{username: value, usernamePlaceholder: value});
+					{username: value});
 				return _Utils_update(
 					model,
 					{formFields: newForm});
@@ -9435,13 +9449,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v18 = decodeData(parser.a);
-					if (_v18.$ === 'Err') {
-						var e = _v18.a;
+					var _v17 = decodeData(parser.a);
+					if (_v17.$ === 'Err') {
+						var e = _v17.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v18.a;
+						var v = _v17.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9492,15 +9506,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v19 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v19.b) {
+				var _v18 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v18.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v19.a.$ === 'ReconnectedResponse') && (!_v19.b.b)) {
-						var r = _v19.a.a;
+					if ((_v18.a.$ === 'ReconnectedResponse') && (!_v18.b.b)) {
+						var r = _v18.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v19;
+						var list = _v18;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -9771,14 +9785,26 @@ var $author$project$Main$update = F2(
 								});
 							return _Utils_Tuple2(
 								mdl,
-								function () {
-									if (me.$ === 'Just') {
-										var player = me.a;
-										return A3($author$project$Main$putLocalStorageString, mdl, 'username', player.username);
-									} else {
-										return $elm$core$Platform$Cmd$none;
-									}
-								}());
+								$elm$core$Platform$Cmd$batch(
+									_List_fromArray(
+										[
+											A2(
+											$elm$core$Maybe$withDefault,
+											$elm$core$Platform$Cmd$none,
+											A2(
+												$elm$core$Maybe$map,
+												function (p) {
+													return A3($author$project$Main$putLocalStorageString, mdl, 'username', p.username);
+												},
+												me)),
+											_Utils_eq(
+											mdl.url,
+											$author$project$Main$getGameLink(mdl)) ? $elm$core$Platform$Cmd$none : A2(
+											$elm$browser$Browser$Navigation$pushUrl,
+											mdl.key,
+											$elm$url$Url$toString(
+												$author$project$Main$getGameLink(mdl)))
+										])));
 						case 'ErrorResponse':
 							var error = value.a;
 							return _Utils_Tuple2(
@@ -9849,9 +9875,9 @@ var $author$project$Main$update = F2(
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
 				default:
-					var _v11 = msg.a;
-					var pressed = _v11.a;
-					var dialogId = _v11.b;
+					var _v10 = msg.a;
+					var pressed = _v10.a;
+					var dialogId = _v10.b;
 					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
 					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
 					var mdl = _Utils_update(
@@ -9879,7 +9905,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v20, _v21) {
+			function (_v19, _v20) {
 				return $author$project$Main$cmdPort;
 			}));
 }
@@ -10296,20 +10322,6 @@ var $author$project$Main$LeaveGame = {$: 'LeaveGame'};
 var $author$project$Main$StartGame = {$: 'StartGame'};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
-var $author$project$Main$getGameLink = function (model) {
-	var url = model.url;
-	var _v0 = model.gameId;
-	if (_v0.$ === 'Just') {
-		var gameId = _v0.a;
-		return _Utils_update(
-			url,
-			{
-				fragment: $elm$core$Maybe$Just(gameId)
-			});
-	} else {
-		return url;
-	}
-};
 var $elm$html$Html$Attributes$href = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,

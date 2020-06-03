@@ -289,11 +289,14 @@ update msg model =
               , players = players
               , formFields = formFieldsNew }
           in
-            ( mdl, case me of
-              Just player ->
-                putLocalStorageString mdl "username" player.username
-              Nothing ->
-                Cmd.none
+            ( mdl,
+                Cmd.batch [
+                  me |> Maybe.map (\p -> putLocalStorageString mdl "username" p.username) |> Maybe.withDefault Cmd.none,
+                  if mdl.url == getGameLink mdl then
+                    Cmd.none
+                  else
+                    Nav.pushUrl mdl.key (getGameLink mdl |> Url.toString)
+                ]
             )
         Protocol.ErrorResponse error ->
           (model, errorLog error)
@@ -354,7 +357,7 @@ setField model field value =
     UsernameField ->
       let
         oldForm = model.formFields
-        newForm = { oldForm | username = value, usernamePlaceholder = value}
+        newForm = { oldForm | username = value }
       in
         { model | formFields = newForm }
     UsernamePlaceholder ->
