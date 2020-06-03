@@ -12,6 +12,7 @@ use warp::http::header::{HeaderMap, HeaderValue};
 use warp::Filter;
 use uuid::Uuid;
 use std::iter;
+use std::env;
 
 use log::{trace,debug,info,warn,error};
 
@@ -157,11 +158,17 @@ impl Game {
     }
 }
 
+// TODO: Cache the result of this
+fn is_debug_mode() -> bool {
+    env::var("DRAWTICE_DEBUG")
+        .map(|s| !s.is_empty())
+        .unwrap_or(false)
+}
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init_timed();
 
-    // Keep track of the current state of all games
     let games : GamesMutex = Arc::new(Mutex::new(HashMap::new()));
     let games = warp::any().map(move || games.clone());
 
@@ -387,9 +394,34 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                         )).await;
                         user.tx_direct(protocol::Response::GameDetails(game)).await;
 
-                        break 'outer;
+                        return Ok(())
                     }
                 }
+            }
+
+            // Reaching this point means the player is not in a game
+            if is_debug_mode() {
+                debug!("Debug mode player joining activated");
+
+                // Debug mode. Place the user immediately into a game
+                let mut game_search = games.iter_mut().next();
+                let (game_id, game) = match game_search {
+                    Some(g) => (*g.0, g.1),
+                    None => {
+                        // Create a game if none exists
+                        let id = NEXT_GAME_ID.fetch_add(1, Ordering::Relaxed);
+                        let mut game = Game::new(id);
+                        games.insert(id, game);
+
+                        (id, games.get_mut(&id).unwrap())
+                    }
+                };
+
+                let player = Player::new(user.uuid, my_id,names::generate_random_name().as_str(), true);
+                let player_id = game.add_player(player);
+                user.game = Some((game_id, player_id));
+
+                game.tx_game_details(users, true).await;
             }
         },
         protocol::Command::StartGame => {
