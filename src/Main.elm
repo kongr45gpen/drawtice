@@ -526,6 +526,8 @@ view model =
                 viewLobby model
               Starting ->
                 viewStarting model
+              Drawing ->
+                viewDrawing model
               _ ->
                 text "nothing"
           ]
@@ -710,6 +712,18 @@ viewStarting model =
       textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
       button [ class "pure-button landing-button", onClick SubmitText ] [ text "Submit idea" ]
     ]
+  ]
+
+
+viewDrawing : Model -> Html Msg
+viewDrawing model =
+  section [ class "drawing hall" ] [
+    div [ class "drawing-prompt" ] [
+      div [ class "drawing-prompt-intro" ] [ text "You must draw:" ],
+      div [ class "drawing-subject" ] [ text "an armadillo" ]
+    ],
+    textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
+    button [ class "pure-button pure-button-success landing-button", onClick SubmitText ] [ text "I'm done!" ]
   ]
 
 viewPlayerAvatar : Player -> Html msg

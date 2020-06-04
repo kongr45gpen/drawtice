@@ -313,3 +313,22 @@ body {
   max-height: 100%;
   min-width: 10%;
 }
+
+/*
+ * GAME (DRAWING PAGE)
+ */
+ .drawing {
+  text-align: center;
+  font-size: 15pt;
+}
+
+.drawing-prompt > * {
+  text-align: center;
+  display: block;
+  margin: 5px;
+}
+
+.drawing-subject {
+  font-size: 20pt;
+  font-weight: bold;
+}

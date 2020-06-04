@@ -150,6 +150,6 @@ playerStatusFromString string =
   case string of
     "Stuck" -> Stuck
     "Done" -> Done
-    "Working" -> Working 0.5
+    "Working" -> Working 0
     "Uploading" -> Uploading 50
     _ -> Stuck
