@@ -114,6 +114,25 @@ const ADJECTIVES: &'static [&'static str] = &[
     "tall",
 ];
 
+const THINGS: &'static [&'static str] = &[
+    "a fish",
+    "a stick",
+    "a straight line",
+    "whatever you want",
+    "a toast",
+    "something in green",
+    "an afdoijewrndas",
+    "the Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch village",
+    "excitement",
+    "the Eiffel tower",
+    "wolf",
+    "a circle",
+    "I don't know!!",
+    "draw a joke",
+    "a film review",
+    "a tail",
+];
+
 pub fn generate_random_name() -> String {
     let animal = NAMES
         .choose(&mut rand::thread_rng())
@@ -127,4 +146,15 @@ pub fn generate_random_name() -> String {
         .to_lowercase();
 
     format!("{}-{}", adjective, animal)
+}
+
+// For people who forgot to submit!
+pub fn generate_random_thing() -> String {
+    let thing = THINGS
+        .choose(&mut rand::thread_rng())
+        .map(|s| *s)
+        .unwrap_or("a box with a question mark")
+        .to_lowercase();
+
+    thing
 }
