@@ -6868,6 +6868,7 @@ var $author$project$Main$init = F3(
 					return '';
 				}
 			}(),
+			text: '',
 			username: '',
 			usernamePlaceholder: ''
 		};
@@ -7157,6 +7158,7 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Protocol$ErrorResponse = function (a) {
 	return {$: 'ErrorResponse', a: a};
 };
+var $author$project$Main$GameIdField = {$: 'GameIdField'};
 var $author$project$Protocol$JoinCommand = F2(
 	function (a, b) {
 		return {$: 'JoinCommand', a: a, b: b};
@@ -7180,6 +7182,10 @@ var $author$project$Main$StorageReceive = F2(
 	function (a, b) {
 		return {$: 'StorageReceive', a: a, b: b};
 	});
+var $author$project$Protocol$TextPackageCommand = function (a) {
+	return {$: 'TextPackageCommand', a: a};
+};
+var $author$project$Main$UsernameField = {$: 'UsernameField'};
 var $author$project$Protocol$UuidCommand = function (a) {
 	return {$: 'UuidCommand', a: a};
 };
@@ -7404,11 +7410,14 @@ var $author$project$Protocol$GameDetailsResponse = function (a) {
 var $author$project$Protocol$Drawing = {$: 'Drawing'};
 var $author$project$Protocol$GameOver = {$: 'GameOver'};
 var $author$project$Protocol$Lobby = {$: 'Lobby'};
+var $author$project$Protocol$Starting = {$: 'Starting'};
 var $author$project$Protocol$Understanding = {$: 'Understanding'};
 var $author$project$Protocol$gameStatusFromString = function (string) {
 	switch (string) {
 		case 'Lobby':
 			return $author$project$Protocol$Lobby;
+		case 'Starting':
+			return $author$project$Protocol$Starting;
 		case 'Drawing':
 			return $author$project$Protocol$Drawing;
 		case 'Understanding':
@@ -9016,6 +9025,42 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $author$project$Main$setField = F3(
+	function (field, value, model) {
+		var oldForm = model.formFields;
+		var newForm = function () {
+			switch (field.$) {
+				case 'GameIdField':
+					return _Utils_update(
+						oldForm,
+						{gameId: value});
+				case 'UsernameField':
+					return _Utils_update(
+						oldForm,
+						{username: value});
+				case 'UsernamePlaceholder':
+					return _Utils_update(
+						oldForm,
+						{usernamePlaceholder: value});
+				default:
+					return _Utils_update(
+						oldForm,
+						{text: value});
+			}
+		}();
+		return _Utils_update(
+			model,
+			{formFields: newForm});
+	});
+var $author$project$Main$maybeSetField = F2(
+	function (field, value) {
+		if (value.$ === 'Just') {
+			var v = value.a;
+			return A2($author$project$Main$setField, field, v);
+		} else {
+			return $elm$core$Basics$identity;
+		}
+	});
 var $author$project$Protocol$PersonalDetails = F2(
 	function (myId, amAdministrator) {
 		return {amAdministrator: amAdministrator, myId: myId};
@@ -9295,13 +9340,26 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'player_id',
 								$elm$json$Json$Encode$int(playerId))
 							]))));
-		default:
+		case 'UuidCommand':
 			var uuid = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
 				'my_uuid',
 				$elm$core$Maybe$Just(
 					$elm$json$Json$Encode$string(uuid)));
+		default:
+			var text = command.a;
+			return A2(
+				$author$project$Protocol$prepareSocketCommandJson,
+				'text_package',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$object(
+						_List_fromArray(
+							[
+								_Utils_Tuple2(
+								'text',
+								$elm$json$Json$Encode$string(text))
+							]))));
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$send = $billstclair$elm_port_funnel$PortFunnel$sendMessage($billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleDesc);
@@ -9319,35 +9377,6 @@ var $author$project$Main$sendSocketCommand = function (command) {
 				0,
 				$author$project$Protocol$prepareSocketCommand(command))));
 };
-var $author$project$Main$setField = F3(
-	function (model, field, value) {
-		switch (field.$) {
-			case 'GameIdField':
-				var oldForm = model.formFields;
-				var newForm = _Utils_update(
-					oldForm,
-					{gameId: value});
-				return _Utils_update(
-					model,
-					{formFields: newForm});
-			case 'UsernameField':
-				var oldForm = model.formFields;
-				var newForm = _Utils_update(
-					oldForm,
-					{username: value});
-				return _Utils_update(
-					model,
-					{formFields: newForm});
-			default:
-				var oldForm = model.formFields;
-				var newForm = _Utils_update(
-					oldForm,
-					{usernamePlaceholder: value});
-				return _Utils_update(
-					model,
-					{formFields: newForm});
-		}
-	});
 var $elm$core$Result$toMaybe = function (result) {
 	if (result.$ === 'Ok') {
 		var v = result.a;
@@ -9449,13 +9478,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v17 = decodeData(parser.a);
-					if (_v17.$ === 'Err') {
-						var e = _v17.a;
+					var _v16 = decodeData(parser.a);
+					if (_v16.$ === 'Err') {
+						var e = _v16.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v17.a;
+						var v = _v16.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9506,15 +9535,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v18 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v18.b) {
+				var _v17 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v17.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v18.a.$ === 'ReconnectedResponse') && (!_v18.b.b)) {
-						var r = _v18.a.a;
+					if ((_v17.a.$ === 'ReconnectedResponse') && (!_v17.b.b)) {
+						var r = _v17.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v18;
+						var list = _v17;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -9569,22 +9598,19 @@ var $author$project$Main$update = F2(
 					}
 				case 'UrlChanged':
 					var url = msg.a;
-					var formFieldsOld = model.formFields;
-					var formFieldsNew = function () {
+					var mdl = function () {
 						var _v2 = url.fragment;
 						if (_v2.$ === 'Just') {
 							var f = _v2.a;
-							return _Utils_update(
-								formFieldsOld,
-								{gameId: f});
+							return A3($author$project$Main$setField, $author$project$Main$GameIdField, f, model);
 						} else {
-							return formFieldsOld;
+							return model;
 						}
 					}();
 					return _Utils_Tuple2(
 						_Utils_update(
-							model,
-							{formFields: formFieldsNew, url: url}),
+							mdl,
+							{url: url}),
 						$elm$core$Platform$Cmd$none);
 				case 'Tick':
 					var newTime = msg.a;
@@ -9638,6 +9664,11 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						$author$project$Main$leaveGame(model),
 						$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
+				case 'SubmitText':
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand(
+							$author$project$Protocol$TextPackageCommand(model.formFields.text)));
 				case 'KickPlayer':
 					var value = msg.a;
 					return _Utils_Tuple2(
@@ -9648,16 +9679,13 @@ var $author$project$Main$update = F2(
 					var field = msg.a;
 					var value = msg.b;
 					return _Utils_Tuple2(
-						A3($author$project$Main$setField, model, field, value),
+						A3($author$project$Main$setField, field, value, model),
 						$elm$core$Platform$Cmd$none);
 				case 'Send':
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
-						A2(
-							$elm$core$Debug$log,
-							'Send ' + A2($elm$json$Json$Encode$encode, 0, value),
-							$author$project$Main$cmdPort(value)));
+						$author$project$Main$cmdPort(value));
 				case 'Receive':
 					var value = msg.a;
 					var _v4 = A4(
@@ -9703,16 +9731,12 @@ var $author$project$Main$update = F2(
 					var value = msg.b;
 					switch (key) {
 						case 'username':
-							var formFieldsOld = model.formFields;
-							var formFieldsNew = _Utils_update(
-								formFieldsOld,
-								{
-									username: A2($elm$core$Maybe$withDefault, '', value)
-								});
 							return _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{formFields: formFieldsNew}),
+								A3(
+									$author$project$Main$setField,
+									$author$project$Main$UsernameField,
+									A2($elm$core$Maybe$withDefault, '', value),
+									model),
 								$elm$core$Platform$Cmd$none);
 						case 'uuid':
 							if (value.$ === 'Just') {
@@ -9764,25 +9788,23 @@ var $author$project$Main$update = F2(
 									return A2($elm$core$Array$get, id, players);
 								},
 								model.myId);
-							var formFieldsOld = model.formFields;
-							var formFieldsNew = function () {
-								if (me.$ === 'Just') {
-									var player = me.a;
-									return _Utils_update(
-										formFieldsOld,
-										{username: player.username});
-								} else {
-									return formFieldsOld;
-								}
-							}();
-							var mdl = _Utils_update(
-								model,
-								{
-									formFields: formFieldsNew,
-									gameId: $elm$core$Maybe$Just(details.alias),
-									players: players,
-									status: details.status
-								});
+							var username = A2(
+								$elm$core$Maybe$map,
+								function (p) {
+									return p.username;
+								},
+								me);
+							var mdl = A3(
+								$author$project$Main$maybeSetField,
+								$author$project$Main$UsernameField,
+								username,
+								_Utils_update(
+									model,
+									{
+										gameId: $elm$core$Maybe$Just(details.alias),
+										players: players,
+										status: details.status
+									}));
 							return _Utils_Tuple2(
 								mdl,
 								$elm$core$Platform$Cmd$batch(
@@ -9875,9 +9897,9 @@ var $author$project$Main$update = F2(
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
 				default:
-					var _v10 = msg.a;
-					var pressed = _v10.a;
-					var dialogId = _v10.b;
+					var _v9 = msg.a;
+					var pressed = _v9.a;
+					var dialogId = _v9.b;
 					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
 					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
 					var mdl = _Utils_update(
@@ -9905,7 +9927,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v19, _v20) {
+			function (_v18, _v19) {
 				return $author$project$Main$cmdPort;
 			}));
 }
@@ -10129,6 +10151,8 @@ var $author$project$Main$viewHeader = function (model) {
 										return 'Ready';
 									case 'Lobby':
 										return 'Waiting for Players…';
+									case 'Starting':
+										return 'Starting…';
 									case 'Drawing':
 										return 'Drawing…';
 									case 'Understanding':
@@ -10140,10 +10164,8 @@ var $author$project$Main$viewHeader = function (model) {
 						]))
 				])));
 };
-var $author$project$Main$GameIdField = {$: 'GameIdField'};
 var $author$project$Main$JoinGame = {$: 'JoinGame'};
 var $author$project$Main$NewGame = {$: 'NewGame'};
-var $author$project$Main$UsernameField = {$: 'UsernameField'};
 var $elm$html$Html$Attributes$autocomplete = function (bool) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -10881,6 +10903,59 @@ var $author$project$Main$viewSidebar = function (model) {
 							]) : _List_Nil)))
 			]));
 };
+var $author$project$Main$SubmitText = {$: 'SubmitText'};
+var $author$project$Main$TextField = {$: 'TextField'};
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $author$project$Main$viewStarting = function (model) {
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('starting')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('text-starting hall')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-starting-prompt')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('What do you want people to draw?')
+							])),
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-starting-input'),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$SetField($author$project$Main$TextField))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('pure-button landing-button'),
+								$elm$html$Html$Events$onClick($author$project$Main$SubmitText)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Submit idea')
+							]))
+					]))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -10911,6 +10986,8 @@ var $author$project$Main$view = function (model) {
 										return $author$project$Main$viewLanding(model);
 									case 'Lobby':
 										return $author$project$Main$viewLobby(model);
+									case 'Starting':
+										return $author$project$Main$viewStarting(model);
 									default:
 										return $elm$html$Html$text('nothing');
 								}

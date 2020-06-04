@@ -70,7 +70,11 @@ funnelDict =
 
 -- MODEL
 
-type FormField = GameIdField | UsernameField | UsernamePlaceholder
+type FormField
+  = GameIdField
+  | UsernameField
+  | UsernamePlaceholder
+  | TextField
 
 type alias Player =
   {
@@ -85,7 +89,8 @@ type alias FormFields =
   {
     gameId : String,
     username : String,
-    usernamePlaceholder : String
+    usernamePlaceholder : String,
+    text : String
   }
 
 type alias Model =
@@ -116,7 +121,8 @@ init flags url key =
         Nothing -> ""
       ,
       username = "",
-      usernamePlaceholder = ""
+      usernamePlaceholder = "",
+      text = ""
       }
 
     model = Model
@@ -146,6 +152,7 @@ type Msg
   | StartGame
   | LeaveGame
   | KickPlayer Int
+  | SubmitText
   | SetField FormField String
   | Send JE.Value
   | Receive JE.Value
@@ -170,14 +177,13 @@ update msg model =
 
     UrlChanged url ->
       let
-        formFieldsOld = model.formFields
-        formFieldsNew = case url.fragment of
+        mdl = case url.fragment of
           Just f ->
-            { formFieldsOld | gameId = f }
+            model |> setField GameIdField f
           Nothing ->
-            formFieldsOld
+            model
       in
-        ( { model | url = url, formFields = formFieldsNew }, Cmd.none )
+        ( { mdl | url = url }, Cmd.none )
 
     Tick newTime ->
       ( { model | lastUpdate = Just newTime, players =
@@ -214,14 +220,17 @@ update msg model =
     LeaveGame ->
       (leaveGame model, sendSocketCommand LeaveCommand)
 
+    SubmitText ->
+      (model, sendSocketCommand <| TextPackageCommand model.formFields.text )
+
     KickPlayer value ->
-      (model, sendSocketCommand (KickCommand value))
+      (model, sendSocketCommand <| KickCommand value)
 
     SetField field value ->
-      ( setField model field value, Cmd.none )
+      ( setField field value model, Cmd.none )
 
     Send value ->
-      (model, Debug.log ("Send " ++ JE.encode 0 value) (cmdPort value))
+      (model, cmdPort value)
 
     Receive value ->
       case
@@ -248,11 +257,7 @@ update msg model =
     StorageReceive key value ->
       case key of
         "username" ->
-          let
-            formFieldsOld = model.formFields
-            formFieldsNew = { formFieldsOld | username = value |> Maybe.withDefault ""}
-          in
-            ({ model | formFields = formFieldsNew }, Cmd.none)
+          (model |> setField UsernameField (value |> Maybe.withDefault ""), Cmd.none)
         "uuid" ->
           case value of
             Just uuid ->
@@ -277,17 +282,11 @@ update msg model =
               }
             players = Array.indexedMap playerCreator (Array.fromList details.players)
             me = model.myId |> Maybe.andThen (\id -> Array.get id players)
-            formFieldsOld = model.formFields
-            formFieldsNew = case me of
-              Just player ->
-                { formFieldsOld | username = player.username }
-              Nothing ->
-                formFieldsOld
+            username = Maybe.map (\p -> p.username) me
             mdl = { model
               | gameId = Just details.alias
               , status = details.status
-              , players = players
-              , formFields = formFieldsNew }
+              , players = players } |> maybeSetField UsernameField username
           in
             ( mdl,
                 Cmd.batch [
@@ -345,27 +344,30 @@ update msg model =
         else
           (mdl, Cmd.none)
 
-setField : Model -> FormField -> String -> Model
-setField model field value =
-  case field of
-    GameIdField ->
-      let
-        oldForm = model.formFields
-        newForm = { oldForm | gameId = value}
-      in
-        { model | formFields = newForm }
-    UsernameField ->
-      let
-        oldForm = model.formFields
-        newForm = { oldForm | username = value }
-      in
-        { model | formFields = newForm }
-    UsernamePlaceholder ->
-      let
-        oldForm = model.formFields
-        newForm = { oldForm | usernamePlaceholder = value}
-      in
-        { model | formFields = newForm }
+maybeSetField : FormField -> Maybe String -> (Model -> Model)
+maybeSetField field value =
+  case value of
+    Just v ->
+      setField field v
+    Nothing ->
+      identity
+
+setField : FormField -> String -> Model -> Model
+setField field value model =
+  let
+    oldForm = model.formFields
+    newForm = case field of
+      GameIdField ->
+        { oldForm | gameId = value }
+      UsernameField ->
+        { oldForm | username = value }
+      UsernamePlaceholder ->
+        { oldForm | usernamePlaceholder = value }
+      TextField ->
+        { oldForm | text = value }
+  in
+    { model | formFields = newForm }
+
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -515,6 +517,8 @@ view model =
                 viewLanding model
               Lobby ->
                 viewLobby model
+              Starting ->
+                viewStarting model
               _ ->
                 text "nothing"
           ]
@@ -582,6 +586,7 @@ viewHeader model =
       div [ class "game-status" ] [ text (case model.status of
           NoGame -> "Ready"
           Lobby -> "Waiting for Players…"
+          Starting -> "Starting…"
           Drawing -> "Drawing…"
           Understanding -> "Understanding…"
           GameOver -> "Game Over"
@@ -688,6 +693,17 @@ viewLobby model =
     else
       [ button [ class "pure-button pure-button-danger landing-button", onClick LeaveGame ] [ text "Leave Game" ] ]
   )
+
+
+viewStarting : Model -> Html Msg
+viewStarting model =
+  section [ class "starting" ] [
+    Html.form [ class "text-starting hall" ] [
+      div [ class "text-starting-prompt" ] [ text "What do you want people to draw?" ],
+      textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
+      button [ class "pure-button landing-button", onClick SubmitText ] [ text "Submit idea" ]
+    ]
+  ]
 
 viewPlayerAvatar : Player -> Html msg
 viewPlayerAvatar player =

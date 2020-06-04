@@ -23,6 +23,7 @@ pub enum PlayerStatus {
 #[derive(Serialize, Debug, PartialEq)]
 pub enum GameStatus {
     Lobby,
+    Starting,
     Drawing,
     Understanding,
     GameOver
@@ -53,6 +54,7 @@ pub struct Game {
     pub alias: String,
     pub game_status: GameStatus,
     pub players: Vec<Player>,
+    pub current_stage: usize
 }
 
 impl Player {
@@ -79,6 +81,7 @@ impl Game {
             alias,
             game_status: GameStatus::Lobby,
             players: vec![],
+            current_stage: 0
         }
     }
 
@@ -106,10 +109,27 @@ impl Game {
 
     /// Start the game, letting all players play
     pub fn start(&mut self) {
-        self.game_status = GameStatus::Understanding;
-        for player in self.players.iter_mut() {
+        self.game_status = GameStatus::Starting;
+        for player in self.players.iter_mut()
+            .filter(|p| p.status != PlayerStatus::Stuck)
+        {
             player.status = PlayerStatus::Working;
         }
+    }
+
+    /// Advance to the next game stage
+    pub fn next_stage(&mut self) {
+
+    }
+
+    pub fn provide_text_package(&mut self, player_id: usize) {
+        let player = self.players.get_mut(player_id);
+        if player.is_none() {
+            return;
+        }
+
+        let player = player.unwrap();
+        player.status = PlayerStatus::Done;
     }
 
     /// End the game, removing all players

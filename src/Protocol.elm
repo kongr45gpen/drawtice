@@ -13,10 +13,11 @@ type SocketCommand
   | StartCommand
   | LeaveCommand
   | UuidCommand String
+  | TextPackageCommand String
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
-type GameStatus = NoGame | Lobby | Drawing | Understanding | GameOver
+type GameStatus = NoGame | Lobby | Starting | Drawing | Understanding | GameOver
 
 -- JSON RESPONSE STRUCTURES
 
@@ -76,6 +77,10 @@ prepareSocketCommand command =
       prepareSocketCommandJson "my_uuid" (Just (JE.string
         uuid
       ))
+    TextPackageCommand text ->
+      prepareSocketCommandJson "text_package" (Just (JE.object
+        [ ( "text", JE.string text ) ]
+      ))
 
 
 prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value
@@ -132,6 +137,7 @@ gameStatusFromString : String -> GameStatus
 gameStatusFromString string =
   case string of
     "Lobby" -> Lobby
+    "Starting" -> Starting
     "Drawing" -> Drawing
     "Understanding" -> Understanding
     "GameOver" -> GameOver

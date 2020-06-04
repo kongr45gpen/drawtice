@@ -49,7 +49,8 @@ pub enum Command {
     StartGame,
     LeaveGame,
     KickPlayer(KickCommand),
-    MyUuid(String)
+    MyUuid(String),
+    TextPackage(TextPackageCommand),
 }
 
 #[derive(Debug)]
@@ -78,6 +79,12 @@ pub struct NewGameCommand {
 #[derive(Deserialize, Debug)]
 pub struct KickCommand {
     pub player_id: usize
+}
+
+#[derive(Deserialize, Debug)]
+pub struct TextPackageCommand {
+    #[serde(deserialize_with = "de_validate_text_package")]
+    pub text: String
 }
 
 #[derive(Serialize, Debug)]
@@ -117,6 +124,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         "start_game" => Command::StartGame,
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
         "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
+        "text_package" => Command::TextPackage(TextPackageCommand::deserialize(data?)?),
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
 
@@ -149,8 +157,23 @@ fn de_validate_nonempty<'de, D>(d: D) -> std::result::Result<String, D::Error>
     let value = String::deserialize(d)?;
 
     if value.is_empty() {
-        return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(value.as_str()),
-                                            &"a non-empty username"));
+        return Err(serde::de::Error::custom(" Please give a non-empty username!"));
+    }
+
+    Ok(value)
+}
+
+fn de_validate_text_package<'de, D>(d: D) -> std::result::Result<String, D::Error>
+    where D: serde::de::Deserializer<'de>
+{
+    let value = String::deserialize(d)?;
+
+    if value.len() < 3 {
+        return Err(serde::de::Error::invalid_length(value.len(),
+                                                   &"a word longer than 2 characters"));
+    } else if value.len() > 250 {
+        return Err(serde::de::Error::invalid_length(value.len(),
+                                               &"a smaller word"));
     }
 
     Ok(value)

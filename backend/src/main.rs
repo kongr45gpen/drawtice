@@ -415,6 +415,12 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                         // Create a game if none exists
                         let id = NEXT_GAME_ID.fetch_add(1, Ordering::Relaxed);
                         let mut game = Game::new(id);
+
+                        // Add a fake stuck player to be able to start immediately
+                        let mut stuck_player = Player::new(Uuid::new_v4(), usize::max_value(), "fake player", false);
+                        stuck_player.status = game::PlayerStatus::Stuck;
+                        game.add_player(stuck_player);
+
                         games.insert(id, game);
 
                         (id, games.get_mut(&id).unwrap())
@@ -434,6 +440,12 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             player.expect_admin()?;
 
             game.start();
+            game.tx_game_details(users, false).await;
+        },
+        protocol::Command::TextPackage(c) => {
+            let game = user.fetch_game_mut(games)?;
+
+            game.provide_text_package(user.game.unwrap().1);
             game.tx_game_details(users, false).await;
         }
     }
