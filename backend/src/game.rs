@@ -2,6 +2,8 @@ extern crate chrono;
 extern crate uuid;
 extern crate rand;
 use chrono::{DateTime, Utc};
+use chrono::prelude::*;
+use std::time::{Duration, SystemTime};
 use uuid::Uuid;
 use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
@@ -40,7 +42,7 @@ pub struct Player {
     image_url: String,
     pub status: PlayerStatus,
 
-    #[serde(skip_serializing)]
+    #[serde(with = "posix_date_format")]
     deadline: Option<DateTime<Utc>>,
 
     pub is_admin: bool,
@@ -54,6 +56,9 @@ pub struct Game {
     pub alias: String,
     pub game_status: GameStatus,
     pub players: Vec<Player>,
+
+    #[serde(skip_serializing)]
+    default_time: Duration,
 
     pub current_stage: usize,
     pub total_stages: usize,
@@ -83,6 +88,7 @@ impl Game {
             alias,
             game_status: GameStatus::Lobby,
             players: vec![],
+            default_time: Duration::new(10 * 60, 0),
             current_stage: 0,
             total_stages: 0,
         }
@@ -147,6 +153,9 @@ impl Game {
             player.status = if self.game_status == GameStatus::GameOver {
                 PlayerStatus::Done
             } else {
+                let deadline = DateTime::from(SystemTime::now() + self.default_time);
+                player.deadline = Some(deadline);
+
                 PlayerStatus::Working
             }
         }
@@ -174,5 +183,52 @@ impl Game {
     /// Return whether the game has ended
     pub fn is_over(&self) -> bool {
         return self.players.is_empty()
+    }
+}
+
+mod posix_date_format {
+    use chrono::{DateTime, Utc, TimeZone};
+    use serde::{self, Deserialize, Serializer, Deserializer};
+
+    // The signature of a serialize_with function must follow the pattern:
+    //
+    //    fn serialize<S>(&T, S) -> Result<S::Ok, S::Error>
+    //    where
+    //        S: Serializer
+    //
+    // although it may also be generic over the input types T.
+    pub fn serialize<S>(
+        date: &Option<DateTime<Utc>>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        match date {
+            Some(d) => serializer.serialize_i64(d.timestamp()),
+            None => serializer.serialize_i64(0),
+        }
+
+    }
+
+    // The signature of a deserialize_with function must follow the pattern:
+    //
+    //    fn deserialize<'de, D>(D) -> Result<T, D::Error>
+    //    where
+    //        D: Deserializer<'de>
+    //
+    // although it may also be generic over the output types T.
+    pub fn deserialize<'de, D>(
+        deserializer: D,
+    ) -> Result<Option<DateTime<Utc>>, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        let timestamp = i64::deserialize(deserializer)?;
+
+        match timestamp {
+            0 => Ok(None),
+            _ => Ok(Some(Utc.timestamp(timestamp, 0)))
+        }
     }
 }

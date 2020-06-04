@@ -7428,11 +7428,11 @@ var $author$project$Protocol$gameStatusFromString = function (string) {
 			return $author$project$Protocol$Lobby;
 	}
 };
-var $author$project$Protocol$PlayerDetails = F4(
-	function (username, imageUrl, status, isAdmin) {
-		return {imageUrl: imageUrl, isAdmin: isAdmin, status: status, username: username};
+var $author$project$Protocol$PlayerDetails = F5(
+	function (username, imageUrl, status, isAdmin, deadline) {
+		return {deadline: deadline, imageUrl: imageUrl, isAdmin: isAdmin, status: status, username: username};
 	});
-var $elm$json$Json$Decode$map4 = _Json_map4;
+var $elm$json$Json$Decode$map5 = _Json_map5;
 var $author$project$Protocol$Done = {$: 'Done'};
 var $author$project$Protocol$Stuck = {$: 'Stuck'};
 var $author$project$Protocol$Uploading = function (a) {
@@ -7455,8 +7455,8 @@ var $author$project$Protocol$playerStatusFromString = function (string) {
 			return $author$project$Protocol$Stuck;
 	}
 };
-var $author$project$Protocol$playerDecoder = A5(
-	$elm$json$Json$Decode$map4,
+var $author$project$Protocol$playerDecoder = A6(
+	$elm$json$Json$Decode$map5,
 	$author$project$Protocol$PlayerDetails,
 	A2($elm$json$Json$Decode$field, 'username', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'image_url', $elm$json$Json$Decode$string),
@@ -7464,7 +7464,8 @@ var $author$project$Protocol$playerDecoder = A5(
 		$elm$json$Json$Decode$field,
 		'status',
 		A2($elm$json$Json$Decode$map, $author$project$Protocol$playerStatusFromString, $elm$json$Json$Decode$string)),
-	A2($elm$json$Json$Decode$field, 'is_admin', $elm$json$Json$Decode$bool));
+	A2($elm$json$Json$Decode$field, 'is_admin', $elm$json$Json$Decode$bool),
+	A2($elm$json$Json$Decode$field, 'deadline', $elm$json$Json$Decode$int));
 var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
 	A4(
 		$elm$json$Json$Decode$map3,
@@ -9077,10 +9078,6 @@ var $author$project$Protocol$personalDetailsParser = _Utils_Tuple2(
 	function (v) {
 		return $author$project$Protocol$PersonalDetailsResponse(v);
 	});
-var $author$project$Main$posixTimeDifferenceSeconds = F2(
-	function (a, b) {
-		return ($elm$time$Time$posixToMillis(a) - $elm$time$Time$posixToMillis(b)) / 1000;
-	});
 var $billstclair$elm_port_funnel$PortFunnel$process = F4(
 	function (accessors, _v0, genericMessage, state) {
 		var moduleDesc = _v0.a;
@@ -9429,15 +9426,28 @@ var $elm$url$Url$toString = function (url) {
 					_Utils_ap(http, url.host)),
 				url.path)));
 };
+var $author$project$Main$posixTimeDifferenceSeconds = F2(
+	function (a, b) {
+		return ($elm$time$Time$posixToMillis(a) - $elm$time$Time$posixToMillis(b)) / 1000;
+	});
 var $author$project$Main$updatePlayerTime = F2(
-	function (timeDifference, player) {
+	function (currentTime, player) {
 		var _v0 = player.status;
 		if (_v0.$ === 'Working') {
 			var timeLeft = _v0.a;
 			return _Utils_update(
 				player,
 				{
-					status: $author$project$Protocol$Working(timeLeft - timeDifference)
+					status: $author$project$Protocol$Working(
+						A2(
+							$elm$core$Maybe$withDefault,
+							0,
+							A2(
+								$elm$core$Maybe$map,
+								function (d) {
+									return A2($author$project$Main$posixTimeDifferenceSeconds, d, currentTime);
+								},
+								player.deadline)))
 				});
 		} else {
 			return player;
@@ -9627,8 +9637,7 @@ var $author$project$Main$update = F2(
 										var lastUpdate = _v3.a;
 										return A2(
 											$elm$core$Array$map,
-											$author$project$Main$updatePlayerTime(
-												A2($author$project$Main$posixTimeDifferenceSeconds, newTime, lastUpdate)),
+											$author$project$Main$updatePlayerTime(newTime),
 											model.players);
 									}
 								}()
@@ -9763,6 +9772,8 @@ var $author$project$Main$update = F2(
 							var playerCreator = F2(
 								function (id, player) {
 									return {
+										deadline: (!player.deadline) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+											$elm$time$Time$millisToPosix(player.deadline * 1000)),
 										image: player.imageUrl,
 										isAdministrator: player.isAdmin,
 										isMe: A2(
@@ -10004,6 +10015,7 @@ var $author$project$Main$formatTimeDifference = function (seconds) {
 			$elm$core$Basics$abs(seconds % 60)))));
 };
 var $elm$html$Html$header = _VirtualDom_node('header');
+var $elm$core$Basics$round = _Basics_round;
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$img = _VirtualDom_node('img');
@@ -10099,8 +10111,7 @@ var $author$project$Main$viewHeader = function (model) {
 													[
 														$elm$html$Html$text(
 														$author$project$Main$formatTimeDifference(
-															$elm$core$Basics$floor(
-																A2($elm$core$Debug$log, 'timeLeft', timeLeft))))
+															$elm$core$Basics$round(timeLeft)))
 													]));
 										case 'Uploading':
 											var percentage = _v1.a;
@@ -10745,7 +10756,6 @@ var $author$project$Main$KickPlayer = function (a) {
 	return {$: 'KickPlayer', a: a};
 };
 var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$viewPlayer = F3(
 	function (model, id, player) {
 		return A2(
@@ -10781,8 +10791,8 @@ var $author$project$Main$viewPlayer = F3(
 								case 'Working':
 									var timeLeft = _v0.a;
 									return $elm$html$Html$text(
-										'Working, ' + ($elm$core$String$fromInt(
-											$elm$core$Basics$round(timeLeft)) + ' s left'));
+										'Working, ' + ($author$project$Main$formatTimeDifference(
+											$elm$core$Basics$round(timeLeft)) + ' left'));
 								case 'Uploading':
 									var fraction = _v0.a;
 									return $elm$html$Html$text(

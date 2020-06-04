@@ -82,7 +82,8 @@ type alias Player =
     image : String,
     status : PlayerStatus,
     isMe : Bool,
-    isAdministrator: Bool
+    isAdministrator: Bool,
+    deadline : Maybe Time.Posix
   }
 
 type alias FormFields =
@@ -192,7 +193,8 @@ update msg model =
             model.players
 
           Just lastUpdate ->
-            Array.map (updatePlayerTime (posixTimeDifferenceSeconds newTime lastUpdate)) model.players }
+            Array.map (updatePlayerTime newTime) model.players
+      }
       , if WebSocket.isConnected wsKey model.funnelState.websocket then
           Cmd.none
         else
@@ -278,7 +280,8 @@ update msg model =
                 image = player.imageUrl,
                 status = player.status,
                 isMe = model.myId |> Maybe.map (\i -> i == id) |> Maybe.withDefault False,
-                isAdministrator = player.isAdmin
+                isAdministrator = player.isAdmin,
+                deadline = if player.deadline == 0 then Nothing else Just <| Time.millisToPosix (player.deadline * 1000)
               }
             players = Array.indexedMap playerCreator (Array.fromList details.players)
             me = model.myId |> Maybe.andThen (\id -> Array.get id players)
@@ -373,11 +376,15 @@ posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
   toFloat (Time.posixToMillis a - Time.posixToMillis b) / 1000
 
-updatePlayerTime : Float -> Player -> Player
-updatePlayerTime timeDifference player =
+updatePlayerTime : Time.Posix -> Player -> Player
+updatePlayerTime currentTime player =
   case player.status of
     Working timeLeft ->
-      { player | status = Working (timeLeft - timeDifference) }
+      { player | status = player.deadline
+                        |> Maybe.map (\d -> posixTimeDifferenceSeconds d currentTime)
+                        |> Maybe.withDefault 0
+                        |> Working
+      }
     _ ->
       player
 
@@ -574,7 +581,7 @@ viewHeader model =
               Done ->
                 span [ class "status" ] [ text "Ready" ]
               Working timeLeft ->
-                span [ class "big-scary-clock" ] [ text (formatTimeDifference (floor (Debug.log "timeLeft" timeLeft))) ]
+                span [ class "big-scary-clock" ] [ text (formatTimeDifference (round timeLeft)) ]
               Uploading percentage ->
                 span [ class "status" ] [ text (String.fromInt (floor (percentage * 100)) ++ "%") ]
               Stuck ->
@@ -629,7 +636,7 @@ viewPlayer model id player =
       Done ->
         (text "Done")
       Working timeLeft ->
-        (text ("Working, " ++ String.fromInt (round timeLeft) ++ " s left"))
+        (text ("Working, " ++ formatTimeDifference (round timeLeft) ++ " left"))
       Uploading fraction ->
         (text ("Uploading (" ++ String.fromFloat (fraction * 100) ++ "% done)"))
       Stuck ->

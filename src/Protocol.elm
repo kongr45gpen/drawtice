@@ -32,6 +32,7 @@ type alias PlayerDetails =
   , imageUrl: String
   , status: PlayerStatus
   , isAdmin: Bool
+  , deadline: Int
   }
 
 type alias PersonalDetails =
@@ -113,11 +114,12 @@ gameDetailsParser =
 
 playerDecoder : Decoder PlayerDetails
 playerDecoder =
-  map4 PlayerDetails
+  map5 PlayerDetails
     (field "username" string)
     (field "image_url" string)
     (field "status" (map playerStatusFromString string))
     (field "is_admin" bool)
+    (field "deadline" int)
 
 personalDetailsParser : (Decoder PersonalDetails, PersonalDetails -> Response)
 personalDetailsParser =
