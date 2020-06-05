@@ -75,16 +75,21 @@ PortFunnel.subscribe(app);
             connectedCallback() {
                 var drawer = new DrawerJs.Drawer(null, {
                     plugins: drawerPlugins,
+                    pluginsConfig: {
+                        Zoom: {
+                            enabled: false
+                        }
+                    },
                     defaultActivePlugin : { name : 'Pencil', mode : 'lastUsed' },
                     exitOnOutsideClick: false,
                     contentConfig: {
-                    saveInHtml: false,
-                    saveCanvasData: function(canvasId, canvasData){
-                        localStorage.setItem('drawtice.canvas', JSON.stringify(JSON.parse(canvasData)));
-                    },
-                    loadCanvasData: function(canvasId){
-                        return localStorage.getItem('drawtice.canvas');
-                    },
+                        saveInHtml: false,
+                        saveCanvasData: function(canvasId, canvasData){
+                            localStorage.setItem('drawtice.canvas', JSON.stringify(JSON.parse(canvasData)));
+                        },
+                        loadCanvasData: function(canvasId){
+                            return localStorage.getItem('drawtice.canvas');
+                        },
                     }
                 }, '100%', this.offsetHeight);
                 this.innerHTML = drawer.getHtml();
