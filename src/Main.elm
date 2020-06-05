@@ -156,6 +156,7 @@ type Msg
   | StartGame
   | LeaveGame
   | KickPlayer Int
+  | NextRound
   | SubmitText
   | SetField FormField String
   | Send JE.Value
@@ -230,6 +231,9 @@ update msg model =
 
     KickPlayer value ->
       (model, sendSocketCommand <| KickCommand value)
+
+    NextRound ->
+      (model, sendSocketCommand <| NextRoundCommand)
 
     SetField field value ->
       ( setField field value model, Cmd.none )
@@ -626,7 +630,7 @@ viewSidebar model =
         then [
           div [ class "admin-actions" ] [
             button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
-            button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
+            button [ class "pure-button", onClick (NextRound |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
           ]
         ]
         else []

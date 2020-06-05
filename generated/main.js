@@ -7176,6 +7176,7 @@ var $author$project$PortFunnels$LocalStorageHandler = function (a) {
 var $author$project$Protocol$NewGameCommand = function (a) {
 	return {$: 'NewGameCommand', a: a};
 };
+var $author$project$Protocol$NextRoundCommand = {$: 'NextRoundCommand'};
 var $author$project$Main$SocketReceive = function (a) {
 	return {$: 'SocketReceive', a: a};
 };
@@ -9348,7 +9349,7 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 				'my_uuid',
 				$elm$core$Maybe$Just(
 					$elm$json$Json$Encode$string(uuid)));
-		default:
+		case 'TextPackageCommand':
 			var text = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
@@ -9361,6 +9362,8 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'text',
 								$elm$json$Json$Encode$string(text))
 							]))));
+		default:
+			return A2($author$project$Protocol$prepareSocketCommandJson, 'next_round', $elm$core$Maybe$Nothing);
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$send = $billstclair$elm_port_funnel$PortFunnel$sendMessage($billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleDesc);
@@ -9688,6 +9691,10 @@ var $author$project$Main$update = F2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$KickCommand(value)));
+				case 'NextRound':
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand($author$project$Protocol$NextRoundCommand));
 				case 'SetField':
 					var field = msg.a;
 					var value = msg.b;
@@ -10825,6 +10832,7 @@ var $author$project$Main$viewNav = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$NextRound = {$: 'NextRound'};
 var $author$project$Main$ShowConfirmDialog = F2(
 	function (a, b) {
 		return {$: 'ShowConfirmDialog', a: a, b: b};
@@ -10986,7 +10994,7 @@ var $author$project$Main$viewSidebar = function (model) {
 											[
 												$elm$html$Html$Attributes$class('pure-button'),
 												$elm$html$Html$Events$onClick(
-												A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to quickly end this round?', $author$project$Main$LeaveGame))
+												A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to quickly end this round?', $author$project$Main$NextRound))
 											]),
 										_List_fromArray(
 											[

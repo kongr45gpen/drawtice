@@ -14,6 +14,7 @@ type SocketCommand
   | LeaveCommand
   | UuidCommand String
   | TextPackageCommand String
+  | NextRoundCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
@@ -85,6 +86,8 @@ prepareSocketCommand command =
       prepareSocketCommandJson "text_package" (Just (JE.object
         [ ( "text", JE.string text ) ]
       ))
+    NextRoundCommand ->
+      prepareSocketCommandJson "next_round" Nothing
 
 
 prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value

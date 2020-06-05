@@ -80,7 +80,7 @@ PortFunnel.subscribe(app);
             }
 
             connectedCallback() {
-                var drawer = new DrawerJs.Drawer(null, {
+                this.drawer = new DrawerJs.Drawer(null, {
                     plugins: drawerPlugins,
                     pluginsConfig: {
                         Zoom: {
@@ -99,9 +99,15 @@ PortFunnel.subscribe(app);
                         },
                     }
                 }, '100%', this.offsetHeight);
-                this.innerHTML = drawer.getHtml();
-                drawer.onInsert();
-                drawer.api.startEditing();
+                this.innerHTML = this.drawer.getHtml();
+                this.drawer.onInsert();
+                this.drawer.api.startEditing();
+            }
+
+            disconnectedCallback() {
+                if (this.drawer !== undefined) {
+                    this.drawer.destroy();
+                }
             }
         }
     );

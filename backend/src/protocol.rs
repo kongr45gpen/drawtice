@@ -52,6 +52,7 @@ pub enum Command {
     KickPlayer(KickCommand),
     MyUuid(String),
     TextPackage(TextPackageCommand),
+    NextRound,
 }
 
 #[derive(Debug)]
@@ -126,6 +127,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
         "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
         "text_package" => Command::TextPackage(TextPackageCommand::deserialize(data?)?),
+        "next_round" => Command::NextRound,
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
 

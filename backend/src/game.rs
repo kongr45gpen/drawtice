@@ -31,6 +31,20 @@ pub enum GameStatus {
     GameOver,
 }
 
+pub enum WorkPackage {
+    TextPackage(TextPackage),
+    ImagePackage(ImagePackage),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TextPackage {
+    pub text: String
+}
+
+pub struct ImagePackage {
+    pub url: String
+}
+
 #[derive(Serialize, Debug, Clone)]
 pub struct Player {
     #[serde(skip_serializing)]
@@ -92,7 +106,7 @@ impl Game {
             uuid: Uuid::new_v4(),
             game_status: GameStatus::Lobby,
             players: vec![],
-            default_time: Duration::new(10, 0),
+            default_time: Duration::new(60 * 10, 0),
             current_stage: 0,
             total_stages: 0,
         }

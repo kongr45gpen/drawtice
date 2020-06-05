@@ -473,6 +473,14 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             game.provide_text_package(user.game.unwrap().1);
             game.tx_game_details(users, false).await;
         }
+        protocol::Command::NextRound => {
+            let game = user.fetch_game_mut(games)?;
+            let (player, _) = user.fetch_player(game)?;
+            player.expect_admin()?;
+
+            game.next_stage();
+            game.tx_game_details(users, false).await;
+        }
     }
 
     Ok(())
@@ -480,7 +488,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
 async fn scheduler(users: &mut Users, games: &mut Games) {
     for (&gid, game) in games.iter_mut() {
-        if game.is_round_done() {
+        if game.is_round_done() && !is_debug_mode() {
             game.next_stage();
             game.tx_game_details(users, false).await;
         }
