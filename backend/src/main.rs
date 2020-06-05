@@ -241,7 +241,7 @@ async fn user_connected(ws: WebSocket, users: UsersMutex, games: GamesMutex) {
 
     // user_ws_rx stream will keep processing as long as the user stays
     // connected. Once they disconnect, then...
-    user_disconnected(my_id, &users2).await;
+    user_disconnected(my_id, &users2, &games).await;
 }
 
 async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &GamesMutex) {
@@ -321,7 +321,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                     .next()
                     .ok_or("Could not find a game with this name!")?;
 
-            if game.1.game_status != game::GameStatus::Lobby {
+            if game.1.game_status != game::GameStatus::Lobby && !is_debug_mode() {
                 return Err(protocol::Error::from("I'm sorry, but this game is already running :/"));
             }
 
@@ -388,13 +388,16 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                     if player.uuid == uuid {
                         // Found the player!
                         player.user_id = my_id;
+                        player.stuck = false;
                         user.game = Some((gid, pid));
 
                         // Announce the game to the user
                         user.tx_direct(protocol::Response::PersonalDetails(
                             protocol::PersonalDetailsResponse::new(pid, &player)
                         )).await;
-                        user.tx_direct(protocol::Response::GameDetails(game)).await;
+
+                        // Announce the user to the other players
+                        game.tx_game_details(users, false).await;
 
                         return Ok(());
                     }
@@ -406,7 +409,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 debug!("Debug mode player joining activated");
 
                 // Debug mode. Place the user immediately into a game
-                let mut game_search = games.iter_mut().next();
+                let game_search = games.iter_mut().next();
                 let (game_id, game) = match game_search {
                     Some(g) => (*g.0, g.1),
                     None => {
@@ -416,7 +419,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
                         // Add a fake stuck player to be able to start immediately
                         let mut stuck_player = Player::new(Uuid::new_v4(), usize::max_value(), "fake player", false);
-                        stuck_player.status = game::PlayerStatus::Stuck;
+                        stuck_player.stuck = true;
                         game.add_player(stuck_player);
 
                         games.insert(id, game);
@@ -510,11 +513,22 @@ async fn tx_broadcast(users: &Users, my_id: usize, response: protocol::Response<
     };
 }
 
-async fn user_disconnected(my_id: usize, users: &UsersMutex) {
-    eprintln!("good bye user: {}", my_id);
+async fn user_disconnected(my_id: usize, users: &UsersMutex, games: &GamesMutex) {
+    debug!("User {} left", my_id);
+
+    let mut users = users.lock().await;
+    let mut games = games.lock().await;
+
+    // If the user is in a game, remove them from that game
+    let user: &User = users.get(&my_id).unwrap();
+    if let Some(game) = user.game.and_then(|g| games.get_mut(&g.0)) {
+        let player_id = user.game.unwrap().1;
+        game.player_stuck(player_id, true);
+        game.tx_game_details(&users, false).await;
+    }
 
     // Stream closed up, so remove from the user list
-    users.lock().await.remove(&my_id);
+    users.remove(&my_id);
 }
 
 static INDEX_HTML: &str = r#"

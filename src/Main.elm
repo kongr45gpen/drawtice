@@ -51,7 +51,7 @@ port confirmPort : (String, Int) -> Cmd msg
 
 port confirmReturnPort : ((Bool, Int) -> msg) -> Sub msg
 
-port canvasPort : String -> Cmd msg
+port canvasPort : (String, Maybe String) -> Cmd msg
 
 cmdPort : JE.Value -> Cmd Msg
 cmdPort =
@@ -106,6 +106,7 @@ type alias Model =
   , players : Array.Array Player
   , myId : Maybe Int
   , uuid : Maybe String
+  , gameKey : Maybe String
   , funnelState : PortFunnels.State
   , formFields : FormFields
   , pendingDialogs : Dict Int Msg
@@ -130,7 +131,7 @@ init flags url key =
 
     model = Model
       key url NoGame Nothing False Nothing
-      Array.empty Nothing Nothing (PortFunnels.initialState "drawtice")
+      Array.empty Nothing Nothing Nothing (PortFunnels.initialState "drawtice")
       formFields Dict.empty 0 Nothing
   in
     ( model, Cmd.batch [
@@ -280,7 +281,7 @@ update msg model =
               {
                 username = player.username,
                 image = player.imageUrl,
-                status = player.status,
+                status = if player.stuck then Stuck else player.status,
                 isMe = model.myId |> Maybe.map (\i -> i == id) |> Maybe.withDefault False,
                 isAdministrator = player.isAdmin,
                 deadline = if player.deadline == 0 then Nothing else Just <| Time.millisToPosix (player.deadline * 1000)
@@ -290,6 +291,7 @@ update msg model =
             username = Maybe.map (\p -> p.username) me
             mdl = { model
               | gameId = Just details.alias
+              , gameKey = Just <| details.uuid ++ "-" ++ String.fromInt details.currentStage
               , status = details.status
               , players = players } |> maybeSetField UsernameField username
           in
@@ -392,7 +394,7 @@ updatePlayerTime currentTime player =
 
 leaveGame : Model -> Model
 leaveGame model =
-  {model | status = NoGame, gameId = Nothing, players = Array.empty, myId = Nothing}
+  {model | status = NoGame, gameId = Nothing, gameKey = Nothing, players = Array.empty, myId = Nothing}
 
 errorLog : String -> Cmd Msg
 errorLog message =
@@ -724,7 +726,7 @@ viewDrawing model =
       div [ class "drawing-prompt-intro" ] [ text "You must draw:" ],
       div [ class "drawing-subject" ] [ text "an armadillo" ]
     ],
-    node "drawing-canvas" [ class "drawing-canvas" ] [ ],
+    node "drawing-canvas" [ class "drawing-canvas", attribute "key" (model.gameKey |> Maybe.withDefault "") ] [ ],
     button [ class "pure-button pure-button-success landing-button", onClick SubmitText ] [ text "I'm done!" ]
   ]
 

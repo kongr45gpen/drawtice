@@ -25,6 +25,8 @@ type alias GameDetails =
   { alias: String
   , status: GameStatus
   , players: List PlayerDetails
+  , uuid: String
+  , currentStage: Int
   }
 
 type alias PlayerDetails =
@@ -33,6 +35,7 @@ type alias PlayerDetails =
   , status: PlayerStatus
   , isAdmin: Bool
   , deadline: Int
+  , stuck: Bool
   }
 
 type alias PersonalDetails =
@@ -104,22 +107,25 @@ errorParser =
 gameDetailsParser : (Decoder GameDetails, GameDetails -> Response)
 gameDetailsParser =
   (
-    map3 GameDetails
+    map5 GameDetails
       (field "alias" string)
       (field "game_status" (map gameStatusFromString string))
       (field "players" (list playerDecoder))
+      (field "uuid" string)
+      (field "current_stage" int)
     ,
     \v -> GameDetailsResponse v
   )
 
 playerDecoder : Decoder PlayerDetails
 playerDecoder =
-  map5 PlayerDetails
+  map6 PlayerDetails
     (field "username" string)
     (field "image_url" string)
     (field "status" (map playerStatusFromString string))
     (field "is_admin" bool)
     (field "deadline" int)
+    (field "stuck" bool)
 
 personalDetailsParser : (Decoder PersonalDetails, PersonalDetails -> Response)
 personalDetailsParser =
@@ -148,7 +154,6 @@ gameStatusFromString string =
 playerStatusFromString : String -> PlayerStatus
 playerStatusFromString string =
   case string of
-    "Stuck" -> Stuck
     "Done" -> Done
     "Working" -> Working 0
     "Uploading" -> Uploading 50

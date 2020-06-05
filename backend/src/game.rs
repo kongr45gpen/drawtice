@@ -17,7 +17,6 @@ use std::iter;
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
 pub enum PlayerStatus {
-    Stuck,
     Done,
     Working,
     Uploading,
@@ -42,6 +41,7 @@ pub struct Player {
     pub username: String,
     image_url: String,
     pub status: PlayerStatus,
+    pub stuck: bool,
 
     #[serde(with = "posix_date_format")]
     deadline: Option<DateTime<Utc>>,
@@ -54,6 +54,7 @@ pub struct Game {
     #[serde(skip_serializing)]
     pub id: usize,
 
+    pub uuid: Uuid,
     pub alias: String,
     pub game_status: GameStatus,
     pub players: Vec<Player>,
@@ -73,6 +74,7 @@ impl Player {
             username: username.to_string(),
             image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg?background=%23559", username),
             status: PlayerStatus::Done,
+            stuck: false,
             deadline: None,
             is_admin,
         }
@@ -87,6 +89,7 @@ impl Game {
         Game {
             id,
             alias,
+            uuid: Uuid::new_v4(),
             game_status: GameStatus::Lobby,
             players: vec![],
             default_time: Duration::new(10 * 60, 0),
@@ -126,7 +129,7 @@ impl Game {
 
     fn is_everyone_done(&self) -> bool {
         self.players.iter()
-            .all(|p| p.status == PlayerStatus::Done || p.status == PlayerStatus::Stuck)
+            .all(|p| p.status == PlayerStatus::Done || p.stuck)
     }
 
     /// Advance to the next game stage
@@ -149,7 +152,7 @@ impl Game {
         }
 
         for player in self.players.iter_mut()
-            .filter(|p| p.status != PlayerStatus::Stuck)
+            .filter(|p| !p.stuck)
         {
             player.status = if self.game_status == GameStatus::GameOver {
                 PlayerStatus::Done
@@ -184,6 +187,13 @@ impl Game {
     /// Return whether the game has ended
     pub fn is_over(&self) -> bool {
         return self.players.is_empty();
+    }
+
+    /// Mark a player as stuck, if they exist
+    pub fn player_stuck(&mut self, player_id: usize, stuck: bool) {
+        self.players
+            .get_mut(player_id)
+            .map(|player| player.stuck = stuck);
     }
 }
 

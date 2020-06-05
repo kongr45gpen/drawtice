@@ -72,6 +72,13 @@ PortFunnel.subscribe(app);
         class extends HTMLElement {
             // things required by Custom Elements
             constructor() { super(); }
+
+            static get observedAttributes() { return ['key']; }
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                console.log(name, oldValue, newValue);
+            }
+
             connectedCallback() {
                 var drawer = new DrawerJs.Drawer(null, {
                     plugins: drawerPlugins,
@@ -99,9 +106,15 @@ PortFunnel.subscribe(app);
         }
     );
 
-    // app.ports.canvasPort.subscribe(function(data) {
-        // if (data == "create") {
-        // }
+        console.log(app.ports);
+
+    // app.ports.canvasPort.subscribe(function(input) {
+    //     var command = input[0];
+    //     var data = input[1];
+    //     if (data == "create") {
+    //     } else if (data == "setkey") {
+
+    //     }
     // });
 
   // Debugging

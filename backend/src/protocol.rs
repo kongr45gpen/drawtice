@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, from_value, json};
+use uuid::Uuid;
 
 use std::io::{ErrorKind};
 use log::{trace, debug, info, warn, error};

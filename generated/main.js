@@ -5242,12 +5242,14 @@ var $author$project$Main$Model = function (key) {
 						return function (players) {
 							return function (myId) {
 								return function (uuid) {
-									return function (funnelState) {
-										return function (formFields) {
-											return function (pendingDialogs) {
-												return function (nextDialogId) {
-													return function (error) {
-														return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, status: status, url: url, uuid: uuid};
+									return function (gameKey) {
+										return function (funnelState) {
+											return function (formFields) {
+												return function (pendingDialogs) {
+													return function (nextDialogId) {
+														return function (error) {
+															return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, status: status, url: url, uuid: uuid};
+														};
 													};
 												};
 											};
@@ -6872,7 +6874,7 @@ var $author$project$Main$init = F3(
 			username: '',
 			usernamePlaceholder: ''
 		};
-		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
+		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
 			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
@@ -7182,6 +7184,7 @@ var $author$project$Main$StorageReceive = F2(
 	function (a, b) {
 		return {$: 'StorageReceive', a: a, b: b};
 	});
+var $author$project$Protocol$Stuck = {$: 'Stuck'};
 var $author$project$Protocol$TextPackageCommand = function (a) {
 	return {$: 'TextPackageCommand', a: a};
 };
@@ -7400,9 +7403,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString = funct
 			return 'InvalidMessageError: ' + $billstclair$elm_websocket_client$PortFunnel$WebSocket$toString(message);
 	}
 };
-var $author$project$Protocol$GameDetails = F3(
-	function (alias, status, players) {
-		return {alias: alias, players: players, status: status};
+var $author$project$Protocol$GameDetails = F5(
+	function (alias, status, players, uuid, currentStage) {
+		return {alias: alias, currentStage: currentStage, players: players, status: status, uuid: uuid};
 	});
 var $author$project$Protocol$GameDetailsResponse = function (a) {
 	return {$: 'GameDetailsResponse', a: a};
@@ -7428,13 +7431,13 @@ var $author$project$Protocol$gameStatusFromString = function (string) {
 			return $author$project$Protocol$Lobby;
 	}
 };
-var $author$project$Protocol$PlayerDetails = F5(
-	function (username, imageUrl, status, isAdmin, deadline) {
-		return {deadline: deadline, imageUrl: imageUrl, isAdmin: isAdmin, status: status, username: username};
-	});
 var $elm$json$Json$Decode$map5 = _Json_map5;
+var $author$project$Protocol$PlayerDetails = F6(
+	function (username, imageUrl, status, isAdmin, deadline, stuck) {
+		return {deadline: deadline, imageUrl: imageUrl, isAdmin: isAdmin, status: status, stuck: stuck, username: username};
+	});
+var $elm$json$Json$Decode$map6 = _Json_map6;
 var $author$project$Protocol$Done = {$: 'Done'};
-var $author$project$Protocol$Stuck = {$: 'Stuck'};
 var $author$project$Protocol$Uploading = function (a) {
 	return {$: 'Uploading', a: a};
 };
@@ -7443,8 +7446,6 @@ var $author$project$Protocol$Working = function (a) {
 };
 var $author$project$Protocol$playerStatusFromString = function (string) {
 	switch (string) {
-		case 'Stuck':
-			return $author$project$Protocol$Stuck;
 		case 'Done':
 			return $author$project$Protocol$Done;
 		case 'Working':
@@ -7455,8 +7456,8 @@ var $author$project$Protocol$playerStatusFromString = function (string) {
 			return $author$project$Protocol$Stuck;
 	}
 };
-var $author$project$Protocol$playerDecoder = A6(
-	$elm$json$Json$Decode$map5,
+var $author$project$Protocol$playerDecoder = A7(
+	$elm$json$Json$Decode$map6,
 	$author$project$Protocol$PlayerDetails,
 	A2($elm$json$Json$Decode$field, 'username', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'image_url', $elm$json$Json$Decode$string),
@@ -7465,10 +7466,11 @@ var $author$project$Protocol$playerDecoder = A6(
 		'status',
 		A2($elm$json$Json$Decode$map, $author$project$Protocol$playerStatusFromString, $elm$json$Json$Decode$string)),
 	A2($elm$json$Json$Decode$field, 'is_admin', $elm$json$Json$Decode$bool),
-	A2($elm$json$Json$Decode$field, 'deadline', $elm$json$Json$Decode$int));
+	A2($elm$json$Json$Decode$field, 'deadline', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'stuck', $elm$json$Json$Decode$bool));
 var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
-	A4(
-		$elm$json$Json$Decode$map3,
+	A6(
+		$elm$json$Json$Decode$map5,
 		$author$project$Protocol$GameDetails,
 		A2($elm$json$Json$Decode$field, 'alias', $elm$json$Json$Decode$string),
 		A2(
@@ -7478,7 +7480,9 @@ var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
 		A2(
 			$elm$json$Json$Decode$field,
 			'players',
-			$elm$json$Json$Decode$list($author$project$Protocol$playerDecoder))),
+			$elm$json$Json$Decode$list($author$project$Protocol$playerDecoder)),
+		A2($elm$json$Json$Decode$field, 'uuid', $elm$json$Json$Decode$string),
+		A2($elm$json$Json$Decode$field, 'current_stage', $elm$json$Json$Decode$int)),
 	function (v) {
 		return $author$project$Protocol$GameDetailsResponse(v);
 	});
@@ -7545,7 +7549,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 var $author$project$Main$leaveGame = function (model) {
 	return _Utils_update(
 		model,
-		{gameId: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, status: $author$project$Protocol$NoGame});
+		{gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, status: $author$project$Protocol$NoGame});
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Debug$log = _Debug_log;
@@ -9785,7 +9789,7 @@ var $author$project$Main$update = F2(
 													return _Utils_eq(i, id);
 												},
 												model.myId)),
-										status: player.status,
+										status: player.stuck ? $author$project$Protocol$Stuck : player.status,
 										username: player.username
 									};
 								});
@@ -9813,6 +9817,8 @@ var $author$project$Main$update = F2(
 									model,
 									{
 										gameId: $elm$core$Maybe$Just(details.alias),
+										gameKey: $elm$core$Maybe$Just(
+											details.uuid + ('-' + $elm$core$String$fromInt(details.currentStage))),
 										players: players,
 										status: details.status
 									}));
@@ -9973,6 +9979,14 @@ var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$SubmitText = {$: 'SubmitText'};
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
@@ -10040,7 +10054,11 @@ var $author$project$Main$viewDrawing = function (model) {
 				'drawing-canvas',
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('drawing-canvas')
+						$elm$html$Html$Attributes$class('drawing-canvas'),
+						A2(
+						$elm$html$Html$Attributes$attribute,
+						'key',
+						A2($elm$core$Maybe$withDefault, '', model.gameKey))
 					]),
 				_List_Nil),
 				A2(
