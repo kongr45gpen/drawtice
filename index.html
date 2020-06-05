@@ -22,6 +22,7 @@
 
   <script type="text/javascript" src='lib/DrawerJS/lib/jquery-3.4.1.min.js'></script>
   <script type="text/javascript" src='lib/DrawerJS/dist/drawerJs.standalone.min.js'></script>
+  <script type="text/javascript" src='lib/BrushSizeSimple.js'></script>
   <script>
 
 var drawerPlugins = [
@@ -33,7 +34,7 @@ var drawerPlugins = [
     'Rectangle',
     'Circle',
     'Color',
-    'BrushSize',
+    'BrushSizeSimple',
     // 'Resize',
     // 'ShapeContextMenu'
 ];
@@ -93,10 +94,10 @@ PortFunnel.subscribe(app);
         }
     );
 
-    app.ports.canvasPort.subscribe(function(data) {
-        if (data == "create") {
-        }
-    });
+    // app.ports.canvasPort.subscribe(function(data) {
+        // if (data == "create") {
+        // }
+    // });
 
   // Debugging
 //   ports.cmdPort.subscribe(function (string) {

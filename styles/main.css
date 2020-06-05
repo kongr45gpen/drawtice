@@ -335,7 +335,7 @@ body {
 
 .drawing-canvas {
   width: 100%;
-  min-height: 50%;
+  min-height: 40%;
 
   max-width: 100%;
   min-width: 30%;
@@ -343,4 +343,37 @@ body {
 
 .drawing-canvas .editable-canvas-image {
   max-width: 100%;
+}
+
+.drawing-size-buttons {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.drawing-size-buttons button {
+  height: 32px;
+  width: 3rem;
+  overflow: hidden;
+  text-align: center;
+  padding: 0;
+}
+
+.drawing-size-buttons button i {
+  pointer-events: none;
+}
+
+.drawing-size-buttons button:nth-child(1) {
+  font-size: 5pt;
+}
+
+.drawing-size-buttons button:nth-child(2) {
+  font-size: 10pt;
+}
+
+.drawing-size-buttons button:nth-child(3) {
+  font-size: 15pt;
+}
+
+.drawing-size-buttons button:nth-child(4) {
+  font-size: 20pt;
 }
