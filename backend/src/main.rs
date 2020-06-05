@@ -14,19 +14,19 @@ use uuid::Uuid;
 use std::iter;
 use std::env;
 
-use log::{trace,debug,info,warn,error};
+use log::{trace, debug, info, warn, error};
 
 pub(crate) mod game;
 pub(crate) mod protocol;
 pub(crate) mod names;
 
-use game::{Player,Game};
+use game::{Player, Game};
 
 struct User {
     uuid: Uuid,
     tx: mpsc::UnboundedSender<Result<Message, warp::Error>>,
     /// IDs of the game and the player in the game
-    game: Option<(usize, usize)>
+    game: Option<(usize, usize)>,
 }
 
 /// Our global unique user id counter.
@@ -169,7 +169,7 @@ fn is_debug_mode() -> bool {
 async fn main() {
     pretty_env_logger::init_timed();
 
-    let games : GamesMutex = Arc::new(Mutex::new(HashMap::new()));
+    let games: GamesMutex = Arc::new(Mutex::new(HashMap::new()));
     let games = warp::any().map(move || games.clone());
 
     // Keep track of all connected users, key is usize, value
@@ -212,8 +212,7 @@ async fn user_connected(ws: WebSocket, users: UsersMutex, games: GamesMutex) {
     // Use an unbounded channel to handle buffering and flushing of messages
     // to the websocket...
     let (tx, rx) = mpsc::unbounded_channel();
-    tokio::task::spawn(rx.forward(user_ws_tx).map(|result| {
-    }));
+    tokio::task::spawn(rx.forward(user_ws_tx).map(|result| {}));
 
     // Save the sender in our list of connected users.
     let user = User { tx, uuid: Uuid::new_v4(), game: None };
@@ -262,14 +261,14 @@ async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &Ga
             tx_direct(&users_locked, my_id,
                       protocol::Response::Error(format!("Invalid data: {}", e.to_string())))
                 .await;
-            return
-        },
+            return;
+        }
         Ok(c) => c,
     };
 
     let mut games_locked = games.lock().await;
 
-    let result = game_command(&mut users_locked, my_id,&mut games_locked, command).await;
+    let result = game_command(&mut users_locked, my_id, &mut games_locked, command).await;
     if let Err(e) = result {
         let error_response = protocol::Response::Error(e.to_string());
         warn!("Sending error: {:?}", e);
@@ -278,7 +277,7 @@ async fn user_message(my_id: usize, msg: Message, users: &UsersMutex, games: &Ga
 }
 
 async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, command: protocol::Command)
-    -> protocol::Result<()> {
+                      -> protocol::Result<()> {
     trace!("Command {:?} to game_command", command);
     let user = users.get_mut(&my_id).unwrap();
 
@@ -286,7 +285,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         protocol::Command::Ping => (),
         protocol::Command::NewGame(c) => {
             // Create the administrator player based on the current user
-            let player = Player::new(user.uuid, my_id,c.username.as_str(), true);
+            let player = Player::new(user.uuid, my_id, c.username.as_str(), true);
             let player2 = player.clone();
 
             // Now create the game itself
@@ -308,17 +307,16 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             tx_direct(users, my_id,
                       protocol::Response::PersonalDetails(
                           protocol::PersonalDetailsResponse::new(player_id, &player2)
-                      )
+                      ),
             ).await;
             tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
                 .await;
-        },
+        }
         protocol::Command::JoinGame(c) => {
-            let player = Player::new(user.uuid, my_id,c.username.as_str(), false);
+            let player = Player::new(user.uuid, my_id, c.username.as_str(), false);
 
             // Linear search of the game by the provided alias
-            let game =
-                games.iter_mut()
+            let game = games.iter_mut()
                     .filter(|g| g.1.alias == c.game_id)
                     .next()
                     .ok_or("Could not find a game with this name!")?;
@@ -340,11 +338,11 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             tx_direct(users, my_id,
                       protocol::Response::PersonalDetails(
                           protocol::PersonalDetailsResponse::new(player_id, &player2)
-                      )
+                      ),
             ).await;
             tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
                 .await;
-        },
+        }
         protocol::Command::KickPlayer(c) => {
             let game = user.fetch_game_mut(games)?;
             let (kicker, _) = user.fetch_player(game)?;
@@ -378,7 +376,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             game.reassign_users(users);
             game.tx_game_details(users, true).await;
-        },
+        }
         protocol::Command::MyUuid(s) => {
             let uuid = Uuid::parse_str(s.as_str())
                 .map_err(|_| protocol::Error::from("Invalid UUID provided"))?;
@@ -398,7 +396,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                         )).await;
                         user.tx_direct(protocol::Response::GameDetails(game)).await;
 
-                        return Ok(())
+                        return Ok(());
                     }
                 }
             }
@@ -427,13 +425,13 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                     }
                 };
 
-                let player = Player::new(user.uuid, my_id,names::generate_random_name().as_str(), true);
+                let player = Player::new(user.uuid, my_id, names::generate_random_name().as_str(), true);
                 let player_id = game.add_player(player);
                 user.game = Some((game_id, player_id));
 
                 game.tx_game_details(users, true).await;
             }
-        },
+        }
         protocol::Command::StartGame => {
             let game = user.fetch_game_mut(games)?;
             let (player, _) = user.fetch_player(game)?;
@@ -441,7 +439,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             game.start();
             game.tx_game_details(users, false).await;
-        },
+        }
         protocol::Command::TextPackage(c) => {
             let game = user.fetch_game_mut(games)?;
 
@@ -491,7 +489,7 @@ async fn tx_game(users: &Users, my_id: usize, game_id: usize, response: protocol
                     }
                 }
             }
-        },
+        }
         Err(e) => return error!("Could not transmit message: {:?}", e),
     };
 }
@@ -507,7 +505,7 @@ async fn tx_broadcast(users: &Users, my_id: usize, response: protocol::Response<
                     user.tx_direct_str(r.clone()).await;
                 }
             }
-        },
+        }
         Err(e) => return error!("Could not transmit message: {:?}", e),
     };
 }

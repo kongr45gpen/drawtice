@@ -51,6 +51,8 @@ port confirmPort : (String, Int) -> Cmd msg
 
 port confirmReturnPort : ((Bool, Int) -> msg) -> Sub msg
 
+port canvasPort : String -> Cmd msg
+
 cmdPort : JE.Value -> Cmd Msg
 cmdPort =
     PortFunnels.getCmdPort Receive "" False
@@ -292,9 +294,9 @@ update msg model =
               , players = players } |> maybeSetField UsernameField username
           in
             ( mdl,
-                Cmd.batch [
-                  me |> Maybe.map (\p -> putLocalStorageString mdl "username" p.username) |> Maybe.withDefault Cmd.none,
-                  if mdl.url == getGameLink mdl then
+                Cmd.batch
+                [ me |> Maybe.map (\p -> putLocalStorageString mdl "username" p.username) |> Maybe.withDefault Cmd.none
+                , if mdl.url == getGameLink mdl then
                     Cmd.none
                   else
                     Nav.pushUrl mdl.key (getGameLink mdl |> Url.toString)
@@ -722,11 +724,11 @@ viewDrawing model =
       div [ class "drawing-prompt-intro" ] [ text "You must draw:" ],
       div [ class "drawing-subject" ] [ text "an armadillo" ]
     ],
-    textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
+    node "drawing-canvas" [ class "drawing-canvas" ] [ ],
     button [ class "pure-button pure-button-success landing-button", onClick SubmitText ] [ text "I'm done!" ]
   ]
 
-viewPlayerAvatar : Player -> Html msg
+viewPlayerAvatar : Player -> Html Msg
 viewPlayerAvatar player =
   img [ class "avatar", alt (player.username ++ " Avatar"), src player.image ] []
 

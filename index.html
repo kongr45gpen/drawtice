@@ -11,16 +11,34 @@
   </style>
 
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.1/build/pure-min.css" integrity="sha384-QkSsJi6SGgWv5LAx1TdvIDRf8TW5Ui4NVKqDDlK1wY2eKioo7wvYIJvGWFQSFE4U" crossorigin="anonymous">
+  <link rel="stylesheet" href="lib/DrawerJS/assets/font-awesome.min.css">
+  <link rel="stylesheet" href="lib/DrawerJS/dist/drawerJs.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
   <script type='text/javascript' src='lib/PortFunnel.js'></script>
   <script type='text/javascript' src='lib/PortFunnel/WebSocket.js'></script>
   <script type='text/javascript' src='lib/PortFunnel/LocalStorage.js'></script>
+
+  <script type="text/javascript" src='lib/DrawerJS/lib/jquery-3.4.1.min.js'></script>
+  <script type="text/javascript" src='lib/DrawerJS/dist/drawerJs.standalone.min.js'></script>
   <script>
 
+var drawerPlugins = [
+    'Pencil',
+    'Eraser',
+    'Line',
+    'ArrowOneSide',
+    'ArrowTwoSide',
+    'Rectangle',
+    'Circle',
+    'Color',
+    'BrushSize',
+    // 'Resize',
+    // 'ShapeContextMenu'
+];
+
 var app = Elm.Main.init();
-console.log(app);
 
 // These are the defaults, so you don't need to pass them.  If you
 // need to use different port names, you can pass them as the
@@ -47,6 +65,38 @@ PortFunnel.subscribe(app);
 
     app.ports.confirmReturnPort.send([window.confirm(text), id])
   });
+
+
+    customElements.define('drawing-canvas',
+        class extends HTMLElement {
+            // things required by Custom Elements
+            constructor() { super(); }
+            connectedCallback() {
+                var drawer = new DrawerJs.Drawer(null, {
+                    plugins: drawerPlugins,
+                    defaultActivePlugin : { name : 'Pencil', mode : 'lastUsed' },
+                    exitOnOutsideClick: false,
+                    contentConfig: {
+                    saveInHtml: false,
+                    saveCanvasData: function(canvasId, canvasData){
+                        localStorage.setItem('drawtice.canvas', JSON.stringify(JSON.parse(canvasData)));
+                    },
+                    loadCanvasData: function(canvasId){
+                        return localStorage.getItem('drawtice.canvas');
+                    },
+                    }
+                }, '100%', this.offsetHeight);
+                this.innerHTML = drawer.getHtml();
+                drawer.onInsert();
+                drawer.api.startEditing();
+            }
+        }
+    );
+
+    app.ports.canvasPort.subscribe(function(data) {
+        if (data == "create") {
+        }
+    });
 
   // Debugging
 //   ports.cmdPort.subscribe(function (string) {

@@ -9973,8 +9973,12 @@ var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$SubmitText = {$: 'SubmitText'};
-var $author$project$Main$TextField = {$: 'TextField'};
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -9992,39 +9996,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
 var $elm$html$Html$section = _VirtualDom_node('section');
-var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$viewDrawing = function (model) {
 	return A2(
 		$elm$html$Html$section,
@@ -10063,13 +10035,12 @@ var $author$project$Main$viewDrawing = function (model) {
 								$elm$html$Html$text('an armadillo')
 							]))
 					])),
-				A2(
-				$elm$html$Html$textarea,
+				A3(
+				$elm$html$Html$node,
+				'drawing-canvas',
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('text-starting-input'),
-						$elm$html$Html$Events$onInput(
-						$author$project$Main$SetField($author$project$Main$TextField))
+						$elm$html$Html$Attributes$class('drawing-canvas')
 					]),
 				_List_Nil),
 				A2(
@@ -10299,6 +10270,37 @@ var $elm$html$Html$Attributes$autocomplete = function (bool) {
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
 var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
 	return _Utils_Tuple2(msg, true);
 };
@@ -10976,6 +10978,8 @@ var $author$project$Main$viewSidebar = function (model) {
 							]) : _List_Nil)))
 			]));
 };
+var $author$project$Main$TextField = {$: 'TextField'};
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$viewStarting = function (model) {
 	return A2(
 		$elm$html$Html$section,

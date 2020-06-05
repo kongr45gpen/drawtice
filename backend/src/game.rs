@@ -1,6 +1,7 @@
 extern crate chrono;
 extern crate uuid;
 extern crate rand;
+
 use chrono::{DateTime, Utc};
 use chrono::prelude::*;
 use std::time::{Duration, SystemTime};
@@ -19,7 +20,7 @@ pub enum PlayerStatus {
     Stuck,
     Done,
     Working,
-    Uploading
+    Uploading,
 }
 
 #[derive(Serialize, Debug, PartialEq)]
@@ -28,7 +29,7 @@ pub enum GameStatus {
     Starting,
     Drawing,
     Understanding,
-    GameOver
+    GameOver,
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -73,7 +74,7 @@ impl Player {
             image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg?background=%23559", username),
             status: PlayerStatus::Done,
             deadline: None,
-            is_admin
+            is_admin,
         }
     }
 }
@@ -182,7 +183,7 @@ impl Game {
 
     /// Return whether the game has ended
     pub fn is_over(&self) -> bool {
-        return self.players.is_empty()
+        return self.players.is_empty();
     }
 }
 
@@ -208,7 +209,6 @@ mod posix_date_format {
             Some(d) => serializer.serialize_i64(d.timestamp()),
             None => serializer.serialize_i64(0),
         }
-
     }
 
     // The signature of a deserialize_with function must follow the pattern:

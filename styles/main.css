@@ -332,3 +332,15 @@ body {
   font-size: 20pt;
   font-weight: bold;
 }
+
+.drawing-canvas {
+  width: 100%;
+  min-height: 50%;
+
+  max-width: 100%;
+  min-width: 30%;
+}
+
+.drawing-canvas .editable-canvas-image {
+  max-width: 100%;
+}
