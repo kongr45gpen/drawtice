@@ -11,7 +11,7 @@ use warp::ws::{Message, WebSocket};
 use warp::http::header::{HeaderMap, HeaderValue};
 use warp::Filter;
 use uuid::Uuid;
-use std::iter;
+use std::{iter, thread};
 use std::env;
 
 use log::{trace, debug, info, warn, error};
@@ -21,6 +21,7 @@ pub(crate) mod protocol;
 pub(crate) mod names;
 
 use game::{Player, Game};
+use std::time::Duration;
 
 struct User {
     uuid: Uuid,
@@ -170,13 +171,15 @@ async fn main() {
     pretty_env_logger::init_timed();
 
     let games: GamesMutex = Arc::new(Mutex::new(HashMap::new()));
-    let games = warp::any().map(move || games.clone());
+    let games2 = games.clone();
+    let games_filter = warp::any().map(move || games.clone());
 
     // Keep track of all connected users, key is usize, value
     // is a websocket sender.
     let users = Arc::new(Mutex::new(HashMap::new()));
+    let users2 = users.clone();
     // Turn our "state" into a new Filter...
-    let users = warp::any().map(move || users.clone());
+    let users_filter = warp::any().map(move || users.clone());
 
     // Prepare any headers to be added to the request
     let mut headers = HeaderMap::new();
@@ -186,8 +189,8 @@ async fn main() {
     let ws = warp::path("ws")
         // The `ws()` filter will prepare Websocket handshake...
         .and(warp::ws())
-        .and(users)
-        .and(games)
+        .and(users_filter)
+        .and(games_filter)
         .map(|ws: warp::ws::Ws, users, games| {
             // This will call our function if the handshake succeeds.
             ws.on_upgrade(move |socket| user_connected(socket, users, games))
@@ -198,6 +201,27 @@ async fn main() {
     let index = warp::path::end().map(|| warp::reply::html(INDEX_HTML));
 
     let routes = index.or(ws);
+
+    // let handle = thread::spawn(|| {
+    //     loop {
+    //         info!("Hello to my thread");
+    //         thread::sleep(Duration::from_secs(1));
+    //     }
+    // });
+
+    tokio::task::spawn(async move {
+        let mut interval = tokio::time::interval(Duration::from_secs(1));
+
+        loop {
+            interval.tick().await;
+            trace!("Running scheduler");
+
+            let mut users_locked = users2.lock().await;
+            let mut games_locked = games2.lock().await;
+
+            scheduler(&mut users_locked, &mut games_locked).await;
+        }
+    });
 
     warp::serve(routes).run(([0, 0, 0, 0], 3030)).await;
 }
@@ -383,7 +407,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             user.uuid = uuid;
 
             // Search for this user in all our games
-            'outer: for (&gid, game) in games.iter_mut() {
+            for (&gid, game) in games.iter_mut() {
                 for (pid, player) in game.players.iter_mut().enumerate() {
                     if player.uuid == uuid {
                         // Found the player!
@@ -454,21 +478,14 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
     Ok(())
 }
 
-// async fn game_function_single(users: &mut Users, my_id: usize, games: &mut Games, function: fn(&Game)) {
-//     let game = user.game.and_then(|g| games.get(&(g.0)));
-//
-//     if let game = Some(game) {
-//         function(game);
-//     } else {
-//         let response = protocol::Response::Error("User not in a game".to_string());
-//         tx_direct(users, my_id, response).await;
-//     }
-// }
-
-// async fn game_function_single_mut(users: &mut Users, my_id: usize, games: &mut Games, function: fn(&mut Users, usize, &mut Game)) {
-//     let mut game = user.game.and_then(|g| games.get_mut(&(g.0)));
-//     function(users, my_id, game);
-// }
+async fn scheduler(users: &mut Users, games: &mut Games) {
+    for (&gid, game) in games.iter_mut() {
+        if game.is_round_done() {
+            game.next_stage();
+            game.tx_game_details(users, false).await;
+        }
+    }
+}
 
 async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>) {
     let user = users.get(&my_id).unwrap();

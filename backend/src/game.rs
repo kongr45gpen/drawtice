@@ -92,7 +92,7 @@ impl Game {
             uuid: Uuid::new_v4(),
             game_status: GameStatus::Lobby,
             players: vec![],
-            default_time: Duration::new(10 * 60, 0),
+            default_time: Duration::new(10, 0),
             current_stage: 0,
             total_stages: 0,
         }
@@ -127,9 +127,25 @@ impl Game {
         self.next_stage();
     }
 
+    /// Returns if all players have successfully submitted their job
     fn is_everyone_done(&self) -> bool {
         self.players.iter()
             .all(|p| p.status == PlayerStatus::Done || p.stuck)
+    }
+
+    /// Returns if all player have submitted their job or are overtime
+    pub fn is_round_done(&self) -> bool {
+        if self.game_status == GameStatus::Lobby || self.game_status == GameStatus::GameOver {
+            return false
+        }
+
+        self.players.iter()
+            .all(|p| {
+                let now: DateTime<Utc> = DateTime::from(SystemTime::now());
+                p.status == PlayerStatus::Done
+                    || p.stuck
+                    || p.deadline.map_or(false,|d| d < now)
+            })
     }
 
     /// Advance to the next game stage
@@ -144,11 +160,10 @@ impl Game {
                 } else {
                     self.game_status = GameStatus::Drawing;
                 }
-            } else {
-                self.game_status = GameStatus::GameOver;
             }
-
             self.current_stage += 1;
+        } else {
+            self.game_status = GameStatus::GameOver;
         }
 
         for player in self.players.iter_mut()
