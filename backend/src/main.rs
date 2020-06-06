@@ -13,6 +13,7 @@ use warp::Filter;
 use uuid::Uuid;
 use std::{iter, thread};
 use std::env;
+use lazy_static::lazy_static;
 
 use log::{trace, debug, info, warn, error};
 
@@ -159,16 +160,17 @@ impl Game {
     }
 }
 
-// TODO: Cache the result of this
-fn is_debug_mode() -> bool {
-    env::var("DRAWTICE_DEBUG")
+lazy_static! {
+    static ref DEBUG_MODE: bool = env::var("DRAWTICE_DEBUG")
         .map(|s| !s.is_empty())
-        .unwrap_or(false)
+        .unwrap_or(false);
 }
 
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init_timed();
+
+    if *DEBUG_MODE { warn!("Enabling debug mode") }
 
     let games: GamesMutex = Arc::new(Mutex::new(HashMap::new()));
     let games2 = games.clone();
@@ -345,7 +347,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                     .next()
                     .ok_or("Could not find a game with this name!")?;
 
-            if game.1.game_status != game::GameStatus::Lobby && !is_debug_mode() {
+            if game.1.game_status != game::GameStatus::Lobby && !*DEBUG_MODE {
                 return Err(protocol::Error::from("I'm sorry, but this game is already running :/"));
             }
 
@@ -429,7 +431,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             }
 
             // Reaching this point means the player is not in a game
-            if is_debug_mode() {
+            if *DEBUG_MODE {
                 debug!("Debug mode player joining activated");
 
                 // Debug mode. Place the user immediately into a game
@@ -488,7 +490,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
 async fn scheduler(users: &mut Users, games: &mut Games) {
     for (&gid, game) in games.iter_mut() {
-        if game.is_round_done() && !is_debug_mode() {
+        if game.is_round_done() && !*DEBUG_MODE {
             game.next_stage();
             game.tx_game_details(users, false).await;
         }
