@@ -23,6 +23,7 @@
   <script type="text/javascript" src='lib/DrawerJS/lib/jquery-3.4.1.min.js'></script>
   <script type="text/javascript" src='lib/DrawerJS/dist/drawerJs.standalone.min.js'></script>
   <script type="text/javascript" src='lib/BrushSizeSimple.js'></script>
+  <script type="text/javascript" src='lib/lodash.throttle.js'></script>
   <script>
 
 var drawerPlugins = [
@@ -80,6 +81,8 @@ PortFunnel.subscribe(app);
             }
 
             connectedCallback() {
+                const _this = this;
+
                 this.drawer = new DrawerJs.Drawer(null, {
                     plugins: drawerPlugins,
                     pluginsConfig: {
@@ -98,13 +101,25 @@ PortFunnel.subscribe(app);
                             return localStorage.getItem('drawtice.canvas');
                         },
                     }
-                }, '100%', this.offsetHeight);
+                }, '100%', this.offsetHeight - 32);
                 this.innerHTML = this.drawer.getHtml();
                 this.drawer.onInsert();
                 this.drawer.api.startEditing();
+
+                var throttled = throttle(function() {
+                    console.log('resize')
+                    console.log("height = " + _this.offsetHeight);
+                    _this.drawer.api.setSize(_this.offsetWidth, _this.offsetHeight - 32);
+                }, 200);
+
+                this.resizeObserver = new ResizeObserver(throttled);
+                this.resizeObserver.observe(this);
             }
 
             disconnectedCallback() {
+                if (this.resizeObserver !== undefined) {
+                    this.resizeObserver.disconnect();
+                }
                 if (this.drawer !== undefined) {
                     this.drawer.destroy();
                 }
@@ -127,9 +142,7 @@ PortFunnel.subscribe(app);
 //   ports.cmdPort.subscribe(function (string) {
 //       console.log(string);
 //   })
-
 })();
-
     </script>
 </body>
 </html>
