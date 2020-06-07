@@ -163,6 +163,7 @@ type Msg
   | KickPlayer Int
   | NextRound
   | SubmitText
+  | SubmitImage
   | SetField FormField String
   | Send JE.Value
   | Receive JE.Value
@@ -233,6 +234,9 @@ update msg model =
 
     SubmitText ->
       (model, sendSocketCommand <| TextPackageCommand model.formFields.text )
+
+    SubmitImage ->
+      (model, canvasPort ("snap", Nothing))
 
     KickPlayer value ->
       (model, sendSocketCommand <| KickCommand value)
@@ -762,7 +766,7 @@ viewDrawing model =
       div [ class "drawing-subject" ] [ text <| getWorkPackageText model ]
     ],
     node "drawing-canvas" [ class "drawing-canvas", attribute "key" (model.gameKey |> Maybe.withDefault "") ] [ ],
-    button [ class "pure-button pure-button-success landing-button", onClick SubmitText ] [ text "I'm done!" ]
+    button [ class "pure-button pure-button-success landing-button", onClick SubmitImage ] [ text "I'm done!" ]
   ]
 
 viewPlayerAvatar : Player -> Html Msg

@@ -97,9 +97,13 @@ PortFunnel.subscribe(app);
                         saveCanvasData: function(canvasId, canvasData){
                             localStorage.setItem('drawtice.canvas', JSON.stringify(JSON.parse(canvasData)));
                         },
-                        loadCanvasData: function(canvasId){
+                        loadCanvasData: function(canvasId) {
                             return localStorage.getItem('drawtice.canvas');
                         },
+                        // saveImageData: function(canvasId, imageData) {
+                        //     localStorage.setItem('drawtice.image', imageData);
+                        //     _this.temporaryImageStorage = imageData;
+                        // },
                     }
                 }, '100%', this.offsetHeight - 32);
                 this.innerHTML = this.drawer.getHtml();
@@ -107,16 +111,27 @@ PortFunnel.subscribe(app);
                 this.drawer.api.startEditing();
 
                 var throttled = throttle(function() {
-                    console.log('resize')
-                    console.log("height = " + _this.offsetHeight);
                     _this.drawer.api.setSize(_this.offsetWidth, _this.offsetHeight - 32);
                 }, 200);
 
                 this.resizeObserver = new ResizeObserver(throttled);
                 this.resizeObserver.observe(this);
+
+                this.portCallback = function(input) {
+                    console.log(input)
+                    var command = input[0];
+                    var data = input[1];
+                    if (command == "snap") {
+                        console.log(_this.drawer.api.getCanvasAsImage().length);
+                    } else if (data == "setkey") {
+                        // TODO: key using attrs
+                    }
+                }
+                app.ports.canvasPort.subscribe(this.portCallback);
             }
 
             disconnectedCallback() {
+                app.ports.canvasPort.unsubscribe(this.portCallback);
                 if (this.resizeObserver !== undefined) {
                     this.resizeObserver.disconnect();
                 }
@@ -129,14 +144,7 @@ PortFunnel.subscribe(app);
 
         console.log(app.ports);
 
-    // app.ports.canvasPort.subscribe(function(input) {
-    //     var command = input[0];
-    //     var data = input[1];
-    //     if (data == "create") {
-    //     } else if (data == "setkey") {
 
-    //     }
-    // });
 
   // Debugging
 //   ports.cmdPort.subscribe(function (string) {

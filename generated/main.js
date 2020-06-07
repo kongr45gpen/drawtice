@@ -7220,6 +7220,31 @@ var $elm$core$Maybe$andThen = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $elm$core$Maybe$destruct = F3(
+	function (_default, func, maybe) {
+		if (maybe.$ === 'Just') {
+			var a = maybe.a;
+			return func(a);
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$canvasPort = _Platform_outgoingPort(
+	'canvasPort',
+	function ($) {
+		var a = $.a;
+		var b = $.b;
+		return A2(
+			$elm$json$Json$Encode$list,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					$elm$json$Json$Encode$string(a),
+					function ($) {
+					return A3($elm$core$Maybe$destruct, $elm$json$Json$Encode$null, $elm$json$Json$Encode$string, $);
+				}(b)
+				]));
+	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeToString = function (code) {
 	switch (code.$) {
 		case 'NormalClosure':
@@ -9700,6 +9725,11 @@ var $author$project$Main$update = F2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$TextPackageCommand(model.formFields.text)));
+				case 'SubmitImage':
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$canvasPort(
+							_Utils_Tuple2('snap', $elm$core$Maybe$Nothing)));
 				case 'KickPlayer':
 					var value = msg.a;
 					return _Utils_Tuple2(
@@ -10010,7 +10040,7 @@ var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$SubmitText = {$: 'SubmitText'};
+var $author$project$Main$SubmitImage = {$: 'SubmitImage'};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -10111,7 +10141,7 @@ var $author$project$Main$viewDrawing = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('pure-button pure-button-success landing-button'),
-						$elm$html$Html$Events$onClick($author$project$Main$SubmitText)
+						$elm$html$Html$Events$onClick($author$project$Main$SubmitImage)
 					]),
 				_List_fromArray(
 					[
@@ -11084,6 +11114,7 @@ var $author$project$Main$viewSidebar = function (model) {
 								]) : _List_Nil))))
 			]));
 };
+var $author$project$Main$SubmitText = {$: 'SubmitText'};
 var $author$project$Main$TextField = {$: 'TextField'};
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$viewStarting = function (model) {
