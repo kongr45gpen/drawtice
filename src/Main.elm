@@ -78,6 +78,10 @@ type FormField
   | UsernamePlaceholder
   | TextField
 
+type WorkPackage
+  = TextPackage String
+  | ImagePackage String
+
 type alias Player =
   {
     username : String,
@@ -106,6 +110,7 @@ type alias Model =
   , players : Array.Array Player
   , myId : Maybe Int
   , uuid : Maybe String
+  , previousPackage : Maybe WorkPackage
   , gameKey : Maybe String
   , funnelState : PortFunnels.State
   , formFields : FormFields
@@ -131,7 +136,7 @@ init flags url key =
 
     model = Model
       key url NoGame Nothing False Nothing
-      Array.empty Nothing Nothing Nothing (PortFunnels.initialState "drawtice")
+      Array.empty Nothing Nothing Nothing Nothing (PortFunnels.initialState "drawtice")
       formFields Dict.empty 0 Nothing
   in
     ( model, Cmd.batch [
@@ -322,6 +327,8 @@ update msg model =
           ({model | uuid = Just uuid}, putLocalStorageString model "uuid" uuid)
         Protocol.LeftGameResponse ->
           (leaveGame model, Cmd.none)
+        Protocol.PreviousTextPackageResponse text ->
+          ({model | previousPackage = Just <| TextPackage text}, Cmd.none)
 
 
     ShowError value ->
@@ -398,7 +405,12 @@ updatePlayerTime currentTime player =
 
 leaveGame : Model -> Model
 leaveGame model =
-  {model | status = NoGame, gameId = Nothing, gameKey = Nothing, players = Array.empty, myId = Nothing}
+  {model | status = NoGame
+         , gameId = Nothing
+         , gameKey = Nothing
+         , players = Array.empty
+         , myId = Nothing
+         , previousPackage = Nothing}
 
 errorLog : String -> Cmd Msg
 errorLog message =
@@ -464,6 +476,8 @@ socketHandler response state mdl =
                 decodeDataUsingParser Protocol.uuidParser
               "left_game" ->
                 Protocol.LeftGameResponse
+              "previous_text_package" ->
+                decodeDataUsingParser Protocol.previousTextPackageParser
               _ ->
                 Protocol.ErrorResponse "Uknown response type received"
       in
@@ -728,7 +742,7 @@ viewDrawing model =
   section [ class "drawing hall" ] [
     div [ class "drawing-prompt" ] [
       div [ class "drawing-prompt-intro" ] [ text "You must draw:" ],
-      div [ class "drawing-subject" ] [ text "an armadillo" ]
+      div [ class "drawing-subject" ] [ text <| getWorkPackageText model ]
     ],
     node "drawing-canvas" [ class "drawing-canvas", attribute "key" (model.gameKey |> Maybe.withDefault "") ] [ ],
     button [ class "pure-button pure-button-success landing-button", onClick SubmitText ] [ text "I'm done!" ]
@@ -761,3 +775,12 @@ hasGameStarted model =
   case model.gameId of
     Nothing -> False
     Just _ -> True
+
+getWorkPackageText : Model -> String
+getWorkPackageText model =
+  let
+    previousPackage = model.previousPackage |> Maybe.withDefault (TextPackage "an armadillo")
+  in
+    case previousPackage of
+      TextPackage t -> t
+      _ -> "An error 500"

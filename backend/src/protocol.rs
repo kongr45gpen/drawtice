@@ -13,7 +13,7 @@ pub(crate) type Result<T> = std::result::Result<T, Error>;
 
 // Define protocol error type
 #[derive(Debug, Clone)]
-pub(crate) struct Error {
+pub struct Error {
     pub text: String,
 }
 
@@ -51,7 +51,7 @@ pub enum Command {
     LeaveGame,
     KickPlayer(KickCommand),
     MyUuid(String),
-    TextPackage(TextPackageCommand),
+    TextPackage(game::TextPackage),
     NextRound,
 }
 
@@ -62,7 +62,9 @@ pub enum Response<'a> {
     GameDetails(&'a game::Game),
     PersonalDetails(PersonalDetailsResponse),
     YourUuid(String),
-    LeftGame
+    LeftGame,
+    PreviousTextPackage(game::TextPackage),
+    PreviousImagePackage(game::ImagePackage),
 }
 
 #[derive(Deserialize, Debug)]
@@ -81,12 +83,6 @@ pub struct NewGameCommand {
 #[derive(Deserialize, Debug)]
 pub struct KickCommand {
     pub player_id: usize
-}
-
-#[derive(Deserialize, Debug)]
-pub struct TextPackageCommand {
-    #[serde(deserialize_with = "de_validate_text_package")]
-    pub text: String
 }
 
 #[derive(Serialize, Debug)]
@@ -126,7 +122,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         "start_game" => Command::StartGame,
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
         "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
-        "text_package" => Command::TextPackage(TextPackageCommand::deserialize(data?)?),
+        "text_package" => Command::TextPackage(game::TextPackage::deserialize(data?)?),
         "next_round" => Command::NextRound,
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
@@ -144,6 +140,8 @@ pub fn encode(response: Response) -> serde_json::Result<String> {
         Response::PersonalDetails(r) => ("personal_details", Some(json!(r))),
         Response::YourUuid(s) => ("your_uuid", Some(json!(s))),
         Response::LeftGame => ("left_game", None),
+        Response::PreviousTextPackage(p) => ("previous_text_package", Some(json!(p))),
+        Response::PreviousImagePackage(p) => ("previous_image_package", Some(json!(p))),
     };
 
     let json = json!({
@@ -166,7 +164,7 @@ fn de_validate_nonempty<'de, D>(d: D) -> std::result::Result<String, D::Error>
     Ok(value)
 }
 
-fn de_validate_text_package<'de, D>(d: D) -> std::result::Result<String, D::Error>
+pub fn de_validate_text_package<'de, D>(d: D) -> std::result::Result<String, D::Error>
     where D: serde::de::Deserializer<'de>
 {
     let value = String::deserialize(d)?;

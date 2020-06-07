@@ -5242,13 +5242,15 @@ var $author$project$Main$Model = function (key) {
 						return function (players) {
 							return function (myId) {
 								return function (uuid) {
-									return function (gameKey) {
-										return function (funnelState) {
-											return function (formFields) {
-												return function (pendingDialogs) {
-													return function (nextDialogId) {
-														return function (error) {
-															return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, status: status, url: url, uuid: uuid};
+									return function (previousPackage) {
+										return function (gameKey) {
+											return function (funnelState) {
+												return function (formFields) {
+													return function (pendingDialogs) {
+														return function (nextDialogId) {
+															return function (error) {
+																return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, previousPackage: previousPackage, status: status, url: url, uuid: uuid};
+															};
 														};
 													};
 												};
@@ -6874,7 +6876,7 @@ var $author$project$Main$init = F3(
 			username: '',
 			usernamePlaceholder: ''
 		};
-		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
+		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
 			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
@@ -7186,6 +7188,9 @@ var $author$project$Main$StorageReceive = F2(
 		return {$: 'StorageReceive', a: a, b: b};
 	});
 var $author$project$Protocol$Stuck = {$: 'Stuck'};
+var $author$project$Main$TextPackage = function (a) {
+	return {$: 'TextPackage', a: a};
+};
 var $author$project$Protocol$TextPackageCommand = function (a) {
 	return {$: 'TextPackageCommand', a: a};
 };
@@ -7550,7 +7555,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 var $author$project$Main$leaveGame = function (model) {
 	return _Utils_update(
 		model,
-		{gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, status: $author$project$Protocol$NoGame});
+		{gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, status: $author$project$Protocol$NoGame});
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Debug$log = _Debug_log;
@@ -9083,6 +9088,14 @@ var $author$project$Protocol$personalDetailsParser = _Utils_Tuple2(
 	function (v) {
 		return $author$project$Protocol$PersonalDetailsResponse(v);
 	});
+var $author$project$Protocol$PreviousTextPackageResponse = function (a) {
+	return {$: 'PreviousTextPackageResponse', a: a};
+};
+var $author$project$Protocol$previousTextPackageParser = _Utils_Tuple2(
+	A2($elm$json$Json$Decode$field, 'text', $elm$json$Json$Decode$string),
+	function (v) {
+		return $author$project$Protocol$PreviousTextPackageResponse(v);
+	});
 var $billstclair$elm_port_funnel$PortFunnel$process = F4(
 	function (accessors, _v0, genericMessage, state) {
 		var moduleDesc = _v0.a;
@@ -9525,6 +9538,8 @@ var $author$project$Main$socketHandler = F3(
 								return decodeDataUsingParser($author$project$Protocol$uuidParser);
 							case 'left_game':
 								return $author$project$Protocol$LeftGameResponse;
+							case 'previous_text_package':
+								return decodeDataUsingParser($author$project$Protocol$previousTextPackageParser);
 							default:
 								return $author$project$Protocol$ErrorResponse('Uknown response type received');
 						}
@@ -9889,9 +9904,19 @@ var $author$project$Main$update = F2(
 										uuid: $elm$core$Maybe$Just(uuid)
 									}),
 								A3($author$project$Main$putLocalStorageString, model, 'uuid', uuid));
-						default:
+						case 'LeftGameResponse':
 							return _Utils_Tuple2(
 								$author$project$Main$leaveGame(model),
+								$elm$core$Platform$Cmd$none);
+						default:
+							var text = value.a;
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										previousPackage: $elm$core$Maybe$Just(
+											$author$project$Main$TextPackage(text))
+									}),
 								$elm$core$Platform$Cmd$none);
 					}
 				case 'ShowError':
@@ -9995,6 +10020,18 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$getWorkPackageText = function (model) {
+	var previousPackage = A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Main$TextPackage('an armadillo'),
+		model.previousPackage);
+	if (previousPackage.$ === 'TextPackage') {
+		var t = previousPackage.a;
+		return t;
+	} else {
+		return 'An error 500';
+	}
+};
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
@@ -10053,7 +10090,8 @@ var $author$project$Main$viewDrawing = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('an armadillo')
+								$elm$html$Html$text(
+								$author$project$Main$getWorkPackageText(model))
 							]))
 					])),
 				A3(

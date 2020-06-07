@@ -53,6 +53,7 @@ type Response
   | PersonalDetailsResponse PersonalDetails
   | UuidResponse String
   | LeftGameResponse
+  | PreviousTextPackageResponse String
 
 -- JSON COMMAND ENCODERS
 prepareSocketCommand : SocketCommand -> JE.Value
@@ -143,6 +144,14 @@ personalDetailsParser =
 uuidParser : (Decoder String, String -> Response)
 uuidParser =
   (string, \s -> UuidResponse s)
+
+previousTextPackageParser : (Decoder String, String -> Response)
+previousTextPackageParser =
+  (
+    field "text" string
+    ,
+    \v -> PreviousTextPackageResponse v
+  )
 
 gameStatusFromString : String -> GameStatus
 gameStatusFromString string =

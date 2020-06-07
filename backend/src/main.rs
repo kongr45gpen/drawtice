@@ -1,4 +1,6 @@
-// #![deny(warnings)]
+#[macro_use]
+extern crate enum_kinds;
+
 use std::collections::HashMap;
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
@@ -115,7 +117,7 @@ impl Game {
         tx_game(users, my_id, self.id, response, inclusive).await
     }
 
-    async fn tx_game_details(self: &Game, users: &Users, include_personal_details: bool) {
+    async fn tx_game_details(self: &mut Game, users: &Users, include_personal_details: bool) {
         let response_game = protocol::encode(protocol::Response::GameDetails(self));
         let response_game = match response_game {
             Ok(r) => r,
@@ -138,8 +140,19 @@ impl Game {
                             user.tx_direct(response_details).await;
                         }
                     }
+
+                    if !self.stage_information_transmitted {
+                        let package = self.get_previous_package(g.1);
+                        let response_package = Game::generate_one_package_response(package);
+                        user.tx_direct(response_package).await;
+                    }
                 }
             }
+        }
+
+        if !self.stage_information_transmitted {
+            debug!("Transmitted game stage package data");
+            self.stage_information_transmitted = true;
         }
     }
 
@@ -155,6 +168,30 @@ impl Game {
                     // Also makes sure to "None" users not belonging in the game anymore
                     user.game = index.map(|i| (g.0, *i));
                 }
+            }
+        }
+    }
+
+    fn generate_one_package_response(package: Option<&game::WorkPackage>) -> protocol::Response {
+        match package {
+            Some(p) => {
+                match &p.data {
+                    Some(game::WorkPackageData::TextPackage(d)) => {
+                        protocol::Response::PreviousTextPackage(d.clone())
+                    },
+                    Some(game::WorkPackageData::ImagePackage(d)) => {
+                        protocol::Response::PreviousImagePackage(d.clone())
+                    },
+                    None => {
+                        protocol::Response::Error("The previous player didn't have enough time to add some data... I guess you'll have to improvise!".to_string())
+                    }
+                }
+
+            },
+            None => {
+                protocol::Response::Error(
+                    "No premise currently available... Please wait for the next round".to_string()
+                )
             }
         }
     }
@@ -472,13 +509,15 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         protocol::Command::TextPackage(c) => {
             let game = user.fetch_game_mut(games)?;
 
-            game.provide_text_package(user.game.unwrap().1);
+            game.provide_package(user.game.unwrap().1, game::WorkPackageData::TextPackage(c))?;
             game.tx_game_details(users, false).await;
         }
         protocol::Command::NextRound => {
             let game = user.fetch_game_mut(games)?;
             let (player, _) = user.fetch_player(game)?;
             player.expect_admin()?;
+
+            debug!("Moving to the next round after admin command");
 
             game.next_stage();
             game.tx_game_details(users, false).await;
@@ -491,6 +530,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 async fn scheduler(users: &mut Users, games: &mut Games) {
     for (&gid, game) in games.iter_mut() {
         if game.is_round_done() && !*DEBUG_MODE {
+            debug!("Moving to the next round because of a timeout");
             game.next_stage();
             game.tx_game_details(users, false).await;
         }
