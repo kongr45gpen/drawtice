@@ -10881,6 +10881,23 @@ var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
 };
+var $author$project$Main$isGameRunning = function (model) {
+	var _v0 = model.status;
+	switch (_v0.$) {
+		case 'NoGame':
+			return false;
+		case 'Lobby':
+			return false;
+		case 'GameOver':
+			return false;
+		case 'Starting':
+			return true;
+		case 'Drawing':
+			return true;
+		default:
+			return true;
+	}
+};
 var $author$project$Main$KickPlayer = function (a) {
 	return {$: 'KickPlayer', a: a};
 };
@@ -11004,7 +11021,7 @@ var $author$project$Main$viewSidebar = function (model) {
 										$author$project$Main$viewPlayer(model),
 										model.players)))
 							]),
-						(model.amAdministrator && $author$project$Main$hasGameStarted(model)) ? _List_fromArray(
+						(model.amAdministrator && $author$project$Main$isGameRunning(model)) ? _List_fromArray(
 							[
 								A2(
 								$elm$html$Html$div,
@@ -11039,7 +11056,32 @@ var $author$project$Main$viewSidebar = function (model) {
 												$elm$html$Html$text('End Round')
 											]))
 									]))
-							]) : _List_Nil)))
+							]) : _Utils_ap(
+							_List_Nil,
+							_Utils_eq(model.status, $author$project$Protocol$GameOver) ? _List_fromArray(
+								[
+									A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('admin-actions')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('pure-button pure-button-danger'),
+													$elm$html$Html$Events$onClick(
+													A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to leave this game?', $author$project$Main$LeaveGame))
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Leave Game')
+												]))
+										]))
+								]) : _List_Nil))))
 			]));
 };
 var $author$project$Main$TextField = {$: 'TextField'};

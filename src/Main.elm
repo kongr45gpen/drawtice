@@ -412,6 +412,16 @@ leaveGame model =
          , myId = Nothing
          , previousPackage = Nothing}
 
+isGameRunning : Model -> Bool
+isGameRunning model =
+  case model.status of
+    NoGame -> False
+    Lobby -> False
+    GameOver -> False
+    Starting -> True
+    Drawing -> True
+    Understanding -> True
+
 errorLog : String -> Cmd Msg
 errorLog message =
     Cmd.batch [
@@ -640,11 +650,18 @@ viewSidebar model =
         then []
         else [ div [ class "player-list" ] (Array.indexedMap (viewPlayer model) model.players |> Array.toList) ]
     )
-      ++ if model.amAdministrator && hasGameStarted model
+      ++ if model.amAdministrator && isGameRunning model
         then [
           div [ class "admin-actions" ] [
             button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
             button [ class "pure-button", onClick (NextRound |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
+          ]
+        ]
+        else []
+      ++ if model.status == GameOver
+        then [
+          div [ class "admin-actions" ] [
+            button [ class "pure-button pure-button-danger", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to leave this game?") ] [ text "Leave Game" ]
           ]
         ]
         else []

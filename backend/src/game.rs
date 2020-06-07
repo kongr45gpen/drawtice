@@ -195,7 +195,7 @@ impl Game {
 
     /// Advance to the next game stage
     pub fn next_stage(&mut self) {
-        if self.current_stage <= self.total_stages {
+        if self.current_stage == 0 || self.current_stage < self.total_stages {
             // Game status state machine transitions
             if self.current_stage == 0 {
                 // Game start
