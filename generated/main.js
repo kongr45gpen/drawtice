@@ -10539,9 +10539,12 @@ var $elm$html$Html$Attributes$autocomplete = function (bool) {
 		'autocomplete',
 		bool ? 'on' : 'off');
 };
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
 var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -10625,23 +10628,51 @@ var $author$project$Main$viewLanding = function (model) {
 					[
 						A2(
 						$elm$html$Html$label,
-						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$for('username')
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('People usually call me:')
 							])),
 						A2(
-						$elm$html$Html$input,
+						$elm$html$Html$div,
+						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$placeholder(model.formFields.usernamePlaceholder),
-								$elm$html$Html$Attributes$required(true),
-								$elm$html$Html$Events$onInput(
-								$author$project$Main$SetField($author$project$Main$UsernameField)),
-								$elm$html$Html$Attributes$autocomplete(true),
-								$elm$html$Html$Attributes$value(model.formFields.username)
-							]),
-						_List_Nil)
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('landing-username'),
+										$elm$html$Html$Attributes$name('username'),
+										$elm$html$Html$Attributes$placeholder(model.formFields.usernamePlaceholder),
+										$elm$html$Html$Attributes$required(true),
+										$elm$html$Html$Events$onInput(
+										$author$project$Main$SetField($author$project$Main$UsernameField)),
+										$elm$html$Html$Attributes$autocomplete(true),
+										$elm$html$Html$Attributes$value(model.formFields.username)
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('landing-username-icon'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-hidden', 'true')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$i,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('fa fa-user-o')
+											]),
+										_List_Nil)
+									]))
+							]))
 					])),
 				A2(
 				$elm$html$Html$form,
@@ -10653,6 +10684,18 @@ var $author$project$Main$viewLanding = function (model) {
 				_List_fromArray(
 					[
 						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('GameId'),
+								$elm$html$Html$Attributes$required(true),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$SetField($author$project$Main$GameIdField)),
+								$elm$html$Html$Attributes$value(model.formFields.gameId),
+								$elm$html$Html$Attributes$class('text-tt')
+							]),
+						_List_Nil),
+						A2(
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
@@ -10662,18 +10705,7 @@ var $author$project$Main$viewLanding = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text('Join a running game')
-							])),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$placeholder('GameId'),
-								$elm$html$Html$Attributes$required(true),
-								$elm$html$Html$Events$onInput(
-								$author$project$Main$SetField($author$project$Main$GameIdField)),
-								$elm$html$Html$Attributes$value(model.formFields.gameId)
-							]),
-						_List_Nil)
+							]))
 					])),
 				A2(
 				$elm$html$Html$button,
@@ -11342,7 +11374,6 @@ var $author$project$Main$MoveWorkload = function (a) {
 	return {$: 'MoveWorkload', a: a};
 };
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$html$Html$i = _VirtualDom_node('i');
 var $author$project$Main$isAtWorkloadEnd = F2(
 	function (model, dir) {
 		return ((!model.currentWorkload) && _Utils_eq(dir, $author$project$Main$Backward)) ? true : (_Utils_eq(

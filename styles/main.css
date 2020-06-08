@@ -14,7 +14,7 @@ body {
 }
 
 .text-tt {
-  font-family: 'Space Mono', monospace;
+  font-family: "Space Mono", "Ubuntu Mono", "Fira Mono", monospace;
 }
 
 /*
@@ -270,6 +270,33 @@ body {
 
 .landing-join label {
   align-self: center;
+  font-size: 125%;
+  padding: 1.5rem 0;
+}
+
+.landing-username-icon {
+  position: relative;
+  right: calc(100% - 22px);
+  top: 4px;
+  font-size: 25pt;
+
+  width: 0;
+  height: 0;
+  display: inline-block;
+
+  color: #444;
+  transition: 0.1s color;
+}
+
+.landing-username:focus ~ .landing-username-icon {
+  color: #3584e4;
+}
+
+.landing-username {
+  width: 100%;
+  height: 100%;
+
+  padding-left: calc(35pt + 15px);
 }
 
 .game-link-presentation {

@@ -763,20 +763,25 @@ viewLanding : Model -> Html Msg
 viewLanding model =
   section [ class "landing hall" ] [
     div [ class "landing-join" ] [
-      label [] [ text "People usually call me:" ],
-      input [
-        placeholder model.formFields.usernamePlaceholder,
-        required True,
-        onInput <| SetField UsernameField,
-        autocomplete True,
-        value model.formFields.username
-      ] []
+      label [ for "username" ] [ text "People usually call me:" ],
+      div [] [
+        input [
+          class "landing-username",
+          name "username",
+          placeholder model.formFields.usernamePlaceholder,
+          required True,
+          onInput <| SetField UsernameField,
+          autocomplete True,
+          value model.formFields.username
+        ] [],
+        span [ class "landing-username-icon", attribute "aria-hidden" "true" ] [ i [ class "fa fa-user-o"] [] ]
+      ]
     ],
     Html.form [ class "landing-join", onSubmit JoinGame ]  [
+      input [ placeholder "GameId", required True, onInput <| SetField GameIdField, value model.formFields.gameId, class "text-tt" ] [],
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
         text "Join a running game"
-      ],
-      input [ placeholder "GameId", required True, onInput <| SetField GameIdField, value model.formFields.gameId ] []
+      ]
     ],
     button [ class "pure-button pure-button-primary landing-button", onClick NewGame ] [ text "Start a New Game" ]
   ]
