@@ -493,7 +493,12 @@ body {
 .summary-package-prompt {
   font-size: 10pt;
   color: #666;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.summary-package:not(:first-child) {
+  margin-top: 5rem;
+  margin-bottom: 5rem;
 }
 
 .summary-package-image {
@@ -501,8 +506,8 @@ body {
   border: 1px solid black;
   box-shadow: 2px 2px 5px #00000050;
 
-  max-width: 50%;
-  max-height: 50%;
+  max-width: 70%;
+  max-height: 70%;
 
   min-width: 100px;
   min-height: 100px;
@@ -511,5 +516,5 @@ body {
 .summary-package-text {
   font-size: 20pt;
   font-family: "Space Mono","Ubuntu Mono","Fira Mono",monospace;
-  margin-top: 0.2rem;
+  margin: 0rem;
 }
