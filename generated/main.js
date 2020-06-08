@@ -6891,10 +6891,14 @@ var $author$project$Main$init = F3(
 						A2($author$project$Main$getLocalStorageString, model, 'username')
 					])));
 	});
+var $author$project$Main$SendImage = function (a) {
+	return {$: 'SendImage', a: a};
+};
 var $author$project$Main$ShownConfirmDialog = function (a) {
 	return {$: 'ShownConfirmDialog', a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $author$project$Main$canvasReturnPort = _Platform_incomingPort('canvasReturnPort', $elm$json$Json$Decode$string);
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$index = _Json_decodeIndex;
@@ -7156,13 +7160,17 @@ var $author$project$Main$subscriptions = function (model) {
 			[
 				A2($elm$time$Time$every, 1000, $author$project$Main$Tick),
 				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model),
-				$author$project$Main$confirmReturnPort($author$project$Main$ShownConfirmDialog)
+				$author$project$Main$confirmReturnPort($author$project$Main$ShownConfirmDialog),
+				$author$project$Main$canvasReturnPort($author$project$Main$SendImage)
 			]));
 };
 var $author$project$Protocol$ErrorResponse = function (a) {
 	return {$: 'ErrorResponse', a: a};
 };
 var $author$project$Main$GameIdField = {$: 'GameIdField'};
+var $author$project$Protocol$ImagePackageCommand = function (a) {
+	return {$: 'ImagePackageCommand', a: a};
+};
 var $author$project$Protocol$JoinCommand = F2(
 	function (a, b) {
 		return {$: 'JoinCommand', a: a, b: b};
@@ -9400,6 +9408,19 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'text',
 								$elm$json$Json$Encode$string(text))
 							]))));
+		case 'ImagePackageCommand':
+			var image = command.a;
+			return A2(
+				$author$project$Protocol$prepareSocketCommandJson,
+				'image_package',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$object(
+						_List_fromArray(
+							[
+								_Utils_Tuple2(
+								'data',
+								$elm$json$Json$Encode$string(image))
+							]))));
 		default:
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'next_round', $elm$core$Maybe$Nothing);
 	}
@@ -9975,7 +9996,7 @@ var $author$project$Main$update = F2(
 							{nextDialogId: nextDialogId + 1, pendingDialogs: dict}),
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
-				default:
+				case 'ShownConfirmDialog':
 					var _v9 = msg.a;
 					var pressed = _v9.a;
 					var dialogId = _v9.b;
@@ -9998,6 +10019,12 @@ var $author$project$Main$update = F2(
 					} else {
 						return _Utils_Tuple2(mdl, $elm$core$Platform$Cmd$none);
 					}
+				default:
+					var value = msg.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand(
+							$author$project$Protocol$ImagePackageCommand(value)));
 			}
 		}
 	});

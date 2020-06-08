@@ -1,3 +1,5 @@
+extern crate base64;
+
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, from_value, json};
 use uuid::Uuid;
@@ -52,6 +54,7 @@ pub enum Command {
     KickPlayer(KickCommand),
     MyUuid(String),
     TextPackage(game::TextPackage),
+    ImagePackage(RawImagePackage),
     NextRound,
 }
 
@@ -83,6 +86,12 @@ pub struct NewGameCommand {
 #[derive(Deserialize, Debug)]
 pub struct KickCommand {
     pub player_id: usize
+}
+
+#[derive(Deserialize, Debug)]
+pub struct RawImagePackage {
+    #[serde(deserialize_with = "de_image_base64")]
+    pub data: Vec<u8>
 }
 
 #[derive(Serialize, Debug)]
@@ -123,11 +132,20 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
         "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
         "text_package" => Command::TextPackage(game::TextPackage::deserialize(data?)?),
+        "image_package" => {
+            Command::ImagePackage(RawImagePackage::deserialize(data?)?)
+        },
         "next_round" => Command::NextRound,
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
 
-    debug!("Parsed command: {:?}", command);
+    // Debug but with long commands
+    let parsed = format!("Parsed command: {:?}", command);
+    let parsed = match parsed.char_indices().nth(200) {
+        None => parsed.as_str(),
+        Some((idx, _)) => &parsed[..idx],
+    };
+    debug!("{}", parsed);
 
     Ok(command)
 }
@@ -150,6 +168,20 @@ pub fn encode(response: Response) -> serde_json::Result<String> {
     });
 
     serde_json::to_string(&json)
+}
+
+fn de_image_base64<'de, D>(d: D) -> std::result::Result<Vec<u8>, D::Error>
+    where D: serde::de::Deserializer<'de>
+{
+    let base64_full = String::deserialize(d)?;
+    let base64_image = base64_full.split(',').nth(1)
+        .ok_or(serde::de::Error::custom("Invalid image data, does not contain type"))?;
+
+    let result = base64::decode(base64_image)
+        .map_err(|e| serde::de::Error::custom(
+            "Invalid base64: ".to_string() + &e.to_string()))?;
+
+    Ok(result)
 }
 
 fn de_validate_nonempty<'de, D>(d: D) -> std::result::Result<String, D::Error>

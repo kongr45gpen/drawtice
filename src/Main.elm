@@ -53,6 +53,8 @@ port confirmReturnPort : ((Bool, Int) -> msg) -> Sub msg
 
 port canvasPort : (String, Maybe String) -> Cmd msg
 
+port canvasReturnPort : (String -> msg) -> Sub msg
+
 cmdPort : JE.Value -> Cmd Msg
 cmdPort =
     PortFunnels.getCmdPort Receive "" False
@@ -173,6 +175,7 @@ type Msg
   | RemoveError
   | ShowConfirmDialog String Msg
   | ShownConfirmDialog (Bool, Int)
+  | SendImage String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -366,6 +369,9 @@ update msg model =
         else
           (mdl, Cmd.none)
 
+    SendImage value ->
+      (model, sendSocketCommand <| ImagePackageCommand value)
+
 maybeSetField : FormField -> Maybe String -> (Model -> Model)
 maybeSetField field value =
   case value of
@@ -537,7 +543,8 @@ subscriptions model =
   Sub.batch [
     Time.every 1000 Tick,
     PortFunnels.subscriptions Receive model,
-    confirmReturnPort ShownConfirmDialog
+    confirmReturnPort ShownConfirmDialog,
+    canvasReturnPort SendImage
   ]
 
 

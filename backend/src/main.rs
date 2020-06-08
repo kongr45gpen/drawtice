@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate enum_kinds;
 
+use std::io::prelude::*;
 use std::collections::HashMap;
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
 };
-
 use futures::{FutureExt, StreamExt};
 use tokio::sync::{mpsc, Mutex};
 use warp::ws::{Message, WebSocket};
@@ -16,6 +16,7 @@ use uuid::Uuid;
 use std::{iter, thread};
 use std::env;
 use lazy_static::lazy_static;
+use std::fs::File;
 
 use log::{trace, debug, info, warn, error};
 
@@ -25,6 +26,9 @@ pub(crate) mod names;
 
 use game::{Player, Game};
 use std::time::Duration;
+
+// Constants
+const STORAGE_LOCATION: &'static str = "./images";
 
 struct User {
     uuid: Uuid,
@@ -511,6 +515,20 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             game.provide_package(user.game.unwrap().1, game::WorkPackageData::TextPackage(c))?;
             game.tx_game_details(users, false).await;
+        }
+        protocol::Command::ImagePackage(c) => {
+            let game = user.fetch_game_mut(games)?;
+
+            let uuid = Uuid::new_v4().to_string();
+            debug!("Received an interesting image package");
+
+            let mut f = File::create(format!("{}/{}.png", STORAGE_LOCATION, uuid))
+                .map_err(|_| protocol::Error::from("Could not create file for some reason"))?;
+            f.write_all((*c.data).as_ref())
+                .map_err(|_| protocol::Error::from("Could not write to file for some reason"))?;
+
+            // game.provide_package(user.game.unwrap().1, game::WorkPackageData::TextPackage(c))?;
+            // game.tx_game_details(users, false).await;
         }
         protocol::Command::NextRound => {
             let game = user.fetch_game_mut(games)?;

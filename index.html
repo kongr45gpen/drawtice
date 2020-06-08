@@ -118,11 +118,11 @@ PortFunnel.subscribe(app);
                 this.resizeObserver.observe(this);
 
                 this.portCallback = function(input) {
-                    console.log(input)
                     var command = input[0];
                     var data = input[1];
                     if (command == "snap") {
-                        console.log(_this.drawer.api.getCanvasAsImage().length);
+                        const image = _this.drawer.api.getCanvasAsImage();
+                        app.ports.canvasReturnPort.send(image);
                     } else if (data == "setkey") {
                         // TODO: key using attrs
                     }
@@ -142,9 +142,24 @@ PortFunnel.subscribe(app);
         }
     );
 
-        console.log(app.ports);
 
+function dataURItoBlob(dataURI) {
+    // convert base64 to raw binary data held in a string
+    var byteString = atob(dataURI.split(',')[1]);
 
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    // write the ArrayBuffer to a blob, and you're done
+    return new TextDecoder("utf-8").decode(ia);
+}
 
   // Debugging
 //   ports.cmdPort.subscribe(function (string) {

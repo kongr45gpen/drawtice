@@ -14,6 +14,7 @@ type SocketCommand
   | LeaveCommand
   | UuidCommand String
   | TextPackageCommand String
+  | ImagePackageCommand String
   | NextRoundCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
@@ -86,6 +87,10 @@ prepareSocketCommand command =
     TextPackageCommand text ->
       prepareSocketCommandJson "text_package" (Just (JE.object
         [ ( "text", JE.string text ) ]
+      ))
+    ImagePackageCommand image ->
+      prepareSocketCommandJson "image_package" (Just (JE.object
+        [ ( "data", JE.string image ) ]
       ))
     NextRoundCommand ->
       prepareSocketCommandJson "next_round" Nothing
