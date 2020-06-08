@@ -11,6 +11,7 @@
   </style>
 
   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.1/build/pure-min.css" integrity="sha384-QkSsJi6SGgWv5LAx1TdvIDRf8TW5Ui4NVKqDDlK1wY2eKioo7wvYIJvGWFQSFE4U" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.1/css/lightbox.min.css">
   <link rel="stylesheet" href="lib/DrawerJS/assets/font-awesome.min.css">
   <link rel="stylesheet" href="lib/DrawerJS/dist/drawerJs.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,6 +27,9 @@
   <script type="text/javascript" src='lib/LoadTool.js'></script>
   <script type="text/javascript" src='lib/ClearTool.js'></script>
   <script type="text/javascript" src='lib/lodash.throttle.js'></script>
+
+  <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.1/js/lightbox.min.js'></script>
+
   <script>
 
 var drawerPlugins = [
@@ -56,6 +60,11 @@ var app = Elm.Main.init();
 PortFunnel.subscribe(app);
 
 (function() {
+    lightbox.option({
+      'resizeDuration': 200,
+      'wrapAround': true
+    })
+
   var ports = app.ports;
 
   var error = ports.errorPort;
@@ -70,6 +79,15 @@ PortFunnel.subscribe(app);
     id = data[1];
 
     app.ports.confirmReturnPort.send([window.confirm(text), id])
+  });
+
+  app.ports.canvasPort.subscribe(function(input) {
+    var command = input[0];
+    var data = input[1];
+    if (command == "lightbox") {
+        console.log("LAIT BOX")
+        lightbox.start($(document.getElementById(data)));
+    }
   });
 
 

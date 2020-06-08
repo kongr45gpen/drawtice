@@ -181,6 +181,7 @@ type Msg
   | ShowConfirmDialog String Msg
   | ShownConfirmDialog (Bool, Int)
   | SendImage String
+  | ShowLightbox String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -189,6 +190,7 @@ update msg model =
     LinkClicked urlRequest ->
       case urlRequest of
         Browser.Internal url ->
+          -- ( model, Cmd.none)
           ( model, Nav.pushUrl model.key (Url.toString url) )
 
         Browser.External href ->
@@ -403,6 +405,9 @@ update msg model =
 
     SendImage value ->
       (model, sendSocketCommand <| ImagePackageCommand value)
+
+    ShowLightbox value ->
+      (model, canvasPort ("lightbox", Just value))
 
 maybeSetField : FormField -> Maybe String -> (Model -> Model)
 maybeSetField field value =
@@ -817,10 +822,10 @@ viewLobby model =
 viewStarting : Model -> Html Msg
 viewStarting model =
   section [ class "starting" ] [
-    Html.form [ class "text-starting hall", action "#" ] [
+    Html.form [ class "text-starting hall", action "#", onSubmitRaw SubmitText ] [
       div [ class "text-starting-prompt" ] [ text "What do you want people to draw?" ],
       textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
-      button [ class "pure-button landing-button", onClick SubmitText ] [ text "Submit idea" ]
+      button [ class "pure-button landing-button" ] [ text "Submit idea" ]
     ]
   ]
 
@@ -843,10 +848,10 @@ viewUnderstanding model =
       div [ class "understanding-prompt-intro" ] [ text "Someone painted:" ],
       img [ class "understanding-image", src <| getWorkPackageImage model, alt "What the previous player drew" ] [ ]
     ],
-    Html.form [ class "understanding-write", action "#" ] [
+    Html.form [ class "understanding-write", action "#", onSubmitRaw SubmitText  ] [
       div [ class "understanding-write-intro" ] [ text "What is that?" ],
       textarea [ class "text-understanding-input", onInput <| SetField TextField ] [ ],
-      button [ class "pure-button landing-button understanding-button", onClick SubmitText ] [ text "Submit explanation" ]
+      button [ class "pure-button landing-button understanding-button" ] [ text "Submit explanation" ]
     ]
   ]
 
@@ -863,7 +868,7 @@ viewSummary model =
         ] [ i [ class "fa fa-chevron-left" ] [] ],
       div [ class "summary-main" ] [
         h3 [ class "summary-header" ] [ text ("Series " ++ String.fromInt (model.currentWorkload + 1)) ],
-        div [ class "summary-container" ] (List.map (viewWorkpackage model) workload)
+        div [ class "summary-container" ] (List.indexedMap (viewWorkpackage model model.currentWorkload) workload)
       ],
     a [ class ("summary-arrow summary-arrow-right" ++ if isAtWorkloadEnd model Forward then " summary-arrow-disabled" else "")
         , href "#"
@@ -871,14 +876,17 @@ viewSummary model =
         ] [ i [ class "fa fa-chevron-right" ] [] ]
     ]
 
-viewWorkpackage : Model -> WorkPackageDetails -> Html Msg
-viewWorkpackage model package =
+viewWorkpackage : Model -> Int -> Int -> WorkPackageDetails -> Html Msg
+viewWorkpackage model loadId packageId package =
   let
+    uniqId = "summary-image-" ++ String.fromInt loadId ++ "-" ++ String.fromInt packageId
     html = case package.data of
       Just (TextPackage t) ->
         p [ class "summary-package-text" ] [ text t ]
       Just (ImagePackage url) ->
-        img [ class "summary-package-image", src url, alt "Drawn image" ] [ ]
+        a [ id uniqId, href url, attribute "data-lightbox" uniqId, download "", onClickRaw <| ShowLightbox uniqId ] [
+          img [ class "summary-package-image", src url, alt "Drawn image" ] [ ]
+        ]
       Nothing ->
         div [ class "summary-package-nothing", title "The player didn't have time to complete this!" ] [ text "???" ]
     username = model.playerCapture |> Maybe.andThen (\a -> Array.get package.playerId a)
@@ -941,3 +949,15 @@ isAtWorkloadEnd : Model -> Direction -> Bool
 isAtWorkloadEnd model dir =
   if model.currentWorkload == 0 && dir == Backward then True
   else model.currentWorkload == Array.length (model.workloads |> Maybe.withDefault Array.empty) - 1 && dir == Forward
+
+onClickRaw : msg -> Attribute msg
+onClickRaw msg =
+  Html.Events.preventDefaultOn "input" (JD.map alwaysPreventDefault (JD.succeed msg))
+
+onSubmitRaw : msg -> Attribute msg
+onSubmitRaw msg =
+  Html.Events.preventDefaultOn "submit" (JD.map alwaysPreventDefault (JD.succeed msg))
+
+alwaysPreventDefault : msg -> ( msg, Bool )
+alwaysPreventDefault msg =
+  ( msg, True )

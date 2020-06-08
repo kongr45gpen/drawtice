@@ -10141,12 +10141,20 @@ var $author$project$Main$update = F2(
 					} else {
 						return _Utils_Tuple2(mdl, $elm$core$Platform$Cmd$none);
 					}
-				default:
+				case 'SendImage':
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$ImagePackageCommand(value)));
+				default:
+					var value = msg.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$canvasPort(
+							_Utils_Tuple2(
+								'lightbox',
+								$elm$core$Maybe$Just(value))));
 			}
 		}
 	});
@@ -11324,6 +11332,18 @@ var $elm$html$Html$Attributes$action = function (uri) {
 		'action',
 		_VirtualDom_noJavaScriptUri(uri));
 };
+var $author$project$Main$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var $author$project$Main$onSubmitRaw = function (msg) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'submit',
+		A2(
+			$elm$json$Json$Decode$map,
+			$author$project$Main$alwaysPreventDefault,
+			$elm$json$Json$Decode$succeed(msg)));
+};
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$viewStarting = function (model) {
 	return A2(
@@ -11339,7 +11359,8 @@ var $author$project$Main$viewStarting = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('text-starting hall'),
-						$elm$html$Html$Attributes$action('#')
+						$elm$html$Html$Attributes$action('#'),
+						$author$project$Main$onSubmitRaw($author$project$Main$SubmitText)
 					]),
 				_List_fromArray(
 					[
@@ -11366,8 +11387,7 @@ var $author$project$Main$viewStarting = function (model) {
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('pure-button landing-button'),
-								$elm$html$Html$Events$onClick($author$project$Main$SubmitText)
+								$elm$html$Html$Attributes$class('pure-button landing-button')
 							]),
 						_List_fromArray(
 							[
@@ -11389,9 +11409,25 @@ var $author$project$Main$isAtWorkloadEnd = F2(
 			$elm$core$Array$length(
 				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)) - 1) && _Utils_eq(dir, $author$project$Main$Forward));
 	});
+var $author$project$Main$ShowLightbox = function (a) {
+	return {$: 'ShowLightbox', a: a};
+};
+var $elm$html$Html$Attributes$download = function (fileName) {
+	return A2($elm$html$Html$Attributes$stringProperty, 'download', fileName);
+};
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $author$project$Main$onClickRaw = function (msg) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$author$project$Main$alwaysPreventDefault,
+			$elm$json$Json$Decode$succeed(msg)));
+};
 var $elm$html$Html$p = _VirtualDom_node('p');
-var $author$project$Main$viewWorkpackage = F2(
-	function (model, _package) {
+var $author$project$Main$viewWorkpackage = F4(
+	function (model, loadId, packageId, _package) {
 		var username = A2(
 			$elm$core$Maybe$withDefault,
 			'???',
@@ -11406,6 +11442,7 @@ var $author$project$Main$viewWorkpackage = F2(
 						return A2($elm$core$Array$get, _package.playerId, a);
 					},
 					model.playerCapture)));
+		var uniqId = 'summary-image-' + ($elm$core$String$fromInt(loadId) + ('-' + $elm$core$String$fromInt(packageId)));
 		var html = function () {
 			var _v0 = _package.data;
 			if (_v0.$ === 'Just') {
@@ -11424,14 +11461,28 @@ var $author$project$Main$viewWorkpackage = F2(
 				} else {
 					var url = _v0.a.a;
 					return A2(
-						$elm$html$Html$img,
+						$elm$html$Html$a,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('summary-package-image'),
-								$elm$html$Html$Attributes$src(url),
-								$elm$html$Html$Attributes$alt('Drawn image')
+								$elm$html$Html$Attributes$id(uniqId),
+								$elm$html$Html$Attributes$href(url),
+								A2($elm$html$Html$Attributes$attribute, 'data-lightbox', uniqId),
+								$elm$html$Html$Attributes$download(''),
+								$author$project$Main$onClickRaw(
+								$author$project$Main$ShowLightbox(uniqId))
 							]),
-						_List_Nil);
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$img,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('summary-package-image'),
+										$elm$html$Html$Attributes$src(url),
+										$elm$html$Html$Attributes$alt('Drawn image')
+									]),
+								_List_Nil)
+							]));
 				}
 			} else {
 				return A2(
@@ -11532,8 +11583,8 @@ var $author$project$Main$viewSummary = function (model) {
 								$elm$html$Html$Attributes$class('summary-container')
 							]),
 						A2(
-							$elm$core$List$map,
-							$author$project$Main$viewWorkpackage(model),
+							$elm$core$List$indexedMap,
+							A2($author$project$Main$viewWorkpackage, model, model.currentWorkload),
 							workload))
 					])),
 				A2(
@@ -11614,7 +11665,8 @@ var $author$project$Main$viewUnderstanding = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('understanding-write'),
-						$elm$html$Html$Attributes$action('#')
+						$elm$html$Html$Attributes$action('#'),
+						$author$project$Main$onSubmitRaw($author$project$Main$SubmitText)
 					]),
 				_List_fromArray(
 					[
@@ -11641,8 +11693,7 @@ var $author$project$Main$viewUnderstanding = function (model) {
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('pure-button landing-button understanding-button'),
-								$elm$html$Html$Events$onClick($author$project$Main$SubmitText)
+								$elm$html$Html$Attributes$class('pure-button landing-button understanding-button')
 							]),
 						_List_fromArray(
 							[
