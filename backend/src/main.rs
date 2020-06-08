@@ -243,7 +243,10 @@ async fn main() {
     // GET / -> index html
     let index = warp::path::end().map(|| warp::reply::html(INDEX_HTML));
 
-    let routes = index.or(ws);
+    let images = warp::path("images")
+        .and(warp::fs::dir(STORAGE_LOCATION));
+
+    let routes = index.or(ws).or(images);
 
     // let handle = thread::spawn(|| {
     //     loop {
@@ -526,6 +529,12 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 .map_err(|_| protocol::Error::from("Could not create file for some reason"))?;
             f.write_all((*c.data).as_ref())
                 .map_err(|_| protocol::Error::from("Could not write to file for some reason"))?;
+
+            let image_package = game::ImagePackage {
+                url: uuid + ".png"
+            };
+            game.provide_package(user.game.unwrap().1, game::WorkPackageData::ImagePackage(image_package))?;
+            game.tx_game_details(users, false).await;
 
             // game.provide_package(user.game.unwrap().1, game::WorkPackageData::TextPackage(c))?;
             // game.tx_game_details(users, false).await;
