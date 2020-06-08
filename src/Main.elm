@@ -425,6 +425,18 @@ leaveGame model =
          , myId = Nothing
          , previousPackage = Nothing}
 
+getMe : Model -> Maybe Player
+getMe model =
+  model.myId |> Maybe.andThen (\i -> Array.get i model.players)
+
+amDone : Model -> Bool
+amDone model =
+  case getMe model of
+    Just me ->
+      isGameRunning model && me.status == Done
+    Nothing ->
+      False
+
 isGameRunning : Model -> Bool
 isGameRunning model =
   case model.status of
@@ -619,7 +631,9 @@ viewNav model =
 
 viewHeader : Model -> Html Msg
 viewHeader model =
-  header [ class "game-header" ] ((case model.myId |> Maybe.andThen (\i -> Array.get i model.players) of
+  header [
+    class ("game-header" ++ if amDone model then " game-header-done" else "")
+  ] ((case getMe model of
       Nothing ->
         []
       Just me ->

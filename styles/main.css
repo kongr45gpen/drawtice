@@ -156,6 +156,10 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.game-header-done {
+  background-color: rgb(28, 184, 65);
+}
+
 .game-header > * {
   flex: 1 1 auto;
 }

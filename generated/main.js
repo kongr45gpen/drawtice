@@ -10201,6 +10201,40 @@ var $author$project$Main$viewDrawing = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$getMe = function (model) {
+	return A2(
+		$elm$core$Maybe$andThen,
+		function (i) {
+			return A2($elm$core$Array$get, i, model.players);
+		},
+		model.myId);
+};
+var $author$project$Main$isGameRunning = function (model) {
+	var _v0 = model.status;
+	switch (_v0.$) {
+		case 'NoGame':
+			return false;
+		case 'Lobby':
+			return false;
+		case 'GameOver':
+			return false;
+		case 'Starting':
+			return true;
+		case 'Drawing':
+			return true;
+		default:
+			return true;
+	}
+};
+var $author$project$Main$amDone = function (model) {
+	var _v0 = $author$project$Main$getMe(model);
+	if (_v0.$ === 'Just') {
+		var me = _v0.a;
+		return $author$project$Main$isGameRunning(model) && _Utils_eq(me.status, $author$project$Protocol$Done);
+	} else {
+		return false;
+	}
+};
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
@@ -10270,16 +10304,12 @@ var $author$project$Main$viewHeader = function (model) {
 		$elm$html$Html$header,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('game-header')
+				$elm$html$Html$Attributes$class(
+				'game-header' + ($author$project$Main$amDone(model) ? ' game-header-done' : ''))
 			]),
 		_Utils_ap(
 			function () {
-				var _v0 = A2(
-					$elm$core$Maybe$andThen,
-					function (i) {
-						return A2($elm$core$Array$get, i, model.players);
-					},
-					model.myId);
+				var _v0 = $author$project$Main$getMe(model);
 				if (_v0.$ === 'Nothing') {
 					return _List_Nil;
 				} else {
@@ -10962,23 +10992,6 @@ var $elm$html$Html$em = _VirtualDom_node('em');
 var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
-};
-var $author$project$Main$isGameRunning = function (model) {
-	var _v0 = model.status;
-	switch (_v0.$) {
-		case 'NoGame':
-			return false;
-		case 'Lobby':
-			return false;
-		case 'GameOver':
-			return false;
-		case 'Starting':
-			return true;
-		case 'Drawing':
-			return true;
-		default:
-			return true;
-	}
 };
 var $author$project$Main$KickPlayer = function (a) {
 	return {$: 'KickPlayer', a: a};
