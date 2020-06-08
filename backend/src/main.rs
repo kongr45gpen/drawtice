@@ -91,8 +91,13 @@ impl User {
 
     async fn tx_any_packages(self: &User, game: &Game, player_id: usize) {
         let package = game.get_previous_package(player_id);
-        if let Some(package) = Game::generate_one_package_response(package) {
-            self.tx_direct(package).await;
+
+        if game.game_status == game::GameStatus::GameOver {
+            self.tx_direct(game.generate_workload_response()).await;
+        } else {
+            if let Some(package) = Game::generate_one_package_response(package) {
+                self.tx_direct(package).await;
+            }
         }
     }
 
@@ -179,6 +184,10 @@ impl Game {
                 }
             }
         }
+    }
+
+    fn generate_workload_response(self: &Game) -> protocol::Response {
+        protocol::Response::AllWorkloads(self.workloads.clone())
     }
 
     fn generate_one_package_response(package: Option<&game::WorkPackage>) -> Option<protocol::Response> {

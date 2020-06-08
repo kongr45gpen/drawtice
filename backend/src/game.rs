@@ -37,14 +37,15 @@ pub enum GameStatus {
     GameOver,
 }
 
-#[derive(Serialize, Deserialize, Debug, EnumKind)]
+#[derive(Serialize, Deserialize, Debug, Clone, EnumKind)]
 #[enum_kind(WorkPackageDataKind)]
+#[serde(tag = "type")]
 pub enum WorkPackageData {
     TextPackage(TextPackage),
     ImagePackage(ImagePackage),
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct WorkPackage {
     pub player_id: usize,
     pub workload_id: usize,
@@ -57,7 +58,7 @@ pub struct WorkPackage {
     pub filled_automatically: bool,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct WorkLoad {
     pub packages: Vec<WorkPackage>,
     pub player_id: usize,
@@ -214,6 +215,7 @@ impl Game {
             self.current_stage += 1;
         } else {
             self.game_status = GameStatus::GameOver;
+            self.stage_information_transmitted = false;
         }
 
         for player in self.players.iter_mut()
