@@ -89,6 +89,13 @@ impl User {
             .collect()
     }
 
+    async fn tx_any_packages(self: &User, game: &Game, player_id: usize) {
+        let package = game.get_previous_package(player_id);
+        if let Some(package) = Game::generate_one_package_response(package) {
+            self.tx_direct(package).await;
+        }
+    }
+
     async fn tx_direct(self: &User, response: protocol::Response<'_>) {
         let response = protocol::encode(response);
         match response {
@@ -146,9 +153,7 @@ impl Game {
                     }
 
                     if !self.stage_information_transmitted {
-                        let package = self.get_previous_package(g.1);
-                        let response_package = Game::generate_one_package_response(package);
-                        user.tx_direct(response_package).await;
+                        user.tx_any_packages(self, g.1).await;
                     }
                 }
             }
@@ -176,27 +181,32 @@ impl Game {
         }
     }
 
-    fn generate_one_package_response(package: Option<&game::WorkPackage>) -> protocol::Response {
+    fn generate_one_package_response(package: Option<&game::WorkPackage>) -> Option<protocol::Response> {
         match package {
             Some(p) => {
                 match &p.data {
                     Some(game::WorkPackageData::TextPackage(d)) => {
-                        protocol::Response::PreviousTextPackage(d.clone())
+                        Some(protocol::Response::PreviousTextPackage(d.clone()))
                     },
                     Some(game::WorkPackageData::ImagePackage(d)) => {
-                        protocol::Response::PreviousImagePackage(d.clone())
+                        Some(protocol::Response::PreviousImagePackage(d.clone()))
                     },
                     None => {
-                        protocol::Response::Error("The previous player didn't have enough time to add some data... I guess you'll have to improvise!".to_string())
+                        None
                     }
                 }
 
             },
-            None => {
-                protocol::Response::Error(
-                    "No premise currently available... Please wait for the next round".to_string()
+            None => None
+        }
+    }
+
+    fn generate_one_package_response_rude(package: Option<&game::WorkPackage>) -> protocol::Response {
+        match Game::generate_one_package_response(package) {
+            Some(r) => r,
+            None => protocol::Response::Error(
+                    "The previous player didn't have enough time to add some data... I guess you'll have to improvise!".to_string()
                 )
-            }
         }
     }
 }
@@ -446,18 +456,19 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             user.uuid = uuid;
 
             // Search for this user in all our games
-            for (&gid, game) in games.iter_mut() {
-                for (pid, player) in game.players.iter_mut().enumerate() {
+            for (&game_id, game) in games.iter_mut() {
+                for (player_id, player) in game.players.iter_mut().enumerate() {
                     if player.uuid == uuid {
                         // Found the player!
                         player.user_id = my_id;
                         player.stuck = false;
-                        user.game = Some((gid, pid));
+                        user.game = Some((game_id, player_id));
 
                         // Announce the game to the user
                         user.tx_direct(protocol::Response::PersonalDetails(
-                            protocol::PersonalDetailsResponse::new(pid, &player)
+                            protocol::PersonalDetailsResponse::new(player_id, &player)
                         )).await;
+                        user.tx_any_packages(game, player_id).await;
 
                         // Announce the user to the other players
                         game.tx_game_details(users, false).await;
