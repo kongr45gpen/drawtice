@@ -612,7 +612,6 @@ view model =
         viewNav model,
         viewHeader model,
         div [ class "page-container" ] [
-          viewSidebar model,
           main_ [ class "page" ] [
             case model.status of
               NoGame ->
@@ -627,7 +626,8 @@ view model =
                 viewUnderstanding model
               GameOver ->
                 viewSummary model
-          ]
+          ],
+          viewSidebar model
         ]
       ]
   }
@@ -637,8 +637,8 @@ viewNav model =
   nav [ class "page-header pure-menu pure-menu-horizontal" ] [
     span [ class "pure-menu-heading" ] [ text "Drawtice" ],
     ul [ class "pure-menu-list" ] ([
-      li [ class ("pure-menu-item" ++ if not (hasGameStarted model) then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
-      li [ class ("pure-menu-item" ++ if hasGameStarted model then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
+      li [ class ("pure-menu-item pure-menu-useless" ++ if not (hasGameStarted model) then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "New Game" ] ],
+      li [ class ("pure-menu-item pure-menu-useless" ++ if hasGameStarted model then " pure-menu-selected" else "") ] [ span [ class "pure-menu-link" ] [ text "Current Game" ] ]
     ] ++ (case model.gameId of
       Nothing -> []
       Just _ ->
@@ -705,35 +705,34 @@ viewHeader model =
 
 viewSidebar : Model -> Html Msg
 viewSidebar model =
-  aside [ class "sidebar" ] [
-    div [ class "gameId" ] ([
-      text "Game ID: ",
+  let
+    gameId = div [ class "gameId" ] [
       case model.gameId of
         Nothing ->
           em [ class "text-muted" ] [ text "Not Started" ]
         Just id ->
-          text id
-    ] ++ (if Array.isEmpty model.players
-        then []
-        else [ div [ class "player-list" ] (Array.indexedMap (viewPlayer model) model.players |> Array.toList) ]
-    )
-      ++ if model.amAdministrator && isGameRunning model
-        then [
-          div [ class "admin-actions" ] [
-            button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
-            button [ class "pure-button", onClick (NextRound |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
-          ]
+          span [ class "text-tt" ] [ text id ]
+     ]
+    playerList = if Array.isEmpty model.players
+      then []
+      else [ div [ class "player-list" ] (Array.indexedMap (viewPlayer model) model.players |> Array.toList) ]
+    adminActions = if model.amAdministrator && isGameRunning model
+      then [
+        div [ class "admin-actions" ] [
+          button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
+          button [ class "pure-button", onClick (NextRound |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
         ]
-        else []
-      ++ if model.status == GameOver
-        then [
-          div [ class "admin-actions" ] [
-            button [ class "pure-button pure-button-danger", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to leave this game?") ] [ text "Leave Game" ]
-          ]
+      ]
+      else []
+    gameoverActions = if model.status == GameOver
+      then [
+        div [ class "admin-actions" ] [
+          button [ class "pure-button pure-button-danger", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to leave this game?") ] [ text "Leave Game" ]
         ]
-        else []
-    )
-  ]
+      ]
+      else []
+  in
+    aside [ class "sidebar" ] (gameId :: playerList ++ adminActions ++ gameoverActions)
 
 viewPlayer : Model -> Int -> Player -> Html Msg
 viewPlayer model id player =
@@ -762,7 +761,7 @@ viewPlayer model id player =
 viewLanding : Model -> Html Msg
 viewLanding model =
   section [ class "landing hall" ] [
-    div [ class "landing-join" ] [
+    div [ class "landing-join landing-join-username" ] [
       label [ for "username" ] [ text "People usually call me:" ],
       div [] [
         input [
@@ -777,7 +776,7 @@ viewLanding model =
         span [ class "landing-username-icon", attribute "aria-hidden" "true" ] [ i [ class "fa fa-user-o"] [] ]
       ]
     ],
-    Html.form [ class "landing-join", onSubmit JoinGame ]  [
+    Html.form [ class "landing-join landing-join-gameid", onSubmit JoinGame ]  [
       input [ placeholder "GameId", required True, onInput <| SetField GameIdField, value model.formFields.gameId, class "text-tt" ] [],
       button [ type_ "submit", class "pure-button pure-button-primary landing-button" ] [
         text "Join a running game"

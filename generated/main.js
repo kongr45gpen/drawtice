@@ -10622,7 +10622,7 @@ var $author$project$Main$viewLanding = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('landing-join')
+						$elm$html$Html$Attributes$class('landing-join landing-join-username')
 					]),
 				_List_fromArray(
 					[
@@ -10678,7 +10678,7 @@ var $author$project$Main$viewLanding = function (model) {
 				$elm$html$Html$form,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('landing-join'),
+						$elm$html$Html$Attributes$class('landing-join landing-join-gameid'),
 						$elm$html$Html$Events$onSubmit($author$project$Main$JoinGame)
 					]),
 				_List_fromArray(
@@ -10916,7 +10916,7 @@ var $author$project$Main$viewNav = function (model) {
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class(
-									'pure-menu-item' + ((!$author$project$Main$hasGameStarted(model)) ? ' pure-menu-selected' : ''))
+									'pure-menu-item pure-menu-useless' + ((!$author$project$Main$hasGameStarted(model)) ? ' pure-menu-selected' : ''))
 								]),
 							_List_fromArray(
 								[
@@ -10936,7 +10936,7 @@ var $author$project$Main$viewNav = function (model) {
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$class(
-									'pure-menu-item' + ($author$project$Main$hasGameStarted(model) ? ' pure-menu-selected' : ''))
+									'pure-menu-item pure-menu-useless' + ($author$project$Main$hasGameStarted(model) ? ' pure-menu-selected' : ''))
 								]),
 							_List_fromArray(
 								[
@@ -11193,120 +11193,128 @@ var $author$project$Main$viewPlayer = F3(
 				]));
 	});
 var $author$project$Main$viewSidebar = function (model) {
+	var playerList = $elm$core$Array$isEmpty(model.players) ? _List_Nil : _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('player-list')
+				]),
+			$elm$core$Array$toList(
+				A2(
+					$elm$core$Array$indexedMap,
+					$author$project$Main$viewPlayer(model),
+					model.players)))
+		]);
+	var gameoverActions = _Utils_eq(model.status, $author$project$Protocol$GameOver) ? _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('admin-actions')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('pure-button pure-button-danger'),
+							$elm$html$Html$Events$onClick(
+							A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to leave this game?', $author$project$Main$LeaveGame))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Leave Game')
+						]))
+				]))
+		]) : _List_Nil;
+	var gameId = A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('gameId')
+			]),
+		_List_fromArray(
+			[
+				function () {
+				var _v0 = model.gameId;
+				if (_v0.$ === 'Nothing') {
+					return A2(
+						$elm$html$Html$em,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-muted')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Not Started')
+							]));
+				} else {
+					var id = _v0.a;
+					return A2(
+						$elm$html$Html$span,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-tt')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(id)
+							]));
+				}
+			}()
+			]));
+	var adminActions = (model.amAdministrator && $author$project$Main$isGameRunning(model)) ? _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('admin-actions')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('pure-button'),
+							$elm$html$Html$Events$onClick(
+							A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to prematurely end this game for all players?', $author$project$Main$LeaveGame))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Cancel Game')
+						])),
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('pure-button'),
+							$elm$html$Html$Events$onClick(
+							A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to quickly end this round?', $author$project$Main$NextRound))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('End Round')
+						]))
+				]))
+		]) : _List_Nil;
 	return A2(
 		$elm$html$Html$aside,
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$class('sidebar')
 			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('gameId')
-					]),
-				_Utils_ap(
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Game ID: '),
-							function () {
-							var _v0 = model.gameId;
-							if (_v0.$ === 'Nothing') {
-								return A2(
-									$elm$html$Html$em,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('text-muted')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Not Started')
-										]));
-							} else {
-								var id = _v0.a;
-								return $elm$html$Html$text(id);
-							}
-						}()
-						]),
-					_Utils_ap(
-						$elm$core$Array$isEmpty(model.players) ? _List_Nil : _List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('player-list')
-									]),
-								$elm$core$Array$toList(
-									A2(
-										$elm$core$Array$indexedMap,
-										$author$project$Main$viewPlayer(model),
-										model.players)))
-							]),
-						(model.amAdministrator && $author$project$Main$isGameRunning(model)) ? _List_fromArray(
-							[
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('admin-actions')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('pure-button'),
-												$elm$html$Html$Events$onClick(
-												A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to prematurely end this game for all players?', $author$project$Main$LeaveGame))
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Cancel Game')
-											])),
-										A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('pure-button'),
-												$elm$html$Html$Events$onClick(
-												A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to quickly end this round?', $author$project$Main$NextRound))
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('End Round')
-											]))
-									]))
-							]) : _Utils_ap(
-							_List_Nil,
-							_Utils_eq(model.status, $author$project$Protocol$GameOver) ? _List_fromArray(
-								[
-									A2(
-									$elm$html$Html$div,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('admin-actions')
-										]),
-									_List_fromArray(
-										[
-											A2(
-											$elm$html$Html$button,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('pure-button pure-button-danger'),
-													$elm$html$Html$Events$onClick(
-													A2($author$project$Main$ShowConfirmDialog, 'Are you sure you want to leave this game?', $author$project$Main$LeaveGame))
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Leave Game')
-												]))
-										]))
-								]) : _List_Nil))))
-			]));
+		A2(
+			$elm$core$List$cons,
+			gameId,
+			_Utils_ap(
+				playerList,
+				_Utils_ap(adminActions, gameoverActions))));
 };
 var $author$project$Main$SubmitText = {$: 'SubmitText'};
 var $author$project$Main$TextField = {$: 'TextField'};
@@ -11657,7 +11665,6 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$author$project$Main$viewSidebar(model),
 						A2(
 						$elm$html$Html$main_,
 						_List_fromArray(
@@ -11683,7 +11690,8 @@ var $author$project$Main$view = function (model) {
 										return $author$project$Main$viewSummary(model);
 								}
 							}()
-							]))
+							])),
+						$author$project$Main$viewSidebar(model)
 					]))
 			]),
 		title: 'Drawtice'

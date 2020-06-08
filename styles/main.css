@@ -6,6 +6,10 @@ body {
   box-sizing: border-box;
 }
 
+input {
+  padding: 0.3rem;
+}
+
 /*
  * GENERIC HELPERS
  */
@@ -22,7 +26,7 @@ body {
  */
 .page-container {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
 }
 
 /*
@@ -34,6 +38,9 @@ body {
   min-width: 400px;
 
   margin-right: 1.5rem;
+  margin-bottom: 1rem;
+
+  text-align: center;
 }
 
 .player-list {
@@ -77,10 +84,15 @@ body {
   text-shadow: 1px 1px 4px #ff3333ff;
 }
 
+.gameId::before {
+  content: "Game ID: ";
+}
+
 .gameId {
   text-align: center;
   font-size: 95%;
   margin: 0.3rem;
+  margin-bottom: 0.6rem;
 }
 
 /*
@@ -297,6 +309,7 @@ body {
   height: 100%;
 
   padding-left: calc(35pt + 15px);
+  padding-right: 15px;
 }
 
 .game-link-presentation {
@@ -544,4 +557,139 @@ body {
   font-size: 20pt;
   font-family: "Space Mono","Ubuntu Mono","Fira Mono",monospace;
   margin: 0rem;
+}
+
+/*
+ * MEDIA QUERIES
+ */
+ @media (min-width: 1000px) and (max-width: 1300px) {
+  .sidebar {
+    min-width: 200px;
+    font-size: 90%;
+  }
+
+  .player > * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 999px) {
+  .page-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-container > * {
+    width: unset;
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+
+  .my-status {
+    width: unset;
+  }
+
+  .admin-actions .pure-button {
+    font-size: unset;
+  }
+
+  .pure-menu.pure-menu-horizontal .pure-menu-list {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .page-header-fin {
+    display: none !important;
+  }
+
+  .pure-menu-useless {
+    display: none !important;
+  }
+
+  .pure-button.landing-button {
+    white-space: normal;
+    font-size: 110%;
+  }
+
+  .page {
+    height: 100%;
+    min-height: 70vh;
+  }
+
+  .page > * {
+    height: 100%;
+  }
+
+  .hall {
+    height: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-join {
+    font-size: 100%;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .landing-join-gameid {
+    flex-direction: column-reverse;
+  }
+
+  .landing-join input {
+    width: 100%;
+    margin: 1rem 0;
+    height: 64px;
+
+    text-align: center;
+  }
+
+  .landing-join label {
+    margin: 0 !important;
+  }
+
+  .landing-username {
+    padding-left: calc(15pt + 20px);
+    padding-right: 10px;
+    font-size: 90%;
+  }
+
+  .landing-username-icon {
+    top: 2px;
+    right: calc(100% - 25px);
+    font-size: 15pt;
+  }
+
+  .game-link-large {
+    font-size: 100%;
+  }
+
+  .my-username {
+    margin-left: 0.4rem;
+    font-size: 90%;
+  }
+
+  .my-status {
+    font-size: unset;
+  }
+
+  .game-status {
+    font-size: 90%;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar {
+    font-size: 90%;
+    min-width: 0;
+  }
 }
