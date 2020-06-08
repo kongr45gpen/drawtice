@@ -440,3 +440,76 @@ body {
 .understanding-button {
   width: 100%;
 }
+
+/*
+ * GAME (SUMMARY PAGE)
+ */
+.summary.hall {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+}
+
+.summary-arrow {
+  font-size: 5vw;
+  color: #777;
+  flex: 0 1 auto;
+  border-radius: 5px;
+  text-decoration: none;
+
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin: 0.3rem;
+
+  transition: 0.4s all;
+}
+
+.summary-arrow-disabled {
+  color: #eee;
+  cursor: not-allowed;
+}
+
+.summary-arrow:hover {
+  background-color: #ddd;
+}
+
+.summary-arrow-disabled:hover {
+  background-color: #fcfcfc;
+}
+
+.summary-arrow i {
+  display: inline-block;
+}
+
+.summary-main {
+  flex: 1 1 auto;
+
+  text-align: center;
+  overflow-y: auto;
+}
+
+.summary-package-prompt {
+  font-size: 10pt;
+  color: #666;
+  margin-bottom: 0.1rem;
+}
+
+.summary-package-image {
+  object-fit: contain;
+  border: 1px solid black;
+  box-shadow: 2px 2px 5px #00000050;
+
+  max-width: 50%;
+  max-height: 50%;
+
+  min-width: 100px;
+  min-height: 100px;
+}
+
+.summary-package-text {
+  font-size: 20pt;
+  font-family: "Space Mono","Ubuntu Mono","Fira Mono",monospace;
+  margin-top: 0.2rem;
+}

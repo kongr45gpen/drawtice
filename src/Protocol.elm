@@ -2,6 +2,8 @@ module Protocol exposing (..)
 
 import Json.Decode exposing (..)
 import Json.Encode as JE
+import List
+import Array
 
 -- BASIC DEFINITIONS
 
@@ -45,6 +47,17 @@ type alias PersonalDetails =
   , amAdministrator: Bool
   }
 
+type alias Workload = List WorkPackageDetails
+
+type alias WorkPackageDetails =
+  { playerId: Int
+  , data: Maybe WorkPackage
+  }
+
+type WorkPackage
+  = TextPackage String
+  | ImagePackage String
+
 -- JSON RESPONSE, COMMAND
 
 type Response
@@ -56,6 +69,7 @@ type Response
   | LeftGameResponse
   | PreviousTextPackageResponse String
   | PreviousImagePackageResponse String
+  | AllWorkloadsResponse (Array.Array Workload)
 
 -- JSON COMMAND ENCODERS
 prepareSocketCommand : SocketCommand -> JE.Value
@@ -167,6 +181,32 @@ previousImagePackageParser =
     \v -> PreviousImagePackageResponse v
   )
 
+workloadsParser : (Decoder (Array.Array Workload), (Array.Array Workload) -> Response)
+workloadsParser =
+  (
+    array workloadDecoder
+    ,
+    \v -> AllWorkloadsResponse v
+  )
+
+workloadDecoder : Decoder Workload
+workloadDecoder =
+  field "packages" (list workpackageDetailsDecoder)
+
+workpackageDetailsDecoder : Decoder WorkPackageDetails
+workpackageDetailsDecoder =
+  map2 WorkPackageDetails
+    (field "player_id" int)
+    (field "data" (nullable workpackageDecoder))
+
+workpackageDecoder : Decoder WorkPackage
+workpackageDecoder =
+  oneOf
+    [ map TextPackage (field "text" string)
+    , map ImagePackage (field "url" string)
+    ]
+
+-- HELPER FUNCTIONS
 gameStatusFromString : String -> GameStatus
 gameStatusFromString string =
   case string of

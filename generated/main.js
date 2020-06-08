@@ -5243,13 +5243,19 @@ var $author$project$Main$Model = function (key) {
 							return function (myId) {
 								return function (uuid) {
 									return function (previousPackage) {
-										return function (gameKey) {
-											return function (funnelState) {
-												return function (formFields) {
-													return function (pendingDialogs) {
-														return function (nextDialogId) {
-															return function (error) {
-																return {amAdministrator: amAdministrator, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, previousPackage: previousPackage, status: status, url: url, uuid: uuid};
+										return function (workloads) {
+											return function (currentWorkload) {
+												return function (playerCapture) {
+													return function (gameKey) {
+														return function (funnelState) {
+															return function (formFields) {
+																return function (pendingDialogs) {
+																	return function (nextDialogId) {
+																		return function (error) {
+																			return {amAdministrator: amAdministrator, currentWorkload: currentWorkload, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, playerCapture: playerCapture, players: players, previousPackage: previousPackage, status: status, url: url, uuid: uuid, workloads: workloads};
+																		};
+																	};
+																};
 															};
 														};
 													};
@@ -6876,7 +6882,7 @@ var $author$project$Main$init = F3(
 			username: '',
 			usernamePlaceholder: ''
 		};
-		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
+		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
 			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
@@ -7168,7 +7174,7 @@ var $author$project$Protocol$ErrorResponse = function (a) {
 	return {$: 'ErrorResponse', a: a};
 };
 var $author$project$Main$GameIdField = {$: 'GameIdField'};
-var $author$project$Main$ImagePackage = function (a) {
+var $author$project$Protocol$ImagePackage = function (a) {
 	return {$: 'ImagePackage', a: a};
 };
 var $author$project$Protocol$ImagePackageCommand = function (a) {
@@ -7199,7 +7205,7 @@ var $author$project$Main$StorageReceive = F2(
 		return {$: 'StorageReceive', a: a, b: b};
 	});
 var $author$project$Protocol$Stuck = {$: 'Stuck'};
-var $author$project$Main$TextPackage = function (a) {
+var $author$project$Protocol$TextPackage = function (a) {
 	return {$: 'TextPackage', a: a};
 };
 var $author$project$Protocol$TextPackageCommand = function (a) {
@@ -7592,7 +7598,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 var $author$project$Main$leaveGame = function (model) {
 	return _Utils_update(
 		model,
-		{gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, status: $author$project$Protocol$NoGame});
+		{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, playerCapture: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, status: $author$project$Protocol$NoGame, workloads: $elm$core$Maybe$Nothing});
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$core$Debug$log = _Debug_log;
@@ -9548,6 +9554,43 @@ var $elm$core$Result$withDefault = F2(
 			return def;
 		}
 	});
+var $author$project$Protocol$AllWorkloadsResponse = function (a) {
+	return {$: 'AllWorkloadsResponse', a: a};
+};
+var $elm$json$Json$Decode$array = _Json_decodeArray;
+var $author$project$Protocol$WorkPackageDetails = F2(
+	function (playerId, data) {
+		return {data: data, playerId: playerId};
+	});
+var $author$project$Protocol$workpackageDecoder = $elm$json$Json$Decode$oneOf(
+	_List_fromArray(
+		[
+			A2(
+			$elm$json$Json$Decode$map,
+			$author$project$Protocol$TextPackage,
+			A2($elm$json$Json$Decode$field, 'text', $elm$json$Json$Decode$string)),
+			A2(
+			$elm$json$Json$Decode$map,
+			$author$project$Protocol$ImagePackage,
+			A2($elm$json$Json$Decode$field, 'url', $elm$json$Json$Decode$string))
+		]));
+var $author$project$Protocol$workpackageDetailsDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Protocol$WorkPackageDetails,
+	A2($elm$json$Json$Decode$field, 'player_id', $elm$json$Json$Decode$int),
+	A2(
+		$elm$json$Json$Decode$field,
+		'data',
+		$elm$json$Json$Decode$nullable($author$project$Protocol$workpackageDecoder)));
+var $author$project$Protocol$workloadDecoder = A2(
+	$elm$json$Json$Decode$field,
+	'packages',
+	$elm$json$Json$Decode$list($author$project$Protocol$workpackageDetailsDecoder));
+var $author$project$Protocol$workloadsParser = _Utils_Tuple2(
+	$elm$json$Json$Decode$array($author$project$Protocol$workloadDecoder),
+	function (v) {
+		return $author$project$Protocol$AllWorkloadsResponse(v);
+	});
 var $author$project$Main$wsUrl = 'ws://192.168.1.11:3030/ws';
 var $author$project$Main$socketHandler = F3(
 	function (response, state, mdl) {
@@ -9566,13 +9609,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v16 = decodeData(parser.a);
-					if (_v16.$ === 'Err') {
-						var e = _v16.a;
+					var _v18 = decodeData(parser.a);
+					if (_v18.$ === 'Err') {
+						var e = _v18.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v16.a;
+						var v = _v18.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9600,8 +9643,10 @@ var $author$project$Main$socketHandler = F3(
 								return decodeDataUsingParser($author$project$Protocol$previousTextPackageParser);
 							case 'previous_image_package':
 								return decodeDataUsingParser($author$project$Protocol$previousImagePackageParser);
+							case 'all_workloads':
+								return decodeDataUsingParser($author$project$Protocol$workloadsParser);
 							default:
-								return $author$project$Protocol$ErrorResponse('Uknown response type received');
+								return $author$project$Protocol$ErrorResponse('Unknown response type received');
 						}
 					}
 				}();
@@ -9627,15 +9672,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v17 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v17.b) {
+				var _v19 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v19.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v17.a.$ === 'ReconnectedResponse') && (!_v17.b.b)) {
-						var r = _v17.a.a;
+					if ((_v19.a.$ === 'ReconnectedResponse') && (!_v19.b.b)) {
+						var r = _v19.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v17;
+						var list = _v19;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -9781,6 +9826,24 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						A3($author$project$Main$setField, field, value, model),
 						$elm$core$Platform$Cmd$none);
+				case 'MoveWorkload':
+					var dir = msg.a;
+					var workload = function () {
+						if (dir.$ === 'Forward') {
+							return model.currentWorkload + 1;
+						} else {
+							return model.currentWorkload - 1;
+						}
+					}();
+					var workload2 = (workload < 0) ? 0 : workload;
+					var maxWorkload = $elm$core$Array$length(
+						A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)) - 1;
+					var workload3 = (_Utils_cmp(workload2, maxWorkload) > 0) ? maxWorkload : workload2;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{currentWorkload: workload3}),
+						$elm$core$Platform$Cmd$none);
 				case 'Send':
 					var value = msg.a;
 					return _Utils_Tuple2(
@@ -9788,19 +9851,19 @@ var $author$project$Main$update = F2(
 						$author$project$Main$cmdPort(value));
 				case 'Receive':
 					var value = msg.a;
-					var _v4 = A4(
+					var _v5 = A4(
 						$author$project$PortFunnels$processValue,
 						$author$project$Main$cyclic$funnelDict(),
 						value,
 						model.funnelState,
 						model);
-					if (_v4.$ === 'Err') {
-						var error = _v4.a;
+					if (_v5.$ === 'Err') {
+						var error = _v5.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$Main$errorLog(error));
 					} else {
-						var res = _v4.a;
+						var res = _v5.a;
 						var modul = A2(
 							$elm$core$Result$withDefault,
 							'none',
@@ -9809,11 +9872,11 @@ var $author$project$Main$update = F2(
 								A2($elm$json$Json$Decode$field, 'module', $elm$json$Json$Decode$string),
 								value));
 						if (modul === 'WebSocket') {
-							var _v5 = A2(
+							var _v6 = A2(
 								$elm$json$Json$Decode$decodeValue,
 								A2($elm$json$Json$Decode$field, 'tag', $elm$json$Json$Decode$string),
 								value);
-							if ((_v5.$ === 'Ok') && (_v5.a === 'startup')) {
+							if ((_v6.$ === 'Ok') && (_v6.a === 'startup')) {
 								return A2(
 									$Janiczek$cmd_extra$Cmd$Extra$addCmd,
 									$author$project$Main$sendWebSocket(
@@ -9980,18 +10043,52 @@ var $author$project$Main$update = F2(
 									model,
 									{
 										previousPackage: $elm$core$Maybe$Just(
-											$author$project$Main$TextPackage(text))
+											$author$project$Protocol$TextPackage(text))
 									}),
 								$elm$core$Platform$Cmd$none);
-						default:
+						case 'PreviousImagePackageResponse':
 							var path = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
 										previousPackage: $elm$core$Maybe$Just(
-											$author$project$Main$ImagePackage(
+											$author$project$Protocol$ImagePackage(
 												_Utils_ap($author$project$Main$imageUrl, path)))
+									}),
+								$elm$core$Platform$Cmd$none);
+						default:
+							var workloads = value.a;
+							var correctURL = function (data) {
+								if ((data.$ === 'Just') && (data.a.$ === 'ImagePackage')) {
+									var url = data.a.a;
+									return $elm$core$Maybe$Just(
+										$author$project$Protocol$ImagePackage(
+											_Utils_ap($author$project$Main$imageUrl, url)));
+								} else {
+									return data;
+								}
+							};
+							var correctionInner = function (workpackage) {
+								return _Utils_update(
+									workpackage,
+									{
+										data: correctURL(workpackage.data)
+									});
+							};
+							var correctionOuter = function (workload) {
+								return A2($elm$core$List$map, correctionInner, workload);
+							};
+							var correctURLs = function (workloads_) {
+								return A2($elm$core$Array$map, correctionOuter, workloads_);
+							};
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										playerCapture: $elm$core$Maybe$Just(model.players),
+										workloads: $elm$core$Maybe$Just(
+											correctURLs(workloads))
 									}),
 								$elm$core$Platform$Cmd$none);
 					}
@@ -10022,9 +10119,9 @@ var $author$project$Main$update = F2(
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
 				case 'ShownConfirmDialog':
-					var _v9 = msg.a;
-					var pressed = _v9.a;
-					var dialogId = _v9.b;
+					var _v11 = msg.a;
+					var pressed = _v11.a;
+					var dialogId = _v11.b;
 					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
 					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
 					var mdl = _Utils_update(
@@ -10058,7 +10155,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v18, _v19) {
+			function (_v20, _v21) {
 				return $author$project$Main$cmdPort;
 			}));
 }
@@ -10090,8 +10187,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$SubmitImage = {$: 'SubmitImage'};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
@@ -10105,7 +10200,7 @@ var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$Main$getWorkPackageText = function (model) {
 	var previousPackage = A2(
 		$elm$core$Maybe$withDefault,
-		$author$project$Main$TextPackage('an armadillo'),
+		$author$project$Protocol$TextPackage('an armadillo'),
 		model.previousPackage);
 	if (previousPackage.$ === 'TextPackage') {
 		var t = previousPackage.a;
@@ -10137,6 +10232,8 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$html$Html$section = _VirtualDom_node('section');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$viewDrawing = function (model) {
 	return A2(
 		$elm$html$Html$section,
@@ -11239,11 +11336,194 @@ var $author$project$Main$viewStarting = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$Backward = {$: 'Backward'};
+var $author$project$Main$Forward = {$: 'Forward'};
+var $author$project$Main$MoveWorkload = function (a) {
+	return {$: 'MoveWorkload', a: a};
+};
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$i = _VirtualDom_node('i');
+var $author$project$Main$isAtWorkloadEnd = F2(
+	function (model, dir) {
+		return ((!model.currentWorkload) && _Utils_eq(dir, $author$project$Main$Backward)) ? true : (_Utils_eq(
+			model.currentWorkload,
+			$elm$core$Array$length(
+				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)) - 1) && _Utils_eq(dir, $author$project$Main$Forward));
+	});
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $author$project$Main$viewWorkpackage = F2(
+	function (model, _package) {
+		var username = A2(
+			$elm$core$Maybe$withDefault,
+			'???',
+			A2(
+				$elm$core$Maybe$map,
+				function (p) {
+					return p.username;
+				},
+				A2(
+					$elm$core$Maybe$andThen,
+					function (a) {
+						return A2($elm$core$Array$get, _package.playerId, a);
+					},
+					model.playerCapture)));
+		var html = function () {
+			var _v0 = _package.data;
+			if (_v0.$ === 'Just') {
+				if (_v0.a.$ === 'TextPackage') {
+					var t = _v0.a.a;
+					return A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('summary-package-text')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(t)
+							]));
+				} else {
+					var url = _v0.a.a;
+					return A2(
+						$elm$html$Html$img,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('summary-package-image'),
+								$elm$html$Html$Attributes$src(url),
+								$elm$html$Html$Attributes$alt('Drawn image')
+							]),
+						_List_Nil);
+				}
+			} else {
+				return A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('summary-package-nothing'),
+							$elm$html$Html$Attributes$title('The player didn\'t have time to complete this!')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('???')
+						]));
+			}
+		}();
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('summary-package')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('summary-package-prompt')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('by ' + (username + ':'))
+						])),
+					html
+				]));
+	});
+var $author$project$Main$viewSummary = function (model) {
+	var workload = A2(
+		$elm$core$Maybe$withDefault,
+		_List_Nil,
+		A2(
+			$elm$core$Maybe$andThen,
+			function (a) {
+				return A2($elm$core$Array$get, model.currentWorkload, a);
+			},
+			model.workloads));
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('summary hall')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class(
+						'summary-arrow summary-arrow-left' + (A2($author$project$Main$isAtWorkloadEnd, model, $author$project$Main$Backward) ? ' summary-arrow-disabled' : '')),
+						$elm$html$Html$Attributes$href('#'),
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MoveWorkload($author$project$Main$Backward))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$i,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('fa fa-chevron-left')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('summary-main')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('summary-header')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'Series ' + $elm$core$String$fromInt(model.currentWorkload + 1))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('summary-container')
+							]),
+						A2(
+							$elm$core$List$map,
+							$author$project$Main$viewWorkpackage(model),
+							workload))
+					])),
+				A2(
+				$elm$html$Html$a,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class(
+						'summary-arrow summary-arrow-right' + (A2($author$project$Main$isAtWorkloadEnd, model, $author$project$Main$Forward) ? ' summary-arrow-disabled' : '')),
+						$elm$html$Html$Attributes$href('#'),
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$MoveWorkload($author$project$Main$Forward))
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$i,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('fa fa-chevron-right')
+							]),
+						_List_Nil)
+					]))
+			]));
+};
 var $author$project$Main$getWorkPackageImage = function (model) {
 	var _default = $author$project$Main$imageUrl + 'dog.jpg';
 	var previousPackage = A2(
 		$elm$core$Maybe$withDefault,
-		$author$project$Main$ImagePackage(_default),
+		$author$project$Protocol$ImagePackage(_default),
 		model.previousPackage);
 	if (previousPackage.$ === 'ImagePackage') {
 		var p = previousPackage.a;
@@ -11369,7 +11649,7 @@ var $author$project$Main$view = function (model) {
 									case 'Understanding':
 										return $author$project$Main$viewUnderstanding(model);
 									default:
-										return $elm$html$Html$text('nothing');
+										return $author$project$Main$viewSummary(model);
 								}
 							}()
 							]))

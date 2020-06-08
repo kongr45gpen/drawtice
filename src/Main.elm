@@ -17,7 +17,7 @@ import Array
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
 import PortFunnel.LocalStorage as LocalStorage
 import PortFunnels exposing (FunnelDict, Handler(..), State)
-import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..))
+import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..), WorkPackage(..), Workload, WorkPackageDetails)
 import Names
 import Cmd.Extra
 
@@ -81,9 +81,9 @@ type FormField
   | UsernamePlaceholder
   | TextField
 
-type WorkPackage
-  = TextPackage String
-  | ImagePackage String
+type Direction
+  = Forward
+  | Backward
 
 type alias Player =
   {
@@ -114,6 +114,9 @@ type alias Model =
   , myId : Maybe Int
   , uuid : Maybe String
   , previousPackage : Maybe WorkPackage
+  , workloads : Maybe (Array.Array Workload)
+  , currentWorkload : Int
+  , playerCapture : Maybe (Array.Array Player)
   , gameKey : Maybe String
   , funnelState : PortFunnels.State
   , formFields : FormFields
@@ -139,8 +142,8 @@ init flags url key =
 
     model = Model
       key url NoGame Nothing False Nothing
-      Array.empty Nothing Nothing Nothing Nothing (PortFunnels.initialState "drawtice")
-      formFields Dict.empty 0 Nothing
+      Array.empty Nothing Nothing Nothing Nothing 0 Nothing Nothing
+      (PortFunnels.initialState "drawtice") formFields Dict.empty 0 Nothing
   in
     ( model, Cmd.batch [
       Task.perform Tick Time.now,
@@ -168,6 +171,7 @@ type Msg
   | SubmitText
   | SubmitImage
   | SetField FormField String
+  | MoveWorkload Direction
   | Send JE.Value
   | Receive JE.Value
   | SocketReceive Protocol.Response
@@ -250,6 +254,19 @@ update msg model =
 
     SetField field value ->
       ( setField field value model, Cmd.none )
+
+    MoveWorkload dir ->
+      let
+        workload = case dir of
+          Forward ->
+            model.currentWorkload + 1
+          Backward ->
+            model.currentWorkload - 1
+        workload2 = if workload < 0 then 0 else workload
+        maxWorkload = Array.length (model.workloads |> Maybe.withDefault Array.empty) - 1
+        workload3 = if workload2 > maxWorkload then maxWorkload else workload2
+      in
+        ({ model | currentWorkload = workload3}, Cmd.none)
 
     Send value ->
       (model, cmdPort value)
@@ -339,6 +356,18 @@ update msg model =
           ({model | previousPackage = Just <| TextPackage text}, Cmd.none)
         Protocol.PreviousImagePackageResponse path ->
           ({model | previousPackage = Just <| ImagePackage (imageUrl ++ path)}, Cmd.none)
+        Protocol.AllWorkloadsResponse workloads ->
+          let
+            correctURL data = case data of
+              Just (ImagePackage url) ->
+                Just <| ImagePackage (imageUrl ++ url)
+              _ ->
+                data
+            correctionInner workpackage = { workpackage | data = correctURL workpackage.data }
+            correctionOuter workload = List.map correctionInner workload
+            correctURLs workloads_ = Array.map correctionOuter workloads_
+          in
+            ({model | workloads = Just <| correctURLs workloads, playerCapture = Just model.players}, Cmd.none)
 
 
     ShowError value ->
@@ -423,7 +452,11 @@ leaveGame model =
          , gameKey = Nothing
          , players = Array.empty
          , myId = Nothing
-         , previousPackage = Nothing}
+         , previousPackage = Nothing
+         , workloads = Nothing
+         , currentWorkload = 0
+         , playerCapture = Nothing
+  }
 
 getMe : Model -> Maybe Player
 getMe model =
@@ -515,8 +548,10 @@ socketHandler response state mdl =
                 decodeDataUsingParser Protocol.previousTextPackageParser
               "previous_image_package" ->
                 decodeDataUsingParser Protocol.previousImagePackageParser
+              "all_workloads" ->
+                decodeDataUsingParser Protocol.workloadsParser
               _ ->
-                Protocol.ErrorResponse "Uknown response type received"
+                Protocol.ErrorResponse "Unknown response type received"
       in
         model |> update (SocketReceive (Debug.log "rcvMSG" received))
 
@@ -590,8 +625,8 @@ view model =
                 viewDrawing model
               Understanding ->
                 viewUnderstanding model
-              _ ->
-                text "nothing"
+              GameOver ->
+                viewSummary model
           ]
         ]
       ]
@@ -811,6 +846,46 @@ viewUnderstanding model =
     ]
   ]
 
+viewSummary : Model -> Html Msg
+viewSummary model =
+  let
+    workload = model.workloads |> Maybe.andThen (\a -> Array.get model.currentWorkload a)
+                               |> Maybe.withDefault []
+  in
+    section [ class "summary hall" ] [
+      a [ class ("summary-arrow summary-arrow-left" ++ if isAtWorkloadEnd model Backward then " summary-arrow-disabled" else "")
+        , href "#"
+        , onClick <| MoveWorkload Backward
+        ] [ i [ class "fa fa-chevron-left" ] [] ],
+      div [ class "summary-main" ] [
+        h3 [ class "summary-header" ] [ text ("Series " ++ String.fromInt (model.currentWorkload + 1)) ],
+        div [ class "summary-container" ] (List.map (viewWorkpackage model) workload)
+      ],
+    a [ class ("summary-arrow summary-arrow-right" ++ if isAtWorkloadEnd model Forward then " summary-arrow-disabled" else "")
+        , href "#"
+        , onClick <| MoveWorkload Forward
+        ] [ i [ class "fa fa-chevron-right" ] [] ]
+    ]
+
+viewWorkpackage : Model -> WorkPackageDetails -> Html Msg
+viewWorkpackage model package =
+  let
+    html = case package.data of
+      Just (TextPackage t) ->
+        p [ class "summary-package-text" ] [ text t ]
+      Just (ImagePackage url) ->
+        img [ class "summary-package-image", src url, alt "Drawn image" ] [ ]
+      Nothing ->
+        div [ class "summary-package-nothing", title "The player didn't have time to complete this!" ] [ text "???" ]
+    username = model.playerCapture |> Maybe.andThen (\a -> Array.get package.playerId a)
+                                   |> Maybe.map (\p -> p.username)
+                                   |> Maybe.withDefault "???"
+  in
+    div [ class "summary-package" ] [
+      div [ class "summary-package-prompt" ] [ text ("by " ++ username ++ ":") ],
+      html
+    ]
+
 viewPlayerAvatar : Player -> Html Msg
 viewPlayerAvatar player =
   img [ class "avatar", alt (player.username ++ " Avatar"), src player.image ] []
@@ -857,3 +932,8 @@ getWorkPackageImage model =
     case previousPackage of
       ImagePackage p -> p
       _ -> default
+
+isAtWorkloadEnd : Model -> Direction -> Bool
+isAtWorkloadEnd model dir =
+  if model.currentWorkload == 0 && dir == Backward then True
+  else model.currentWorkload == Array.length (model.workloads |> Maybe.withDefault Array.empty) - 1 && dir == Forward
