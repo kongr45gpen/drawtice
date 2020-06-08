@@ -248,13 +248,6 @@ async fn main() {
 
     let routes = index.or(ws).or(images);
 
-    // let handle = thread::spawn(|| {
-    //     loop {
-    //         info!("Hello to my thread");
-    //         thread::sleep(Duration::from_secs(1));
-    //     }
-    // });
-
     tokio::task::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(1));
 

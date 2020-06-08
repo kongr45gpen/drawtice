@@ -7168,6 +7168,9 @@ var $author$project$Protocol$ErrorResponse = function (a) {
 	return {$: 'ErrorResponse', a: a};
 };
 var $author$project$Main$GameIdField = {$: 'GameIdField'};
+var $author$project$Main$ImagePackage = function (a) {
+	return {$: 'ImagePackage', a: a};
+};
 var $author$project$Protocol$ImagePackageCommand = function (a) {
 	return {$: 'ImagePackageCommand', a: a};
 };
@@ -7539,6 +7542,7 @@ var $author$project$Main$getGameLink = function (model) {
 		return url;
 	}
 };
+var $author$project$Main$imageUrl = 'http://192.168.1.11:3030/images/';
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
 var $elm$core$Array$indexedMap = F2(
@@ -9121,6 +9125,14 @@ var $author$project$Protocol$personalDetailsParser = _Utils_Tuple2(
 	function (v) {
 		return $author$project$Protocol$PersonalDetailsResponse(v);
 	});
+var $author$project$Protocol$PreviousImagePackageResponse = function (a) {
+	return {$: 'PreviousImagePackageResponse', a: a};
+};
+var $author$project$Protocol$previousImagePackageParser = _Utils_Tuple2(
+	A2($elm$json$Json$Decode$field, 'url', $elm$json$Json$Decode$string),
+	function (v) {
+		return $author$project$Protocol$PreviousImagePackageResponse(v);
+	});
 var $author$project$Protocol$PreviousTextPackageResponse = function (a) {
 	return {$: 'PreviousTextPackageResponse', a: a};
 };
@@ -9586,6 +9598,8 @@ var $author$project$Main$socketHandler = F3(
 								return $author$project$Protocol$LeftGameResponse;
 							case 'previous_text_package':
 								return decodeDataUsingParser($author$project$Protocol$previousTextPackageParser);
+							case 'previous_image_package':
+								return decodeDataUsingParser($author$project$Protocol$previousImagePackageParser);
 							default:
 								return $author$project$Protocol$ErrorResponse('Uknown response type received');
 						}
@@ -9959,7 +9973,7 @@ var $author$project$Main$update = F2(
 							return _Utils_Tuple2(
 								$author$project$Main$leaveGame(model),
 								$elm$core$Platform$Cmd$none);
-						default:
+						case 'PreviousTextPackageResponse':
 							var text = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
@@ -9967,6 +9981,17 @@ var $author$project$Main$update = F2(
 									{
 										previousPackage: $elm$core$Maybe$Just(
 											$author$project$Main$TextPackage(text))
+									}),
+								$elm$core$Platform$Cmd$none);
+						default:
+							var path = value.a;
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										previousPackage: $elm$core$Maybe$Just(
+											$author$project$Main$ImagePackage(
+												_Utils_ap($author$project$Main$imageUrl, path)))
 									}),
 								$elm$core$Platform$Cmd$none);
 					}
@@ -11143,6 +11168,12 @@ var $author$project$Main$viewSidebar = function (model) {
 };
 var $author$project$Main$SubmitText = {$: 'SubmitText'};
 var $author$project$Main$TextField = {$: 'TextField'};
+var $elm$html$Html$Attributes$action = function (uri) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'action',
+		_VirtualDom_noJavaScriptUri(uri));
+};
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
 var $author$project$Main$viewStarting = function (model) {
 	return A2(
@@ -11157,7 +11188,8 @@ var $author$project$Main$viewStarting = function (model) {
 				$elm$html$Html$form,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('text-starting hall')
+						$elm$html$Html$Attributes$class('text-starting hall'),
+						$elm$html$Html$Attributes$action('#')
 					]),
 				_List_fromArray(
 					[
@@ -11190,6 +11222,99 @@ var $author$project$Main$viewStarting = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text('Submit idea')
+							]))
+					]))
+			]));
+};
+var $author$project$Main$getWorkPackageImage = function (model) {
+	var _default = $author$project$Main$imageUrl + 'dog.jpg';
+	var previousPackage = A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Main$ImagePackage(_default),
+		model.previousPackage);
+	if (previousPackage.$ === 'ImagePackage') {
+		var p = previousPackage.a;
+		return p;
+	} else {
+		return _default;
+	}
+};
+var $author$project$Main$viewUnderstanding = function (model) {
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('understanding hall')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('understanding-prompt')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('understanding-prompt-intro')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Someone painted:')
+							])),
+						A2(
+						$elm$html$Html$img,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('understanding-image'),
+								$elm$html$Html$Attributes$src(
+								$author$project$Main$getWorkPackageImage(model)),
+								$elm$html$Html$Attributes$alt('What the previous player drew')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('understanding-write'),
+						$elm$html$Html$Attributes$action('#')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('understanding-write-intro')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('What is that?')
+							])),
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-understanding-input'),
+								$elm$html$Html$Events$onInput(
+								$author$project$Main$SetField($author$project$Main$TextField))
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('pure-button landing-button understanding-button'),
+								$elm$html$Html$Events$onClick($author$project$Main$SubmitText)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Submit explanation')
 							]))
 					]))
 			]));
@@ -11228,6 +11353,8 @@ var $author$project$Main$view = function (model) {
 										return $author$project$Main$viewStarting(model);
 									case 'Drawing':
 										return $author$project$Main$viewDrawing(model);
+									case 'Understanding':
+										return $author$project$Main$viewUnderstanding(model);
 									default:
 										return $elm$html$Html$text('nothing');
 								}

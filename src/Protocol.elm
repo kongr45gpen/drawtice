@@ -55,6 +55,7 @@ type Response
   | UuidResponse String
   | LeftGameResponse
   | PreviousTextPackageResponse String
+  | PreviousImagePackageResponse String
 
 -- JSON COMMAND ENCODERS
 prepareSocketCommand : SocketCommand -> JE.Value
@@ -156,6 +157,14 @@ previousTextPackageParser =
     field "text" string
     ,
     \v -> PreviousTextPackageResponse v
+  )
+
+previousImagePackageParser : (Decoder String, String -> Response)
+previousImagePackageParser =
+  (
+    field "url" string
+    ,
+    \v -> PreviousImagePackageResponse v
   )
 
 gameStatusFromString : String -> GameStatus

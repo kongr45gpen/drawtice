@@ -41,7 +41,8 @@ wsKey : String
 wsKey = "mainws"
 wsUrl : String
 wsUrl = "ws://192.168.1.11:3030/ws"
-
+imageUrl : String
+imageUrl = "http://192.168.1.11:3030/images/"
 
 -- PORTS
 
@@ -336,6 +337,8 @@ update msg model =
           (leaveGame model, Cmd.none)
         Protocol.PreviousTextPackageResponse text ->
           ({model | previousPackage = Just <| TextPackage text}, Cmd.none)
+        Protocol.PreviousImagePackageResponse path ->
+          ({model | previousPackage = Just <| ImagePackage (imageUrl ++ path)}, Cmd.none)
 
 
     ShowError value ->
@@ -498,6 +501,8 @@ socketHandler response state mdl =
                 Protocol.LeftGameResponse
               "previous_text_package" ->
                 decodeDataUsingParser Protocol.previousTextPackageParser
+              "previous_image_package" ->
+                decodeDataUsingParser Protocol.previousImagePackageParser
               _ ->
                 Protocol.ErrorResponse "Uknown response type received"
       in
@@ -571,6 +576,8 @@ view model =
                 viewStarting model
               Drawing ->
                 viewDrawing model
+              Understanding ->
+                viewUnderstanding model
               _ ->
                 text "nothing"
           ]
@@ -757,7 +764,7 @@ viewLobby model =
 viewStarting : Model -> Html Msg
 viewStarting model =
   section [ class "starting" ] [
-    Html.form [ class "text-starting hall" ] [
+    Html.form [ class "text-starting hall", action "#" ] [
       div [ class "text-starting-prompt" ] [ text "What do you want people to draw?" ],
       textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
       button [ class "pure-button landing-button", onClick SubmitText ] [ text "Submit idea" ]
@@ -774,6 +781,20 @@ viewDrawing model =
     ],
     node "drawing-canvas" [ class "drawing-canvas", attribute "key" (model.gameKey |> Maybe.withDefault "") ] [ ],
     button [ class "pure-button pure-button-success landing-button", onClick SubmitImage ] [ text "I'm done!" ]
+  ]
+
+viewUnderstanding : Model -> Html Msg
+viewUnderstanding model =
+  section [ class "understanding hall" ] [
+    div [ class "understanding-prompt" ] [
+      div [ class "understanding-prompt-intro" ] [ text "Someone painted:" ],
+      img [ class "understanding-image", src <| getWorkPackageImage model, alt "What the previous player drew" ] [ ]
+    ],
+    Html.form [ class "understanding-write", action "#" ] [
+      div [ class "understanding-write-intro" ] [ text "What is that?" ],
+      textarea [ class "text-understanding-input", onInput <| SetField TextField ] [ ],
+      button [ class "pure-button landing-button understanding-button", onClick SubmitText ] [ text "Submit explanation" ]
+    ]
   ]
 
 viewPlayerAvatar : Player -> Html Msg
@@ -812,3 +833,13 @@ getWorkPackageText model =
     case previousPackage of
       TextPackage t -> t
       _ -> "An error 500"
+
+getWorkPackageImage : Model -> String
+getWorkPackageImage model =
+  let
+    default = imageUrl ++ "dog.jpg"
+    previousPackage = model.previousPackage |> Maybe.withDefault (ImagePackage default)
+  in
+    case previousPackage of
+      ImagePackage p -> p
+      _ -> default

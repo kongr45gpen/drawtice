@@ -377,3 +377,62 @@ body {
 .drawing-size-buttons button:nth-child(4) {
   font-size: 20pt;
 }
+
+
+/*
+ * GAME (UNDERSTANDING PAGE)
+ */
+.understanding {
+  text-align: center;
+}
+
+.understanding-prompt {
+  max-height: 50%;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.understanding-prompt-intro {
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.understanding-image {
+  object-fit: contain;
+  max-height: 100%;
+  max-width: 100%;
+  flex: 0 1 auto;
+
+  min-height: 100px;
+  min-width: 100px;
+}
+
+.understanding-write {
+  display: flex;
+  flex-direction: column;
+  max-height: 70%;
+}
+
+.text-understanding-input {
+  font-size: 14pt;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.5rem;
+  margin: 0.5rem auto;
+  width: 100%;
+  max-width: 100%;
+  max-height: auto;
+  min-width: 10%;
+}
+
+
+.understanding-write-intro {
+  margin-bottom: 0.5rem;
+  font-size: 15pt;
+}
+
+.understanding-button {
+  width: 100%;
+}
