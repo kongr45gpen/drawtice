@@ -438,7 +438,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             let game = user.fetch_game_mut(games)?;
             let (player, player_id) = user.fetch_player(game)?;
 
-            if player.is_admin {
+            if player.is_admin && game.game_status != game::GameStatus::GameOver {
                 // Destroy the game
                 game.tx_game(users, my_id, protocol::Response::LeftGame, true).await;
                 game.end();
@@ -566,6 +566,9 @@ async fn scheduler(users: &mut Users, games: &mut Games) {
             game.tx_game_details(users, false).await;
         }
     }
+
+    // Garbage collection
+    games.retain(|_, game| game.players.len() != 0);
 }
 
 async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>) {

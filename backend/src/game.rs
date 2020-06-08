@@ -256,6 +256,9 @@ impl Game {
     pub fn get_previous_package(&self, player_id: usize) -> Option<&WorkPackage> {
         let current_package = self.search_current_package(player_id)?;
         let workload = self.workloads.get(current_package.workload_id)?;
+
+        if self.current_stage < 2 { return None }
+
         let previous_package = workload.packages.get(self.current_stage - 2)?;
 
         Some(previous_package)

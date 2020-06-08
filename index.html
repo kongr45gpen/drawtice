@@ -23,6 +23,8 @@
   <script type="text/javascript" src='lib/DrawerJS/lib/jquery-3.4.1.min.js'></script>
   <script type="text/javascript" src='lib/DrawerJS/dist/drawerJs.standalone.min.js'></script>
   <script type="text/javascript" src='lib/BrushSizeSimple.js'></script>
+  <script type="text/javascript" src='lib/LoadTool.js'></script>
+  <script type="text/javascript" src='lib/ClearTool.js'></script>
   <script type="text/javascript" src='lib/lodash.throttle.js'></script>
   <script>
 
@@ -36,6 +38,8 @@ var drawerPlugins = [
     'Circle',
     'Color',
     'BrushSizeSimple',
+    'Load',
+    'Clear',
     // 'Resize',
     // 'ShapeContextMenu'
 ];
@@ -97,12 +101,8 @@ PortFunnel.subscribe(app);
                         saveCanvasData: function(canvasId, canvasData){
                             localStorage.setItem('drawtice.canvas', JSON.stringify(JSON.parse(canvasData)));
                         },
-                        loadCanvasData: function(canvasId) {
-                            return localStorage.getItem('drawtice.canvas');
-                        },
-                        // saveImageData: function(canvasId, imageData) {
-                        //     localStorage.setItem('drawtice.image', imageData);
-                        //     _this.temporaryImageStorage = imageData;
+                        // loadCanvasData: function(canvasId) {
+                        //     return localStorage.getItem('drawtice.canvas');
                         // },
                     }
                 }, '100%', this.offsetHeight - 32);
