@@ -7,6 +7,7 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
 };
+use std::path::{Path, PathBuf};
 use futures::{FutureExt, StreamExt};
 use tokio::sync::{mpsc, Mutex};
 use warp::ws::{Message, WebSocket};
@@ -29,6 +30,7 @@ use std::time::Duration;
 
 // Constants
 const STORAGE_LOCATION: &'static str = "./images";
+const STATIC_LOCATION: &'static str = "./..";
 
 struct User {
     uuid: Uuid,
@@ -259,13 +261,17 @@ async fn main() {
         })
         .with(warp::reply::with::headers(headers));
 
-    // GET / -> index html
-    let index = warp::path::end().map(|| warp::reply::html(INDEX_HTML));
-
+    // GET /images -> uploaded drawings
     let images = warp::path("images")
         .and(warp::fs::dir(STORAGE_LOCATION));
 
-    let routes = index.or(ws).or(images);
+    let static_location = PathBuf::from(STATIC_LOCATION);
+    let static_paths = warp::path::end().and(warp::fs::file(static_location.join("index.html")))
+        .or(warp::path("lib").and(warp::fs::dir(static_location.join("lib"))))
+        .or(warp::path("generated").and(warp::fs::dir(static_location.join("generated"))))
+        .or(warp::path("styles").and(warp::fs::dir(static_location.join("styles"))));
+
+    let routes = ws.or(static_paths).or(images);
 
     tokio::task::spawn(async move {
         let mut interval = tokio::time::interval(Duration::from_secs(1));
@@ -640,7 +646,3 @@ async fn user_disconnected(my_id: usize, users: &UsersMutex, games: &GamesMutex)
     // Stream closed up, so remove from the user list
     users.remove(&my_id);
 }
-
-static INDEX_HTML: &str = r#"
-Hello world. These are not the droids you are looking for.
-"#;

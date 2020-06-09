@@ -190,7 +190,6 @@ update msg model =
     LinkClicked urlRequest ->
       case urlRequest of
         Browser.Internal url ->
-          -- ( model, Cmd.none)
           ( model, Nav.pushUrl model.key (Url.toString url) )
 
         Browser.External href ->
