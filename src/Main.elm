@@ -117,6 +117,7 @@ type alias Model =
   , workloads : Maybe (Array.Array Workload)
   , currentWorkload : Int
   , playerCapture : Maybe (Array.Array Player)
+  , showingGameoverSelf : Bool
   , gameKey : Maybe String
   , funnelState : PortFunnels.State
   , formFields : FormFields
@@ -142,7 +143,7 @@ init flags url key =
 
     model = Model
       key url NoGame Nothing False Nothing
-      Array.empty Nothing Nothing Nothing Nothing 0 Nothing Nothing
+      Array.empty Nothing Nothing Nothing Nothing 0 Nothing True Nothing
       (PortFunnels.initialState "drawtice") formFields Dict.empty 0 Nothing
   in
     ( model, Cmd.batch [
@@ -183,6 +184,7 @@ type Msg
   | ShownConfirmDialog (Bool, Int)
   | SendImage String
   | ShowLightbox String
+  | CloseSelfSummary
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -331,11 +333,13 @@ update msg model =
             players = Array.indexedMap playerCreator (Array.fromList details.players)
             me = model.myId |> Maybe.andThen (\id -> Array.get id players)
             username = Maybe.map (\p -> p.username) me
+            showingGameoverSelf = model.showingGameoverSelf || (details.status == GameOver && model.status /= GameOver)
             mdl = { model
               | gameId = Just details.alias
               , gameKey = Just <| details.uuid ++ "-" ++ String.fromInt details.currentStage
               , status = details.status
-              , players = players } |> maybeSetField UsernameField username
+              , players = players
+              , showingGameoverSelf = showingGameoverSelf } |> maybeSetField UsernameField username
           in
             ( mdl,
                 Cmd.batch
@@ -415,6 +419,9 @@ update msg model =
     ShowLightbox value ->
       (model, canvasPort ("lightbox", Just value))
 
+    CloseSelfSummary ->
+      ({ model | showingGameoverSelf = False}, Cmd.none)
+
 maybeSetField : FormField -> Maybe String -> (Model -> Model)
 maybeSetField field value =
   case value of
@@ -467,6 +474,7 @@ leaveGame model =
          , workloads = Nothing
          , currentWorkload = 0
          , playerCapture = Nothing
+         , showingGameoverSelf = False
   }
 
 getMe : Model -> Maybe Player
@@ -637,7 +645,10 @@ view model =
               Understanding ->
                 viewUnderstanding model
               GameOver ->
-                viewSummary model
+                if model.showingGameoverSelf then
+                  viewSelfSummary model
+                else
+                  viewSummary model
           ],
           viewSidebar model
         ]
@@ -863,6 +874,25 @@ viewUnderstanding model =
     ]
   ]
 
+viewSelfSummary : Model -> Html Msg
+viewSelfSummary model =
+  let
+    workloadFinder id = model.workloads
+     |> Maybe.withDefault Array.empty
+     |> Array.filter (\w -> (List.head w |> Maybe.map (\p -> p.playerId) |> Maybe.withDefault -1) == id)
+     |> Array.get 0
+    workload = model.myId |> Maybe.andThen workloadFinder
+    firstPackage = workload |> Maybe.andThen List.head
+    lastPackage = workload |> Maybe.andThen lastElem
+  in
+    section [ class "self-reflection hall" ] [
+      div [ class "self-reflection-intro" ] [ text "This is what you wrote:" ],
+      firstPackage |> Maybe.map (viewWorkpackage model -1 -2) |> Maybe.withDefault (text "???"),
+      div [ class "self-reflection-intro" ] [ text "and this is what it turned into:" ],
+      lastPackage |> Maybe.map (viewWorkpackage model -1 -2) |> Maybe.withDefault (text "???"),
+      button [ class "pure-button pure-button-success landing-button", onClick CloseSelfSummary ] [ text "See more…" ]
+    ]
+
 viewSummary : Model -> Html Msg
 viewSummary model =
   let
@@ -969,3 +999,13 @@ onSubmitRaw msg =
 alwaysPreventDefault : msg -> ( msg, Bool )
 alwaysPreventDefault msg =
   ( msg, True )
+
+lastElem : List a -> Maybe a
+lastElem list =
+    case list of
+        [] ->
+            Nothing
+        [last] ->
+            Just last
+        head :: rest ->
+            lastElem rest

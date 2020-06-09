@@ -2,6 +2,10 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
+html body {
+  overflow: auto !important;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -503,6 +507,31 @@ canvas {
 
 .understanding-button {
   width: 100%;
+}
+
+/*
+ * GAME (SELF PAGE)
+ */
+.self-reflection {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  text-align: center;
+
+  font-size: 120%;
+}
+
+.self-reflection .summary-package {
+  margin: 0 !important;
+}
+
+.self-reflection .summary-package-prompt {
+  display: none !important;
+}
+
+.self-reflection .summary-package-image {
+  max-height: 50%;
 }
 
 /*

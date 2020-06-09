@@ -5246,13 +5246,15 @@ var $author$project$Main$Model = function (key) {
 										return function (workloads) {
 											return function (currentWorkload) {
 												return function (playerCapture) {
-													return function (gameKey) {
-														return function (funnelState) {
-															return function (formFields) {
-																return function (pendingDialogs) {
-																	return function (nextDialogId) {
-																		return function (error) {
-																			return {amAdministrator: amAdministrator, currentWorkload: currentWorkload, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, playerCapture: playerCapture, players: players, previousPackage: previousPackage, status: status, url: url, uuid: uuid, workloads: workloads};
+													return function (showingGameoverSelf) {
+														return function (gameKey) {
+															return function (funnelState) {
+																return function (formFields) {
+																	return function (pendingDialogs) {
+																		return function (nextDialogId) {
+																			return function (error) {
+																				return {amAdministrator: amAdministrator, currentWorkload: currentWorkload, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, playerCapture: playerCapture, players: players, previousPackage: previousPackage, showingGameoverSelf: showingGameoverSelf, status: status, url: url, uuid: uuid, workloads: workloads};
+																			};
 																		};
 																	};
 																};
@@ -6882,7 +6884,7 @@ var $author$project$Main$init = F3(
 			username: '',
 			usernamePlaceholder: ''
 		};
-		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(
+		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)($elm$core$Maybe$Nothing)(true)($elm$core$Maybe$Nothing)(
 			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
@@ -7177,6 +7179,7 @@ var $author$project$Protocol$ExtendDeadlineCommand = function (a) {
 	return {$: 'ExtendDeadlineCommand', a: a};
 };
 var $author$project$Main$GameIdField = {$: 'GameIdField'};
+var $author$project$Protocol$GameOver = {$: 'GameOver'};
 var $author$project$Protocol$ImagePackage = function (a) {
 	return {$: 'ImagePackage', a: a};
 };
@@ -7462,7 +7465,6 @@ var $author$project$Protocol$GameDetailsResponse = function (a) {
 	return {$: 'GameDetailsResponse', a: a};
 };
 var $author$project$Protocol$Drawing = {$: 'Drawing'};
-var $author$project$Protocol$GameOver = {$: 'GameOver'};
 var $author$project$Protocol$Lobby = {$: 'Lobby'};
 var $author$project$Protocol$Starting = {$: 'Starting'};
 var $author$project$Protocol$Understanding = {$: 'Understanding'};
@@ -7601,7 +7603,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 var $author$project$Main$leaveGame = function (model) {
 	return _Utils_update(
 		model,
-		{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, playerCapture: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, status: $author$project$Protocol$NoGame, workloads: $elm$core$Maybe$Nothing});
+		{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, playerCapture: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, showingGameoverSelf: false, status: $author$project$Protocol$NoGame, workloads: $elm$core$Maybe$Nothing});
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
@@ -9939,6 +9941,7 @@ var $author$project$Main$update = F2(
 					switch (value.$) {
 						case 'GameDetailsResponse':
 							var details = value.a;
+							var showingGameoverSelf = model.showingGameoverSelf || (_Utils_eq(details.status, $author$project$Protocol$GameOver) && (!_Utils_eq(model.status, $author$project$Protocol$GameOver)));
 							var playerCreator = F2(
 								function (id, player) {
 									return {
@@ -9986,6 +9989,7 @@ var $author$project$Main$update = F2(
 										gameKey: $elm$core$Maybe$Just(
 											details.uuid + ('-' + $elm$core$String$fromInt(details.currentStage))),
 										players: players,
+										showingGameoverSelf: showingGameoverSelf,
 										status: details.status
 									}));
 							return _Utils_Tuple2(
@@ -10163,7 +10167,7 @@ var $author$project$Main$update = F2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$ImagePackageCommand(value)));
-				default:
+				case 'ShowLightbox':
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
@@ -10171,6 +10175,12 @@ var $author$project$Main$update = F2(
 							_Utils_Tuple2(
 								'lightbox',
 								$elm$core$Maybe$Just(value))));
+				default:
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{showingGameoverSelf: false}),
+						$elm$core$Platform$Cmd$none);
 			}
 		}
 	});
@@ -11134,6 +11144,240 @@ var $author$project$Main$viewNav = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$CloseSelfSummary = {$: 'CloseSelfSummary'};
+var $elm$core$Array$filter = F2(
+	function (isGood, array) {
+		return $elm$core$Array$fromList(
+			A3(
+				$elm$core$Array$foldr,
+				F2(
+					function (x, xs) {
+						return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+					}),
+				_List_Nil,
+				array));
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$lastElem = function (list) {
+	lastElem:
+	while (true) {
+		if (!list.b) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			if (!list.b.b) {
+				var last = list.a;
+				return $elm$core$Maybe$Just(last);
+			} else {
+				var head = list.a;
+				var rest = list.b;
+				var $temp$list = rest;
+				list = $temp$list;
+				continue lastElem;
+			}
+		}
+	}
+};
+var $author$project$Main$ShowLightbox = function (a) {
+	return {$: 'ShowLightbox', a: a};
+};
+var $elm$html$Html$Attributes$download = function (fileName) {
+	return A2($elm$html$Html$Attributes$stringProperty, 'download', fileName);
+};
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $author$project$Main$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var $author$project$Main$onClickRaw = function (msg) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$author$project$Main$alwaysPreventDefault,
+			$elm$json$Json$Decode$succeed(msg)));
+};
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $author$project$Main$viewWorkpackage = F4(
+	function (model, loadId, packageId, _package) {
+		var username = A2(
+			$elm$core$Maybe$withDefault,
+			'???',
+			A2(
+				$elm$core$Maybe$map,
+				function (p) {
+					return p.username;
+				},
+				A2(
+					$elm$core$Maybe$andThen,
+					function (a) {
+						return A2($elm$core$Array$get, _package.playerId, a);
+					},
+					model.playerCapture)));
+		var uniqId = 'summary-image-' + ($elm$core$String$fromInt(loadId) + ('-' + $elm$core$String$fromInt(packageId)));
+		var html = function () {
+			var _v0 = _package.data;
+			if (_v0.$ === 'Just') {
+				if (_v0.a.$ === 'TextPackage') {
+					var t = _v0.a.a;
+					return A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('summary-package-text')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(t)
+							]));
+				} else {
+					var url = _v0.a.a;
+					return A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id(uniqId),
+								$elm$html$Html$Attributes$href(url),
+								A2($elm$html$Html$Attributes$attribute, 'data-lightbox', uniqId),
+								$elm$html$Html$Attributes$download(''),
+								$author$project$Main$onClickRaw(
+								$author$project$Main$ShowLightbox(uniqId))
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$img,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('summary-package-image'),
+										$elm$html$Html$Attributes$src(url),
+										$elm$html$Html$Attributes$alt('Drawn image')
+									]),
+								_List_Nil)
+							]));
+				}
+			} else {
+				return A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('summary-package-nothing'),
+							$elm$html$Html$Attributes$title('The player didn\'t have time to complete this!')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('???')
+						]));
+			}
+		}();
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('summary-package')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('summary-package-prompt')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('by ' + (username + ':'))
+						])),
+					html
+				]));
+	});
+var $author$project$Main$viewSelfSummary = function (model) {
+	var workloadFinder = function (id) {
+		return A2(
+			$elm$core$Array$get,
+			0,
+			A2(
+				$elm$core$Array$filter,
+				function (w) {
+					return _Utils_eq(
+						A2(
+							$elm$core$Maybe$withDefault,
+							-1,
+							A2(
+								$elm$core$Maybe$map,
+								function (p) {
+									return p.playerId;
+								},
+								$elm$core$List$head(w))),
+						id);
+				},
+				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)));
+	};
+	var workload = A2($elm$core$Maybe$andThen, workloadFinder, model.myId);
+	var lastPackage = A2($elm$core$Maybe$andThen, $author$project$Main$lastElem, workload);
+	var firstPackage = A2($elm$core$Maybe$andThen, $elm$core$List$head, workload);
+	return A2(
+		$elm$html$Html$section,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('self-reflection hall')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('self-reflection-intro')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('This is what you wrote:')
+					])),
+				A2(
+				$elm$core$Maybe$withDefault,
+				$elm$html$Html$text('???'),
+				A2(
+					$elm$core$Maybe$map,
+					A3($author$project$Main$viewWorkpackage, model, -1, -2),
+					firstPackage)),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('self-reflection-intro')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('and this is what it turned into:')
+					])),
+				A2(
+				$elm$core$Maybe$withDefault,
+				$elm$html$Html$text('???'),
+				A2(
+					$elm$core$Maybe$map,
+					A3($author$project$Main$viewWorkpackage, model, -1, -2),
+					lastPackage)),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pure-button pure-button-success landing-button'),
+						$elm$html$Html$Events$onClick($author$project$Main$CloseSelfSummary)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('See more…')
+					]))
+			]));
+};
 var $author$project$Main$ExtendDeadline = function (a) {
 	return {$: 'ExtendDeadline', a: a};
 };
@@ -11362,9 +11606,6 @@ var $elm$html$Html$Attributes$action = function (uri) {
 		'action',
 		_VirtualDom_noJavaScriptUri(uri));
 };
-var $author$project$Main$alwaysPreventDefault = function (msg) {
-	return _Utils_Tuple2(msg, true);
-};
 var $author$project$Main$onSubmitRaw = function (msg) {
 	return A2(
 		$elm$html$Html$Events$preventDefaultOn,
@@ -11438,116 +11679,6 @@ var $author$project$Main$isAtWorkloadEnd = F2(
 			model.currentWorkload,
 			$elm$core$Array$length(
 				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)) - 1) && _Utils_eq(dir, $author$project$Main$Forward));
-	});
-var $author$project$Main$ShowLightbox = function (a) {
-	return {$: 'ShowLightbox', a: a};
-};
-var $elm$html$Html$Attributes$download = function (fileName) {
-	return A2($elm$html$Html$Attributes$stringProperty, 'download', fileName);
-};
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $author$project$Main$onClickRaw = function (msg) {
-	return A2(
-		$elm$html$Html$Events$preventDefaultOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$author$project$Main$alwaysPreventDefault,
-			$elm$json$Json$Decode$succeed(msg)));
-};
-var $elm$html$Html$p = _VirtualDom_node('p');
-var $author$project$Main$viewWorkpackage = F4(
-	function (model, loadId, packageId, _package) {
-		var username = A2(
-			$elm$core$Maybe$withDefault,
-			'???',
-			A2(
-				$elm$core$Maybe$map,
-				function (p) {
-					return p.username;
-				},
-				A2(
-					$elm$core$Maybe$andThen,
-					function (a) {
-						return A2($elm$core$Array$get, _package.playerId, a);
-					},
-					model.playerCapture)));
-		var uniqId = 'summary-image-' + ($elm$core$String$fromInt(loadId) + ('-' + $elm$core$String$fromInt(packageId)));
-		var html = function () {
-			var _v0 = _package.data;
-			if (_v0.$ === 'Just') {
-				if (_v0.a.$ === 'TextPackage') {
-					var t = _v0.a.a;
-					return A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('summary-package-text')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(t)
-							]));
-				} else {
-					var url = _v0.a.a;
-					return A2(
-						$elm$html$Html$a,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$id(uniqId),
-								$elm$html$Html$Attributes$href(url),
-								A2($elm$html$Html$Attributes$attribute, 'data-lightbox', uniqId),
-								$elm$html$Html$Attributes$download(''),
-								$author$project$Main$onClickRaw(
-								$author$project$Main$ShowLightbox(uniqId))
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$img,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('summary-package-image'),
-										$elm$html$Html$Attributes$src(url),
-										$elm$html$Html$Attributes$alt('Drawn image')
-									]),
-								_List_Nil)
-							]));
-				}
-			} else {
-				return A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('summary-package-nothing'),
-							$elm$html$Html$Attributes$title('The player didn\'t have time to complete this!')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('???')
-						]));
-			}
-		}();
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('summary-package')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('summary-package-prompt')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('by ' + (username + ':'))
-						])),
-					html
-				]));
 	});
 var $author$project$Main$viewSummary = function (model) {
 	var workload = A2(
@@ -11768,7 +11899,7 @@ var $author$project$Main$view = function (model) {
 									case 'Understanding':
 										return $author$project$Main$viewUnderstanding(model);
 									default:
-										return $author$project$Main$viewSummary(model);
+										return model.showingGameoverSelf ? $author$project$Main$viewSelfSummary(model) : $author$project$Main$viewSummary(model);
 								}
 							}()
 							])),
