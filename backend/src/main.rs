@@ -269,7 +269,12 @@ async fn main() {
     let static_paths = warp::path::end().and(warp::fs::file(static_location.join("index.html")))
         .or(warp::path("lib").and(warp::fs::dir(static_location.join("lib"))))
         .or(warp::path("generated").and(warp::fs::dir(static_location.join("generated"))))
-        .or(warp::path("styles").and(warp::fs::dir(static_location.join("styles"))));
+        .or(warp::path("styles").and(warp::fs::dir(static_location.join("styles"))))
+        .or(warp::path("icons").and(warp::fs::dir(static_location.join("icons"))))
+        .or(warp::path("browserconfig.xml").and(warp::fs::dir(static_location.join("browserconfig.xml"))))
+        .or(warp::path("manifest.json").and(warp::fs::dir(static_location.join("manifest.json"))))
+        .or(warp::path("favicon.ico").and(warp::fs::dir(static_location.join("favicon.ico"))))
+        ;
 
     let routes = ws.or(static_paths).or(images);
 
