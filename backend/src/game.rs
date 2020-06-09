@@ -139,7 +139,7 @@ impl Game {
             uuid: Uuid::new_v4(),
             game_status: GameStatus::Lobby,
             players: vec![],
-            default_time: Duration::new(60 * 10, 0),
+            default_time: Duration::new(60 * 2, 0),
             workloads: vec![],
             current_stage: 0,
             total_stages: 0,
