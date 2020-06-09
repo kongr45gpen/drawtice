@@ -18,6 +18,7 @@ use std::{iter, thread};
 use std::env;
 use lazy_static::lazy_static;
 use std::fs::File;
+use chrono::Duration;
 
 use log::{trace, debug, info, warn, error};
 
@@ -26,7 +27,6 @@ pub(crate) mod protocol;
 pub(crate) mod names;
 
 use game::{Player, Game};
-use std::time::Duration;
 
 // Constants
 const STORAGE_LOCATION: &'static str = "./images";
@@ -279,7 +279,7 @@ async fn main() {
     let routes = ws.or(static_paths).or(images);
 
     tokio::task::spawn(async move {
-        let mut interval = tokio::time::interval(Duration::from_secs(1));
+        let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
 
         loop {
             interval.tick().await;
@@ -559,9 +559,6 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             };
             game.provide_package(user.game.unwrap().1, game::WorkPackageData::ImagePackage(image_package))?;
             game.tx_game_details(users, false).await;
-
-            // game.provide_package(user.game.unwrap().1, game::WorkPackageData::TextPackage(c))?;
-            // game.tx_game_details(users, false).await;
         }
         protocol::Command::NextRound => {
             let game = user.fetch_game_mut(games)?;
@@ -571,6 +568,16 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             debug!("Moving to the next round after admin command");
 
             game.next_stage();
+            game.tx_game_details(users, false).await;
+        },
+        protocol::Command::ExtendDeadline(t) => {
+            let game = user.fetch_game_mut(games)?;
+            let (player, _) = user.fetch_player(game)?;
+            player.expect_admin()?;
+
+            debug!("Extending deadline by {}", t);
+
+            game.extend_deadline(Duration::seconds(t as i64));
             game.tx_game_details(users, false).await;
         }
     }

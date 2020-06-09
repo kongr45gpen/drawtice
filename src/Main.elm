@@ -168,6 +168,7 @@ type Msg
   | LeaveGame
   | KickPlayer Int
   | NextRound
+  | ExtendDeadline Float
   | SubmitText
   | SubmitImage
   | SetField FormField String
@@ -252,6 +253,12 @@ update msg model =
 
     NextRound ->
       (model, sendSocketCommand <| NextRoundCommand)
+
+    ExtendDeadline value ->
+      let
+        secs = round (value * 60)
+      in
+        (model, sendSocketCommand <| ExtendDeadlineCommand secs)
 
     SetField field value ->
       ( setField field value model, Cmd.none )
@@ -557,7 +564,8 @@ socketHandler response state mdl =
               _ ->
                 Protocol.ErrorResponse "Unknown response type received"
       in
-        model |> update (SocketReceive (Debug.log "rcvMSG" received))
+        model |> update (SocketReceive received)
+        -- model |> update (SocketReceive (Debug.log "rcvMSG" received))
 
     WebSocket.ConnectedResponse _ ->
         (model, getLocalStorageString model "uuid")
@@ -723,6 +731,7 @@ viewSidebar model =
     adminActions = if model.amAdministrator && isGameRunning model
       then [
         div [ class "admin-actions" ] [
+          button [ class "pure-button", onClick (ExtendDeadline 2.5) ] [ text "Add more time" ],
           button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
           button [ class "pure-button", onClick (NextRound |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
         ]

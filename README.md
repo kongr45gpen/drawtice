@@ -1,6 +1,6 @@
 ## Compilation
 ```bash
-elm make src/Main.elm --output=generated/main.js
+elm make src/Main.elm --optimize --output=generated/main.js
 ```
 
 ## Development

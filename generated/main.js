@@ -7173,6 +7173,9 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Protocol$ErrorResponse = function (a) {
 	return {$: 'ErrorResponse', a: a};
 };
+var $author$project$Protocol$ExtendDeadlineCommand = function (a) {
+	return {$: 'ExtendDeadlineCommand', a: a};
+};
 var $author$project$Main$GameIdField = {$: 'GameIdField'};
 var $author$project$Protocol$ImagePackage = function (a) {
 	return {$: 'ImagePackage', a: a};
@@ -7601,7 +7604,6 @@ var $author$project$Main$leaveGame = function (model) {
 		{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, playerCapture: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, status: $author$project$Protocol$NoGame, workloads: $elm$core$Maybe$Nothing});
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
-var $elm$core$Debug$log = _Debug_log;
 var $billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
 	function (accessors, moduleDesc, commander, handler) {
 		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
@@ -9324,6 +9326,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses 
 			return _List_Nil;
 	}
 };
+var $elm$core$Basics$round = _Basics_round;
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -9439,8 +9442,15 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'data',
 								$elm$json$Json$Encode$string(image))
 							]))));
-		default:
+		case 'NextRoundCommand':
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'next_round', $elm$core$Maybe$Nothing);
+		default:
+			var secs = command.a;
+			return A2(
+				$author$project$Protocol$prepareSocketCommandJson,
+				'extend_deadline',
+				$elm$core$Maybe$Just(
+					$elm$json$Json$Encode$int(secs)));
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$send = $billstclair$elm_port_funnel$PortFunnel$sendMessage($billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleDesc);
@@ -9652,8 +9662,7 @@ var $author$project$Main$socketHandler = F3(
 				}();
 				return A2(
 					$author$project$Main$update,
-					$author$project$Main$SocketReceive(
-						A2($elm$core$Debug$log, 'rcvMSG', received)),
+					$author$project$Main$SocketReceive(received),
 					model);
 			case 'ConnectedResponse':
 				return _Utils_Tuple2(
@@ -9820,6 +9829,13 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand($author$project$Protocol$NextRoundCommand));
+				case 'ExtendDeadline':
+					var value = msg.a;
+					var secs = $elm$core$Basics$round(value * 60);
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand(
+							$author$project$Protocol$ExtendDeadlineCommand(secs)));
 				case 'SetField':
 					var field = msg.a;
 					var value = msg.b;
@@ -10383,7 +10399,6 @@ var $author$project$Main$formatTimeDifference = function (seconds) {
 			$elm$core$Basics$abs(seconds % 60)))));
 };
 var $elm$html$Html$header = _VirtualDom_node('header');
-var $elm$core$Basics$round = _Basics_round;
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$Attributes$alt = $elm$html$Html$Attributes$stringProperty('alt');
 var $elm$html$Html$img = _VirtualDom_node('img');
@@ -11119,6 +11134,9 @@ var $author$project$Main$viewNav = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$ExtendDeadline = function (a) {
+	return {$: 'ExtendDeadline', a: a};
+};
 var $author$project$Main$NextRound = {$: 'NextRound'};
 var $author$project$Main$ShowConfirmDialog = F2(
 	function (a, b) {
@@ -11285,6 +11303,18 @@ var $author$project$Main$viewSidebar = function (model) {
 				]),
 			_List_fromArray(
 				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('pure-button'),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$ExtendDeadline(2.5))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Add more time')
+						])),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(

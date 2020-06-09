@@ -56,6 +56,7 @@ pub enum Command {
     TextPackage(game::TextPackage),
     ImagePackage(RawImagePackage),
     NextRound,
+    ExtendDeadline(i32),
 }
 
 #[derive(Debug)]
@@ -137,6 +138,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
             Command::ImagePackage(RawImagePackage::deserialize(data?)?)
         },
         "next_round" => Command::NextRound,
+        "extend_deadline" => Command::ExtendDeadline(i32::deserialize(data?)?),
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
 

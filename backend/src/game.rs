@@ -20,6 +20,7 @@ use log::debug;
 
 use std::vec::Vec;
 use std::iter;
+use std::ops::Add;
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
 pub enum PlayerStatus {
@@ -228,6 +229,15 @@ impl Game {
                 player.deadline = Some(deadline);
 
                 PlayerStatus::Working
+            }
+        }
+    }
+
+    /// Add a duration to all active deadlines
+    pub fn extend_deadline(&mut self, duration: chrono::Duration) {
+        for player in self.players.iter_mut() {
+            if let Some(ref mut ddl) = player.deadline {
+                *ddl = *ddl + duration;
             }
         }
     }
