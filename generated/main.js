@@ -77,7 +77,7 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
   return fun.a === 9 ? fun.f(a, b, c, d, e, f, g, h, i) : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
 }
 
-console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
+
 
 
 // EQUALITY
@@ -113,7 +113,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return true;
 	}
 
-	/**/
+	/**_UNUSED/
 	if (x.$ === 'Set_elm_builtin')
 	{
 		x = $elm$core$Set$toList(x);
@@ -126,7 +126,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 	}
 	//*/
 
-	/**_UNUSED/
+	/**/
 	if (x.$ < 0)
 	{
 		x = $elm$core$Dict$toList(x);
@@ -161,7 +161,7 @@ function _Utils_cmp(x, y, ord)
 		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
 	}
 
-	/**/
+	/**_UNUSED/
 	if (x instanceof String)
 	{
 		var a = x.valueOf();
@@ -170,10 +170,10 @@ function _Utils_cmp(x, y, ord)
 	}
 	//*/
 
-	/**_UNUSED/
+	/**/
 	if (typeof x.$ === 'undefined')
 	//*/
-	/**/
+	/**_UNUSED/
 	if (x.$[0] === '#')
 	//*/
 	{
@@ -203,17 +203,17 @@ var _Utils_compare = F2(function(x, y)
 
 // COMMON VALUES
 
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
+var _Utils_Tuple0 = 0;
+var _Utils_Tuple0_UNUSED = { $: '#0' };
 
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2_UNUSED(a, b) { return { $: '#2', a: a, b: b }; }
 
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3_UNUSED(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
 
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
+function _Utils_chr(c) { return c; }
+function _Utils_chr_UNUSED(c) { return new String(c); }
 
 
 // RECORDS
@@ -264,11 +264,11 @@ function _Utils_ap(xs, ys)
 
 
 
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
+var _List_Nil = { $: 0 };
+var _List_Nil_UNUSED = { $: '[]' };
 
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons_UNUSED(hd, tl) { return { $: '::', a: hd, b: tl }; }
 
 
 var _List_cons = F2(_List_Cons);
@@ -499,12 +499,12 @@ var _JsArray_appendN = F3(function(n, dest, source)
 
 // LOG
 
-var _Debug_log_UNUSED = F2(function(tag, value)
+var _Debug_log = F2(function(tag, value)
 {
 	return value;
 });
 
-var _Debug_log = F2(function(tag, value)
+var _Debug_log_UNUSED = F2(function(tag, value)
 {
 	console.log(tag + ': ' + _Debug_toString(value));
 	return value;
@@ -530,12 +530,12 @@ function _Debug_todoCase(moduleName, region, value)
 
 // TO STRING
 
-function _Debug_toString_UNUSED(value)
+function _Debug_toString(value)
 {
 	return '<internals>';
 }
 
-function _Debug_toString(value)
+function _Debug_toString_UNUSED(value)
 {
 	return _Debug_toAnsiString(false, value);
 }
@@ -720,13 +720,13 @@ function _Debug_toHexDigit(n)
 // CRASH
 
 
-function _Debug_crash_UNUSED(identifier)
+function _Debug_crash(identifier)
 {
 	throw new Error('https://github.com/elm/core/blob/1.0.0/hints/' + identifier + '.md');
 }
 
 
-function _Debug_crash(identifier, fact1, fact2, fact3, fact4)
+function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 {
 	switch(identifier)
 	{
@@ -784,11 +784,11 @@ function _Debug_crash(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.start.line === region.end.line)
+	if (region.aN.ae === region.aW.ae)
 	{
-		return 'on line ' + region.start.line;
+		return 'on line ' + region.aN.ae;
 	}
-	return 'on lines ' + region.start.line + ' through ' + region.end.line;
+	return 'on lines ' + region.aN.ae + ' through ' + region.aW.ae;
 }
 
 
@@ -1212,7 +1212,7 @@ function _Char_toLocaleLower(char)
 
 
 
-/**/
+/**_UNUSED/
 function _Json_errorToString(error)
 {
 	return $elm$json$Json$Decode$errorToString(error);
@@ -1616,11 +1616,11 @@ var _Json_encode = F2(function(indentLevel, value)
 	return JSON.stringify(_Json_unwrap(value), null, indentLevel) + '';
 });
 
-function _Json_wrap(value) { return { $: 0, a: value }; }
-function _Json_unwrap(value) { return value.a; }
+function _Json_wrap_UNUSED(value) { return { $: 0, a: value }; }
+function _Json_unwrap_UNUSED(value) { return value.a; }
 
-function _Json_wrap_UNUSED(value) { return value; }
-function _Json_unwrap_UNUSED(value) { return value; }
+function _Json_wrap(value) { return value; }
+function _Json_unwrap(value) { return value; }
 
 function _Json_emptyArray() { return []; }
 function _Json_emptyObject() { return {}; }
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.init,
-		impl.update,
-		impl.subscriptions,
+		impl.bG,
+		impl.b2,
+		impl.b_,
 		function() { return function() {} }
 	);
 });
@@ -1872,7 +1872,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 function _Platform_initialize(flagDecoder, args, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(_Json_run, flagDecoder, _Json_wrap(args ? args['flags'] : undefined));
-	$elm$core$Result$isOk(result) || _Debug_crash(2 /**/, _Json_errorToString(result.a) /**/);
+	$elm$core$Result$isOk(result) || _Debug_crash(2 /**_UNUSED/, _Json_errorToString(result.a) /**/);
 	var managers = {};
 	var initPair = init(result.a);
 	var model = initPair.a;
@@ -2316,7 +2316,7 @@ function _Platform_setupIncomingPort(name, sendToApp)
 //
 
 
-function _Platform_export_UNUSED(exports)
+function _Platform_export(exports)
 {
 	scope['Elm']
 		? _Platform_mergeExportsProd(scope['Elm'], exports)
@@ -2337,7 +2337,7 @@ function _Platform_mergeExportsProd(obj, exports)
 }
 
 
-function _Platform_export(exports)
+function _Platform_export_UNUSED(exports)
 {
 	scope['Elm']
 		? _Platform_mergeExportsDebug('Elm', scope['Elm'], exports)
@@ -2377,10 +2377,10 @@ var _VirtualDom_init = F4(function(virtualNode, flagDecoder, debugMetadata, args
 {
 	// NOTE: this function needs _Platform_export available to work
 
-	/**_UNUSED/
+	/**/
 	var node = args['node'];
 	//*/
-	/**/
+	/**_UNUSED/
 	var node = args && args['node'] ? args['node'] : _Debug_crash(0);
 	//*/
 
@@ -2635,24 +2635,24 @@ function _VirtualDom_noInnerHtmlOrFormAction(key)
 	return key == 'innerHTML' || key == 'formAction' ? 'data-' + key : key;
 }
 
-function _VirtualDom_noJavaScriptUri_UNUSED(value)
+function _VirtualDom_noJavaScriptUri(value)
 {
 	return /^javascript:/i.test(value.replace(/\s/g,'')) ? '' : value;
 }
 
-function _VirtualDom_noJavaScriptUri(value)
+function _VirtualDom_noJavaScriptUri_UNUSED(value)
 {
 	return /^javascript:/i.test(value.replace(/\s/g,''))
 		? 'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'
 		: value;
 }
 
-function _VirtualDom_noJavaScriptOrHtmlUri_UNUSED(value)
+function _VirtualDom_noJavaScriptOrHtmlUri(value)
 {
 	return /^\s*(javascript:|data:text\/html)/i.test(value) ? '' : value;
 }
 
-function _VirtualDom_noJavaScriptOrHtmlUri(value)
+function _VirtualDom_noJavaScriptOrHtmlUri_UNUSED(value)
 {
 	return /^\s*(javascript:|data:text\/html)/i.test(value)
 		? 'javascript:alert("This is an XSS vector. Please use ports or web components instead.")'
@@ -2704,9 +2704,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		message: func(record.message),
-		stopPropagation: record.stopPropagation,
-		preventDefault: record.preventDefault
+		bJ: func(record.bJ),
+		aO: record.aO,
+		aJ: record.aJ
 	}
 });
 
@@ -2974,11 +2974,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.message;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.stopPropagation;
+		var message = !tag ? value : tag < 3 ? value.a : value.bJ;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.aO;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.preventDefault) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.aJ) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3928,15 +3928,15 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.init,
-		impl.update,
-		impl.subscriptions,
+		impl.bG,
+		impl.b2,
+		impl.b_,
 		function(sendToApp, initialModel) {
-			var view = impl.view;
-			/**_UNUSED/
+			var view = impl.b5;
+			/**/
 			var domNode = args['node'];
 			//*/
-			/**/
+			/**_UNUSED/
 			var domNode = args && args['node'] ? args['node'] : _Debug_crash(0);
 			//*/
 			var currNode = _VirtualDom_virtualize(domNode);
@@ -3964,12 +3964,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.init,
-		impl.update,
-		impl.subscriptions,
+		impl.bG,
+		impl.b2,
+		impl.b_,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.setup && impl.setup(sendToApp)
-			var view = impl.view;
+			var divertHrefToApp = impl.aM && impl.aM(sendToApp)
+			var view = impl.b5;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3977,12 +3977,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.body);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.bu);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.title) && (_VirtualDom_doc.title = title = doc.title);
+				(title !== doc.b1) && (_VirtualDom_doc.title = title = doc.b1);
 			});
 		}
 	);
@@ -4038,12 +4038,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.onUrlChange;
-	var onUrlRequest = impl.onUrlRequest;
+	var onUrlChange = impl.bM;
+	var onUrlRequest = impl.bN;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		setup: function(sendToApp)
+		aM: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4059,9 +4059,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.protocol === next.protocol
-							&& curr.host === next.host
-							&& curr.port_.a === next.port_.a
+							&& curr.bR === next.bR
+							&& curr.bD === next.bD
+							&& curr.bQ.a === next.bQ.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4069,13 +4069,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		init: function(flags)
+		bG: function(flags)
 		{
-			return A3(impl.init, flags, _Browser_getUrl(), key);
+			return A3(impl.bG, flags, _Browser_getUrl(), key);
 		},
-		view: impl.view,
-		update: impl.update,
-		subscriptions: impl.subscriptions
+		b5: impl.b5,
+		b2: impl.b2,
+		b_: impl.b_
 	});
 }
 
@@ -4141,17 +4141,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { hidden: 'hidden', change: 'visibilitychange' }
+		? { bC: 'hidden', bv: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { hidden: 'mozHidden', change: 'mozvisibilitychange' }
+		? { bC: 'mozHidden', bv: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { hidden: 'msHidden', change: 'msvisibilitychange' }
+		? { bC: 'msHidden', bv: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { hidden: 'webkitHidden', change: 'webkitvisibilitychange' }
-		: { hidden: 'hidden', change: 'visibilitychange' };
+		? { bC: 'webkitHidden', bv: 'webkitvisibilitychange' }
+		: { bC: 'hidden', bv: 'visibilitychange' };
 }
 
 
@@ -4232,12 +4232,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		scene: _Browser_getScene(),
-		viewport: {
-			x: _Browser_window.pageXOffset,
-			y: _Browser_window.pageYOffset,
-			width: _Browser_doc.documentElement.clientWidth,
-			height: _Browser_doc.documentElement.clientHeight
+		bf: _Browser_getScene(),
+		bn: {
+			h: _Browser_window.pageXOffset,
+			i: _Browser_window.pageYOffset,
+			bo: _Browser_doc.documentElement.clientWidth,
+			a0: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4247,8 +4247,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		width: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		height: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		bo: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		a0: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4271,15 +4271,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			scene: {
-				width: node.scrollWidth,
-				height: node.scrollHeight
+			bf: {
+				bo: node.scrollWidth,
+				a0: node.scrollHeight
 			},
-			viewport: {
-				x: node.scrollLeft,
-				y: node.scrollTop,
-				width: node.clientWidth,
-				height: node.clientHeight
+			bn: {
+				h: node.scrollLeft,
+				i: node.scrollTop,
+				bo: node.clientWidth,
+				a0: node.clientHeight
 			}
 		};
 	});
@@ -4309,18 +4309,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			scene: _Browser_getScene(),
-			viewport: {
-				x: x,
-				y: y,
-				width: _Browser_doc.documentElement.clientWidth,
-				height: _Browser_doc.documentElement.clientHeight
+			bf: _Browser_getScene(),
+			bn: {
+				h: x,
+				i: y,
+				bo: _Browser_doc.documentElement.clientWidth,
+				a0: _Browser_doc.documentElement.clientHeight
 			},
-			element: {
-				x: x + rect.left,
-				y: y + rect.top,
-				width: rect.width,
-				height: rect.height
+			bz: {
+				h: x + rect.left,
+				i: y + rect.top,
+				bo: rect.width,
+				a0: rect.height
 			}
 		};
 	});
@@ -4439,20 +4439,20 @@ function _Time_getZoneName()
 	});
 }
 var $author$project$Main$LinkClicked = function (a) {
-	return {$: 'LinkClicked', a: a};
+	return {$: 0, a: a};
 };
 var $author$project$Main$UrlChanged = function (a) {
-	return {$: 'UrlChanged', a: a};
+	return {$: 1, a: a};
 };
-var $elm$core$Basics$EQ = {$: 'EQ'};
-var $elm$core$Basics$GT = {$: 'GT'};
-var $elm$core$Basics$LT = {$: 'LT'};
+var $elm$core$Basics$EQ = 1;
+var $elm$core$Basics$GT = 2;
+var $elm$core$Basics$LT = 0;
 var $elm$core$List$cons = _List_cons;
 var $elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
 		while (true) {
-			if (t.$ === 'RBEmpty_elm_builtin') {
+			if (t.$ === -2) {
 				return acc;
 			} else {
 				var key = t.b;
@@ -4497,7 +4497,7 @@ var $elm$core$Dict$keys = function (dict) {
 		dict);
 };
 var $elm$core$Set$toList = function (_v0) {
-	var dict = _v0.a;
+	var dict = _v0;
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
@@ -4507,7 +4507,7 @@ var $elm$core$Array$foldr = F3(
 		var tail = _v0.d;
 		var helper = F2(
 			function (node, acc) {
-				if (node.$ === 'SubTree') {
+				if (!node.$) {
 					var subTree = node.a;
 					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
 				} else {
@@ -4525,32 +4525,32 @@ var $elm$core$Array$toList = function (array) {
 	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
 };
 var $elm$core$Result$Err = function (a) {
-	return {$: 'Err', a: a};
+	return {$: 1, a: a};
 };
 var $elm$json$Json$Decode$Failure = F2(
 	function (a, b) {
-		return {$: 'Failure', a: a, b: b};
+		return {$: 3, a: a, b: b};
 	});
 var $elm$json$Json$Decode$Field = F2(
 	function (a, b) {
-		return {$: 'Field', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var $elm$json$Json$Decode$Index = F2(
 	function (a, b) {
-		return {$: 'Index', a: a, b: b};
+		return {$: 1, a: a, b: b};
 	});
 var $elm$core$Result$Ok = function (a) {
-	return {$: 'Ok', a: a};
+	return {$: 0, a: a};
 };
 var $elm$json$Json$Decode$OneOf = function (a) {
-	return {$: 'OneOf', a: a};
+	return {$: 2, a: a};
 };
-var $elm$core$Basics$False = {$: 'False'};
+var $elm$core$Basics$False = 1;
 var $elm$core$Basics$add = _Basics_add;
 var $elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
+	return {$: 0, a: a};
 };
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
+var $elm$core$Maybe$Nothing = {$: 1};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -4675,12 +4675,12 @@ var $elm$json$Json$Decode$errorToStringHelp = F2(
 		errorToStringHelp:
 		while (true) {
 			switch (error.$) {
-				case 'Field':
+				case 0:
 					var f = error.a;
 					var err = error.b;
 					var isSimple = function () {
 						var _v1 = $elm$core$String$uncons(f);
-						if (_v1.$ === 'Nothing') {
+						if (_v1.$ === 1) {
 							return false;
 						} else {
 							var _v2 = _v1.a;
@@ -4695,7 +4695,7 @@ var $elm$json$Json$Decode$errorToStringHelp = F2(
 					error = $temp$error;
 					context = $temp$context;
 					continue errorToStringHelp;
-				case 'Index':
+				case 1:
 					var i = error.a;
 					var err = error.b;
 					var indexName = '[' + ($elm$core$String$fromInt(i) + ']');
@@ -4704,7 +4704,7 @@ var $elm$json$Json$Decode$errorToStringHelp = F2(
 					error = $temp$error;
 					context = $temp$context;
 					continue errorToStringHelp;
-				case 'OneOf':
+				case 2:
 					var errors = error.a;
 					if (!errors.b) {
 						return 'Ran into a Json.Decode.oneOf with no possibilities' + function () {
@@ -4768,7 +4768,7 @@ var $elm$json$Json$Decode$errorToStringHelp = F2(
 var $elm$core$Array$branchFactor = 32;
 var $elm$core$Array$Array_elm_builtin = F4(
 	function (a, b, c, d) {
-		return {$: 'Array_elm_builtin', a: a, b: b, c: c, d: d};
+		return {$: 0, a: a, b: b, c: c, d: d};
 	});
 var $elm$core$Elm$JsArray$empty = _JsArray_empty;
 var $elm$core$Basics$ceiling = _Basics_ceiling;
@@ -4783,7 +4783,7 @@ var $elm$core$Array$shiftStep = $elm$core$Basics$ceiling(
 var $elm$core$Array$empty = A4($elm$core$Array$Array_elm_builtin, 0, $elm$core$Array$shiftStep, $elm$core$Elm$JsArray$empty, $elm$core$Elm$JsArray$empty);
 var $elm$core$Elm$JsArray$initialize = _JsArray_initialize;
 var $elm$core$Array$Leaf = function (a) {
-	return {$: 'Leaf', a: a};
+	return {$: 1, a: a};
 };
 var $elm$core$Basics$apL = F2(
 	function (f, x) {
@@ -4803,7 +4803,7 @@ var $elm$core$Basics$max = F2(
 	});
 var $elm$core$Basics$mul = _Basics_mul;
 var $elm$core$Array$SubTree = function (a) {
-	return {$: 'SubTree', a: a};
+	return {$: 0, a: a};
 };
 var $elm$core$Elm$JsArray$initializeFromList = _JsArray_initializeFromList;
 var $elm$core$Array$compressNodes = F2(
@@ -4850,25 +4850,25 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.nodeListSize) {
+		if (!builder.b) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.tail),
+				$elm$core$Elm$JsArray$length(builder.d),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.tail);
+				builder.d);
 		} else {
-			var treeLen = builder.nodeListSize * $elm$core$Array$branchFactor;
+			var treeLen = builder.b * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.nodeList) : builder.nodeList;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.nodeListSize);
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.f) : builder.f;
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.b);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.tail) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.d) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.tail);
+				builder.d);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -4881,7 +4881,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{nodeList: nodeList, nodeListSize: (len / $elm$core$Array$branchFactor) | 0, tail: tail});
+					{f: nodeList, b: (len / $elm$core$Array$branchFactor) | 0, d: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -4911,9 +4911,9 @@ var $elm$core$Array$initialize = F2(
 			return A5($elm$core$Array$initializeHelp, fn, initialFromIndex, len, _List_Nil, tail);
 		}
 	});
-var $elm$core$Basics$True = {$: 'True'};
+var $elm$core$Basics$True = 0;
 var $elm$core$Result$isOk = function (result) {
-	if (result.$ === 'Ok') {
+	if (!result.$) {
 		return true;
 	} else {
 		return false;
@@ -4924,33 +4924,31 @@ var $elm$json$Json$Decode$map2 = _Json_map2;
 var $elm$json$Json$Decode$succeed = _Json_succeed;
 var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
-		case 'Normal':
+		case 0:
 			return 0;
-		case 'MayStopPropagation':
+		case 1:
 			return 1;
-		case 'MayPreventDefault':
+		case 2:
 			return 2;
 		default:
 			return 3;
 	}
 };
 var $elm$browser$Browser$External = function (a) {
-	return {$: 'External', a: a};
+	return {$: 1, a: a};
 };
 var $elm$browser$Browser$Internal = function (a) {
-	return {$: 'Internal', a: a};
+	return {$: 0, a: a};
 };
 var $elm$core$Basics$identity = function (x) {
 	return x;
 };
-var $elm$browser$Browser$Dom$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
-var $elm$url$Url$Http = {$: 'Http'};
-var $elm$url$Url$Https = {$: 'Https'};
+var $elm$browser$Browser$Dom$NotFound = $elm$core$Basics$identity;
+var $elm$url$Url$Http = 0;
+var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
+		return {al: fragment, bD: host, bP: path, bQ: port_, bR: protocol, ba: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -4986,7 +4984,7 @@ var $elm$url$Url$chompBeforePath = F5(
 					var i = _v0.a;
 					var _v1 = $elm$core$String$toInt(
 						A2($elm$core$String$dropLeft, i + 1, str));
-					if (_v1.$ === 'Nothing') {
+					if (_v1.$ === 1) {
 						return $elm$core$Maybe$Nothing;
 					} else {
 						var port_ = _v1;
@@ -5069,26 +5067,24 @@ var $elm$core$String$startsWith = _String_startsWith;
 var $elm$url$Url$fromString = function (str) {
 	return A2($elm$core$String$startsWith, 'http://', str) ? A2(
 		$elm$url$Url$chompAfterProtocol,
-		$elm$url$Url$Http,
+		0,
 		A2($elm$core$String$dropLeft, 7, str)) : (A2($elm$core$String$startsWith, 'https://', str) ? A2(
 		$elm$url$Url$chompAfterProtocol,
-		$elm$url$Url$Https,
+		1,
 		A2($elm$core$String$dropLeft, 8, str)) : $elm$core$Maybe$Nothing);
 };
 var $elm$core$Basics$never = function (_v0) {
 	never:
 	while (true) {
-		var nvr = _v0.a;
+		var nvr = _v0;
 		var $temp$_v0 = nvr;
 		_v0 = $temp$_v0;
 		continue never;
 	}
 };
-var $elm$core$Task$Perform = function (a) {
-	return {$: 'Perform', a: a};
-};
+var $elm$core$Task$Perform = $elm$core$Basics$identity;
 var $elm$core$Task$succeed = _Scheduler_succeed;
-var $elm$core$Task$init = $elm$core$Task$succeed(_Utils_Tuple0);
+var $elm$core$Task$init = $elm$core$Task$succeed(0);
 var $elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -5194,7 +5190,7 @@ var $elm$core$Task$sequence = function (tasks) {
 var $elm$core$Platform$sendToApp = _Platform_sendToApp;
 var $elm$core$Task$spawnCmd = F2(
 	function (router, _v0) {
-		var task = _v0.a;
+		var task = _v0;
 		return _Scheduler_spawn(
 			A2(
 				$elm$core$Task$andThen,
@@ -5206,7 +5202,7 @@ var $elm$core$Task$onEffects = F3(
 		return A2(
 			$elm$core$Task$map,
 			function (_v0) {
-				return _Utils_Tuple0;
+				return 0;
 			},
 			$elm$core$Task$sequence(
 				A2(
@@ -5216,21 +5212,19 @@ var $elm$core$Task$onEffects = F3(
 	});
 var $elm$core$Task$onSelfMsg = F3(
 	function (_v0, _v1, _v2) {
-		return $elm$core$Task$succeed(_Utils_Tuple0);
+		return $elm$core$Task$succeed(0);
 	});
 var $elm$core$Task$cmdMap = F2(
 	function (tagger, _v0) {
-		var task = _v0.a;
-		return $elm$core$Task$Perform(
-			A2($elm$core$Task$map, tagger, task));
+		var task = _v0;
+		return A2($elm$core$Task$map, tagger, task);
 	});
 _Platform_effectManagers['Task'] = _Platform_createManager($elm$core$Task$init, $elm$core$Task$onEffects, $elm$core$Task$onSelfMsg, $elm$core$Task$cmdMap);
 var $elm$core$Task$command = _Platform_leaf('Task');
 var $elm$core$Task$perform = F2(
 	function (toMessage, task) {
 		return $elm$core$Task$command(
-			$elm$core$Task$Perform(
-				A2($elm$core$Task$map, toMessage, task)));
+			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Model = function (key) {
@@ -5253,7 +5247,7 @@ var $author$project$Main$Model = function (key) {
 																	return function (pendingDialogs) {
 																		return function (nextDialogId) {
 																			return function (error) {
-																				return {amAdministrator: amAdministrator, currentWorkload: currentWorkload, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, playerCapture: playerCapture, players: players, previousPackage: previousPackage, showingGameoverSelf: showingGameoverSelf, status: status, url: url, uuid: uuid, workloads: workloads};
+																				return {O: amAdministrator, v: currentWorkload, ak: error, r: formFields, S: funnelState, s: gameId, am: gameKey, ao: key, aF: lastUpdate, A: myId, aH: nextDialogId, V: pendingDialogs, as: playerCapture, l: players, W: previousPackage, Y: showingGameoverSelf, c: status, au: url, aw: uuid, N: workloads};
 																			};
 																		};
 																	};
@@ -5274,24 +5268,22 @@ var $author$project$Main$Model = function (key) {
 		};
 	};
 };
-var $author$project$Protocol$NoGame = {$: 'NoGame'};
+var $author$project$Protocol$NoGame = 0;
 var $author$project$Main$SetField = F2(
 	function (a, b) {
-		return {$: 'SetField', a: a, b: b};
+		return {$: 13, a: a, b: b};
 	});
 var $author$project$Main$Tick = function (a) {
-	return {$: 'Tick', a: a};
+	return {$: 2, a: a};
 };
-var $author$project$Main$UsernamePlaceholder = {$: 'UsernamePlaceholder'};
+var $author$project$Main$UsernamePlaceholder = 2;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
+var $elm$random$Random$Generate = $elm$core$Basics$identity;
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
-		return {$: 'Seed', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$random$Random$next = function (_v0) {
@@ -5309,23 +5301,21 @@ var $elm$random$Random$initialSeed = function (x) {
 		A2($elm$random$Random$Seed, state2, incr));
 };
 var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
+	return {$: 0, a: a};
 };
 var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
+	return {$: 1, a: a};
 };
 var $elm$time$Time$Zone = F2(
 	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$Posix = $elm$core$Basics$identity;
+var $elm$time$Time$millisToPosix = $elm$core$Basics$identity;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$posixToMillis = function (_v0) {
-	var millis = _v0.a;
+	var millis = _v0;
 	return millis;
 };
 var $elm$random$Random$init = A2(
@@ -5338,7 +5328,7 @@ var $elm$random$Random$init = A2(
 	$elm$time$Time$now);
 var $elm$random$Random$step = F2(
 	function (_v0, seed) {
-		var generator = _v0.a;
+		var generator = _v0;
 		return generator(seed);
 	});
 var $elm$random$Random$onEffects = F3(
@@ -5346,7 +5336,7 @@ var $elm$random$Random$onEffects = F3(
 		if (!commands.b) {
 			return $elm$core$Task$succeed(seed);
 		} else {
-			var generator = commands.a.a;
+			var generator = commands.a;
 			var rest = commands.b;
 			var _v1 = A2($elm$random$Random$step, generator, seed);
 			var value = _v1.a;
@@ -5363,35 +5353,30 @@ var $elm$random$Random$onSelfMsg = F3(
 	function (_v0, _v1, seed) {
 		return $elm$core$Task$succeed(seed);
 	});
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
+var $elm$random$Random$Generator = $elm$core$Basics$identity;
 var $elm$random$Random$map = F2(
 	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
+		var genA = _v0;
+		return function (seed0) {
+			var _v1 = genA(seed0);
+			var a = _v1.a;
+			var seed1 = _v1.b;
+			return _Utils_Tuple2(
+				func(a),
+				seed1);
+		};
 	});
 var $elm$random$Random$cmdMap = F2(
 	function (func, _v0) {
-		var generator = _v0.a;
-		return $elm$random$Random$Generate(
-			A2($elm$random$Random$map, func, generator));
+		var generator = _v0;
+		return A2($elm$random$Random$map, func, generator);
 	});
 _Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
 var $elm$random$Random$command = _Platform_leaf('Random');
 var $elm$random$Random$generate = F2(
 	function (tagger, generator) {
 		return $elm$random$Random$command(
-			$elm$random$Random$Generate(
-				A2($elm$random$Random$map, tagger, generator)));
+			A2($elm$random$Random$map, tagger, generator));
 	});
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -5403,7 +5388,7 @@ var $elm$core$Array$getHelp = F3(
 		while (true) {
 			var pos = $elm$core$Array$bitMask & (index >>> shift);
 			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
+			if (!_v0.$) {
 				var subTree = _v0.a;
 				var $temp$shift = shift - $elm$core$Array$shiftStep,
 					$temp$index = index,
@@ -5445,35 +5430,34 @@ var $elm$random$Random$peel = function (_v0) {
 };
 var $elm$random$Random$int = F2(
 	function (a, b) {
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
-				var lo = _v0.a;
-				var hi = _v0.b;
-				var range = (hi - lo) + 1;
-				if (!((range - 1) & range)) {
-					return _Utils_Tuple2(
-						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
-						$elm$random$Random$next(seed0));
-				} else {
-					var threshhold = (((-range) >>> 0) % range) >>> 0;
-					var accountForBias = function (seed) {
-						accountForBias:
-						while (true) {
-							var x = $elm$random$Random$peel(seed);
-							var seedN = $elm$random$Random$next(seed);
-							if (_Utils_cmp(x, threshhold) < 0) {
-								var $temp$seed = seedN;
-								seed = $temp$seed;
-								continue accountForBias;
-							} else {
-								return _Utils_Tuple2((x % range) + lo, seedN);
-							}
+		return function (seed0) {
+			var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+			var lo = _v0.a;
+			var hi = _v0.b;
+			var range = (hi - lo) + 1;
+			if (!((range - 1) & range)) {
+				return _Utils_Tuple2(
+					(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+					$elm$random$Random$next(seed0));
+			} else {
+				var threshhold = (((-range) >>> 0) % range) >>> 0;
+				var accountForBias = function (seed) {
+					accountForBias:
+					while (true) {
+						var x = $elm$random$Random$peel(seed);
+						var seedN = $elm$random$Random$next(seed);
+						if (_Utils_cmp(x, threshhold) < 0) {
+							var $temp$seed = seedN;
+							seed = $temp$seed;
+							continue accountForBias;
+						} else {
+							return _Utils_Tuple2((x % range) + lo, seedN);
 						}
-					};
-					return accountForBias(seed0);
-				}
-			});
+					}
+				};
+				return accountForBias(seed0);
+			}
+		};
 	});
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
@@ -5492,7 +5476,7 @@ var $elm$core$Array$fromListHelp = F3(
 				return A2(
 					$elm$core$Array$builderToArray,
 					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+					{f: nodeList, b: nodeListSize, d: jsArray});
 			} else {
 				var $temp$list = remainingItems,
 					$temp$nodeList = A2(
@@ -5519,7 +5503,7 @@ var $author$project$Names$names = $elm$core$Array$fromList(
 		['Mary', 'John', 'Aliakmonas', 'Alkistis', 'alej', 'virr', 'dojo', 'doggo', 'hojo', 'baktu', 'James', 'Jamie', 'Alex', 'Antidisestablishmentarianism', 'Llanfair­pwllgwyngyll­gogery­chwyrn­drobwll­llan­tysilio­gogo­goch', 'L', 'Professor', 'admin', 'user', 'Nameless', 'Horan', 'Dolores', 'root', 'Picasso', 'Caesar', 'Gleich', 'Mash']));
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
+		if (!maybe.$) {
 			var value = maybe.a;
 			return value;
 		} else {
@@ -5540,11 +5524,11 @@ var $author$project$Names$generator = A2(
 		$elm$core$Array$length($author$project$Names$names) - 1));
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Get = F2(
 	function (a, b) {
-		return {$: 'Get', a: a, b: b};
+		return {$: 1, a: a, b: b};
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$get = $billstclair$elm_localstorage$PortFunnel$InternalTypes$Get($elm$core$Maybe$Nothing);
 var $author$project$Main$Receive = function (a) {
-	return {$: 'Receive', a: a};
+	return {$: 16, a: a};
 };
 var $author$project$PortFunnels$cmdPort = _Platform_outgoingPort('cmdPort', $elm$core$Basics$identity);
 var $elm$core$Basics$compare = _Utils_compare;
@@ -5552,7 +5536,7 @@ var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
 		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
+			if (dict.$ === -2) {
 				return $elm$core$Maybe$Nothing;
 			} else {
 				var key = dict.b;
@@ -5560,14 +5544,14 @@ var $elm$core$Dict$get = F2(
 				var left = dict.d;
 				var right = dict.e;
 				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
+				switch (_v1) {
+					case 0:
 						var $temp$targetKey = targetKey,
 							$temp$dict = left;
 						targetKey = $temp$targetKey;
 						dict = $temp$dict;
 						continue get;
-					case 'EQ':
+					case 1:
 						return $elm$core$Maybe$Just(value);
 					default:
 						var $temp$targetKey = targetKey,
@@ -5580,21 +5564,21 @@ var $elm$core$Dict$get = F2(
 		}
 	});
 var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$Black = 1;
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+		return {$: -1, a: a, b: b, c: c, d: d, e: e};
 	});
-var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$Red = 0;
 var $elm$core$Dict$balance = F5(
 	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+		if ((right.$ === -1) && (!right.a)) {
 			var _v1 = right.a;
 			var rK = right.b;
 			var rV = right.c;
 			var rLeft = right.d;
 			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			if ((left.$ === -1) && (!left.a)) {
 				var _v3 = left.a;
 				var lK = left.b;
 				var lV = left.c;
@@ -5602,22 +5586,22 @@ var $elm$core$Dict$balance = F5(
 				var lRight = left.e;
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
+					0,
 					key,
 					value,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rLeft, rRight));
 			} else {
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
 					color,
 					rK,
 					rV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, left, rLeft),
 					rRight);
 			}
 		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+			if ((((left.$ === -1) && (!left.a)) && (left.d.$ === -1)) && (!left.d.a)) {
 				var _v5 = left.a;
 				var lK = left.b;
 				var lV = left.c;
@@ -5630,11 +5614,11 @@ var $elm$core$Dict$balance = F5(
 				var lRight = left.e;
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Red,
+					0,
 					lK,
 					lV,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 1, key, value, lRight, right));
 			} else {
 				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
 			}
@@ -5642,8 +5626,8 @@ var $elm$core$Dict$balance = F5(
 	});
 var $elm$core$Dict$insertHelp = F3(
 	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		if (dict.$ === -2) {
+			return A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
 		} else {
 			var nColor = dict.a;
 			var nKey = dict.b;
@@ -5651,8 +5635,8 @@ var $elm$core$Dict$insertHelp = F3(
 			var nLeft = dict.d;
 			var nRight = dict.e;
 			var _v1 = A2($elm$core$Basics$compare, key, nKey);
-			switch (_v1.$) {
-				case 'LT':
+			switch (_v1) {
+				case 0:
 					return A5(
 						$elm$core$Dict$balance,
 						nColor,
@@ -5660,7 +5644,7 @@ var $elm$core$Dict$insertHelp = F3(
 						nValue,
 						A3($elm$core$Dict$insertHelp, key, value, nLeft),
 						nRight);
-				case 'EQ':
+				case 1:
 					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
 				default:
 					return A5(
@@ -5676,13 +5660,13 @@ var $elm$core$Dict$insertHelp = F3(
 var $elm$core$Dict$insert = F3(
 	function (key, value, dict) {
 		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+		if ((_v0.$ === -1) && (!_v0.a)) {
 			var _v1 = _v0.a;
 			var k = _v0.b;
 			var v = _v0.c;
 			var l = _v0.d;
 			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
 		} else {
 			var x = _v0;
 			return x;
@@ -5707,7 +5691,7 @@ var $author$project$PortFunnels$getCmdPort = F3(
 			return $author$project$PortFunnels$cmdPort;
 		} else {
 			var _v0 = A2($elm$core$Dict$get, moduleName, $author$project$PortFunnels$simulatedPortDict);
-			if (_v0.$ === 'Just') {
+			if (!_v0.$) {
 				var makeSimulatedCmdPort = _v0.a;
 				return makeSimulatedCmdPort(tagger);
 			} else {
@@ -5717,15 +5701,15 @@ var $author$project$PortFunnels$getCmdPort = F3(
 	});
 var $author$project$Main$cmdPort = A3($author$project$PortFunnels$getCmdPort, $author$project$Main$Receive, '', false);
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Clear = function (a) {
-	return {$: 'Clear', a: a};
+	return {$: 6, a: a};
 };
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$ListKeys = F2(
 	function (a, b) {
-		return {$: 'ListKeys', a: a, b: b};
+		return {$: 4, a: a, b: b};
 	});
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Put = F2(
 	function (a, b) {
-		return {$: 'Put', a: a, b: b};
+		return {$: 3, a: a, b: b};
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$addPrefix = F2(
 	function (prefix, key) {
@@ -5733,32 +5717,32 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$addPrefix = F2(
 	});
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Got = F3(
 	function (a, b, c) {
-		return {$: 'Got', a: a, b: b, c: c};
+		return {$: 2, a: a, b: b, c: c};
 	});
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Keys = F3(
 	function (a, b, c) {
-		return {$: 'Keys', a: a, b: b, c: c};
+		return {$: 5, a: a, b: b, c: c};
 	});
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$SimulateClear = function (a) {
-	return {$: 'SimulateClear', a: a};
+	return {$: 10, a: a};
 };
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$SimulateGet = F2(
 	function (a, b) {
-		return {$: 'SimulateGet', a: a, b: b};
+		return {$: 7, a: a, b: b};
 	});
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$SimulateListKeys = F2(
 	function (a, b) {
-		return {$: 'SimulateListKeys', a: a, b: b};
+		return {$: 9, a: a, b: b};
 	});
 var $billstclair$elm_localstorage$PortFunnel$InternalTypes$SimulatePut = F2(
 	function (a, b) {
-		return {$: 'SimulatePut', a: a, b: b};
+		return {$: 8, a: a, b: b};
 	});
-var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Startup = {$: 'Startup'};
+var $billstclair$elm_localstorage$PortFunnel$InternalTypes$Startup = {$: 0};
 var $elm$json$Json$Decode$decodeValue = _Json_run;
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$GotRecord = F3(
 	function (label, key, value) {
-		return {key: key, label: label, value: value};
+		return {ao: key, bI: label, b4: value};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$map3 = _Json_map3;
@@ -5785,7 +5769,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$gotDecoder = A4(
 	A2($elm$json$Json$Decode$field, 'value', $elm$json$Json$Decode$value));
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$KeysRecord = F3(
 	function (label, prefix, keys) {
-		return {keys: keys, label: label, prefix: prefix};
+		return {ap: keys, bI: label, n: prefix};
 	});
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$keysDecoder = A4(
@@ -5817,25 +5801,25 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$labeledStringDecoder =
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$PutRecord = F2(
 	function (key, value) {
-		return {key: key, value: value};
+		return {ao: key, b4: value};
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$putDecoder = A3(
 	$elm$json$Json$Decode$map2,
 	$billstclair$elm_localstorage$PortFunnel$LocalStorage$PutRecord,
 	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'value', $elm$json$Json$Decode$value));
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$NOTAG = {$: 'NOTAG'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$ClearTag = {$: 'ClearTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$GetTag = {$: 'GetTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$GotTag = {$: 'GotTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$KeysTag = {$: 'KeysTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$ListKeysTag = {$: 'ListKeysTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$PutTag = {$: 'PutTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateClearTag = {$: 'SimulateClearTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateGetTag = {$: 'SimulateGetTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateListKeysTag = {$: 'SimulateListKeysTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulatePutTag = {$: 'SimulatePutTag'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$StartupTag = {$: 'StartupTag'};
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$NOTAG = 11;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$ClearTag = 6;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$GetTag = 1;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$GotTag = 2;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$KeysTag = 5;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$ListKeysTag = 4;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$PutTag = 3;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateClearTag = 10;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateGetTag = 7;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateListKeysTag = 9;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulatePutTag = 8;
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$StartupTag = 0;
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$clearTag = 'clear';
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$getTag = 'get';
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$gotTag = 'got';
@@ -5850,38 +5834,38 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$startupTag = 'startup'
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$tagDict = $elm$core$Dict$fromList(
 	_List_fromArray(
 		[
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$startupTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$StartupTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$getTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$GetTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$gotTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$GotTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$putTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$PutTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$listKeysTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$ListKeysTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$keysTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$KeysTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$clearTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$ClearTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateGetTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateGetTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulatePutTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulatePutTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateListKeysTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateListKeysTag),
-			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateClearTag, $billstclair$elm_localstorage$PortFunnel$LocalStorage$SimulateClearTag)
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$startupTag, 0),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$getTag, 1),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$gotTag, 2),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$putTag, 3),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$listKeysTag, 4),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$keysTag, 5),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$clearTag, 6),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateGetTag, 7),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulatePutTag, 8),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateListKeysTag, 9),
+			_Utils_Tuple2($billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateClearTag, 10)
 		]));
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$strtag = function (str) {
 	var _v0 = A2($elm$core$Dict$get, str, $billstclair$elm_localstorage$PortFunnel$LocalStorage$tagDict);
-	if (_v0.$ === 'Just') {
+	if (!_v0.$) {
 		var tag = _v0.a;
 		return tag;
 	} else {
-		return $billstclair$elm_localstorage$PortFunnel$LocalStorage$NOTAG;
+		return 11;
 	}
 };
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0) {
-	var tag = _v0.tag;
-	var args = _v0.args;
+	var tag = _v0.b$;
+	var args = _v0.bs;
 	var _v1 = $billstclair$elm_localstorage$PortFunnel$LocalStorage$strtag(tag);
-	switch (_v1.$) {
-		case 'GetTag':
+	switch (_v1) {
+		case 1:
 			var _v2 = A2(
 				$elm$json$Json$Decode$decodeValue,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$labeledStringDecoder('key'),
 				args);
-			if (_v2.$ === 'Ok') {
+			if (!_v2.$) {
 				var _v3 = _v2.a;
 				var label = _v3.a;
 				var key = _v3.b;
@@ -5891,12 +5875,12 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'Get key not a string: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'GotTag':
+		case 2:
 			var _v4 = A2($elm$json$Json$Decode$decodeValue, $billstclair$elm_localstorage$PortFunnel$LocalStorage$gotDecoder, args);
-			if (_v4.$ === 'Ok') {
-				var label = _v4.a.label;
-				var key = _v4.a.key;
-				var value = _v4.a.value;
+			if (!_v4.$) {
+				var label = _v4.a.bI;
+				var key = _v4.a.ao;
+				var value = _v4.a.b4;
 				return $elm$core$Result$Ok(
 					A3(
 						$billstclair$elm_localstorage$PortFunnel$InternalTypes$Got,
@@ -5907,11 +5891,11 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'Got not { label, key, value }: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'PutTag':
+		case 3:
 			var _v5 = A2($elm$json$Json$Decode$decodeValue, $billstclair$elm_localstorage$PortFunnel$LocalStorage$putDecoder, args);
-			if (_v5.$ === 'Ok') {
-				var key = _v5.a.key;
-				var value = _v5.a.value;
+			if (!_v5.$) {
+				var key = _v5.a.ao;
+				var value = _v5.a.b4;
 				return $elm$core$Result$Ok(
 					A2(
 						$billstclair$elm_localstorage$PortFunnel$InternalTypes$Put,
@@ -5921,12 +5905,12 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'Put not { key, value }: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'ListKeysTag':
+		case 4:
 			var _v6 = A2(
 				$elm$json$Json$Decode$decodeValue,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$labeledStringDecoder('prefix'),
 				args);
-			if (_v6.$ === 'Ok') {
+			if (!_v6.$) {
 				var _v7 = _v6.a;
 				var label = _v7.a;
 				var prefix = _v7.b;
@@ -5936,21 +5920,21 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'ListKeys prefix not a string: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'KeysTag':
+		case 5:
 			var _v8 = A2($elm$json$Json$Decode$decodeValue, $billstclair$elm_localstorage$PortFunnel$LocalStorage$keysDecoder, args);
-			if (_v8.$ === 'Ok') {
-				var label = _v8.a.label;
-				var prefix = _v8.a.prefix;
-				var keys = _v8.a.keys;
+			if (!_v8.$) {
+				var label = _v8.a.bI;
+				var prefix = _v8.a.n;
+				var keys = _v8.a.ap;
 				return $elm$core$Result$Ok(
 					A3($billstclair$elm_localstorage$PortFunnel$InternalTypes$Keys, label, prefix, keys));
 			} else {
 				return $elm$core$Result$Err(
 					'Keys not { prefix, keys }: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'ClearTag':
+		case 6:
 			var _v9 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$string, args);
-			if (_v9.$ === 'Ok') {
+			if (!_v9.$) {
 				var prefix = _v9.a;
 				return $elm$core$Result$Ok(
 					$billstclair$elm_localstorage$PortFunnel$InternalTypes$Clear(prefix));
@@ -5958,14 +5942,14 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'Clear prefix not a string: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'StartupTag':
+		case 0:
 			return $elm$core$Result$Ok($billstclair$elm_localstorage$PortFunnel$InternalTypes$Startup);
-		case 'SimulateGetTag':
+		case 7:
 			var _v10 = A2(
 				$elm$json$Json$Decode$decodeValue,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$labeledStringDecoder('key'),
 				args);
-			if (_v10.$ === 'Ok') {
+			if (!_v10.$) {
 				var _v11 = _v10.a;
 				var label = _v11.a;
 				var key = _v11.b;
@@ -5975,11 +5959,11 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'Get key not a string: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'SimulatePutTag':
+		case 8:
 			var _v12 = A2($elm$json$Json$Decode$decodeValue, $billstclair$elm_localstorage$PortFunnel$LocalStorage$putDecoder, args);
-			if (_v12.$ === 'Ok') {
-				var key = _v12.a.key;
-				var value = _v12.a.value;
+			if (!_v12.$) {
+				var key = _v12.a.ao;
+				var value = _v12.a.b4;
 				return $elm$core$Result$Ok(
 					A2(
 						$billstclair$elm_localstorage$PortFunnel$InternalTypes$SimulatePut,
@@ -5989,12 +5973,12 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'SimulatePut not { key, value }: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'SimulateListKeysTag':
+		case 9:
 			var _v13 = A2(
 				$elm$json$Json$Decode$decodeValue,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$labeledStringDecoder('prefix'),
 				args);
-			if (_v13.$ === 'Ok') {
+			if (!_v13.$) {
 				var _v14 = _v13.a;
 				var label = _v14.a;
 				var prefix = _v14.b;
@@ -6004,9 +5988,9 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 				return $elm$core$Result$Err(
 					'SimulateListKeys prefix not a string: ' + A2($elm$json$Json$Encode$encode, 0, args));
 			}
-		case 'SimulateClearTag':
+		case 10:
 			var _v15 = A2($elm$json$Json$Decode$decodeValue, $elm$json$Json$Decode$string, args);
-			if (_v15.$ === 'Ok') {
+			if (!_v15.$) {
 				var prefix = _v15.a;
 				return $elm$core$Result$Ok(
 					$billstclair$elm_localstorage$PortFunnel$InternalTypes$SimulateClear(prefix));
@@ -6020,7 +6004,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode = function (_v0
 };
 var $billstclair$elm_port_funnel$PortFunnel$GenericMessage = F3(
 	function (moduleName, tag, args) {
-		return {args: args, moduleName: moduleName, tag: tag};
+		return {bs: args, bL: moduleName, b$: tag};
 	});
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -6032,7 +6016,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 					var v = _v0.b;
 					return A3(_Json_addField, k, v, obj);
 				}),
-			_Json_emptyObject(_Utils_Tuple0),
+			_Json_emptyObject(0),
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -6044,7 +6028,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encodeLabeledString = 
 					_Utils_Tuple2(
 					'label',
 					function () {
-						if (label.$ === 'Just') {
+						if (!label.$) {
 							var lab = label.a;
 							return $elm$json$Json$Encode$string(lab);
 						} else {
@@ -6062,15 +6046,15 @@ var $elm$json$Json$Encode$list = F2(
 			A3(
 				$elm$core$List$foldl,
 				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
+				_Json_emptyArray(0),
 				entries));
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName = 'LocalStorage';
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (message) {
 	switch (message.$) {
-		case 'Startup':
+		case 0:
 			return A3($billstclair$elm_port_funnel$PortFunnel$GenericMessage, $billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName, $billstclair$elm_localstorage$PortFunnel$LocalStorage$startupTag, $elm$json$Json$Encode$null);
-		case 'Get':
+		case 1:
 			var label = message.a;
 			var key = message.b;
 			return A3(
@@ -6078,7 +6062,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$getTag,
 				A3($billstclair$elm_localstorage$PortFunnel$LocalStorage$encodeLabeledString, label, key, 'key'));
-		case 'Got':
+		case 2:
 			var label = message.a;
 			var key = message.b;
 			var value = message.c;
@@ -6092,7 +6076,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 							_Utils_Tuple2(
 							'label',
 							function () {
-								if (label.$ === 'Just') {
+								if (!label.$) {
 									var lab = label.a;
 									return $elm$json$Json$Encode$string(lab);
 								} else {
@@ -6105,7 +6089,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 							_Utils_Tuple2(
 							'value',
 							function () {
-								if (value.$ === 'Nothing') {
+								if (value.$ === 1) {
 									return $elm$json$Json$Encode$null;
 								} else {
 									var v = value.a;
@@ -6113,7 +6097,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 								}
 							}())
 						])));
-		case 'Put':
+		case 3:
 			var key = message.a;
 			var value = message.b;
 			return A3(
@@ -6129,7 +6113,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 							_Utils_Tuple2(
 							'value',
 							function () {
-								if (value.$ === 'Nothing') {
+								if (value.$ === 1) {
 									return $elm$json$Json$Encode$null;
 								} else {
 									var v = value.a;
@@ -6137,7 +6121,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 								}
 							}())
 						])));
-		case 'ListKeys':
+		case 4:
 			var label = message.a;
 			var prefix = message.b;
 			return A3(
@@ -6145,7 +6129,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$listKeysTag,
 				A3($billstclair$elm_localstorage$PortFunnel$LocalStorage$encodeLabeledString, label, prefix, 'prefix'));
-		case 'Keys':
+		case 5:
 			var label = message.a;
 			var prefix = message.b;
 			var keys = message.c;
@@ -6159,7 +6143,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 							_Utils_Tuple2(
 							'label',
 							function () {
-								if (label.$ === 'Just') {
+								if (!label.$) {
 									var lab = label.a;
 									return $elm$json$Json$Encode$string(lab);
 								} else {
@@ -6173,14 +6157,14 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 							'keys',
 							A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, keys))
 						])));
-		case 'Clear':
+		case 6:
 			var prefix = message.a;
 			return A3(
 				$billstclair$elm_port_funnel$PortFunnel$GenericMessage,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$clearTag,
 				$elm$json$Json$Encode$string(prefix));
-		case 'SimulateGet':
+		case 7:
 			var label = message.a;
 			var key = message.b;
 			return A3(
@@ -6188,7 +6172,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName,
 				$billstclair$elm_localstorage$PortFunnel$LocalStorage$simulateGetTag,
 				A3($billstclair$elm_localstorage$PortFunnel$LocalStorage$encodeLabeledString, label, key, 'key'));
-		case 'SimulatePut':
+		case 8:
 			var key = message.a;
 			var value = message.b;
 			return A3(
@@ -6204,7 +6188,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 							_Utils_Tuple2(
 							'value',
 							function () {
-								if (value.$ === 'Nothing') {
+								if (value.$ === 1) {
 									return $elm$json$Json$Encode$null;
 								} else {
 									var v = value.a;
@@ -6212,7 +6196,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 								}
 							}())
 						])));
-		case 'SimulateListKeys':
+		case 9:
 			var label = message.a;
 			var prefix = message.b;
 			return A3(
@@ -6229,32 +6213,27 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode = function (mes
 				$elm$json$Json$Encode$string(prefix));
 	}
 };
-var $billstclair$elm_port_funnel$PortFunnel$ModuleDesc = function (a) {
-	return {$: 'ModuleDesc', a: a};
-};
+var $billstclair$elm_port_funnel$PortFunnel$ModuleDesc = $elm$core$Basics$identity;
 var $billstclair$elm_port_funnel$PortFunnel$ModuleDescRecord = F4(
 	function (moduleName, encoder, decoder, process) {
-		return {decoder: decoder, encoder: encoder, moduleName: moduleName, process: process};
+		return {ay: decoder, az: encoder, bL: moduleName, aK: process};
 	});
 var $billstclair$elm_port_funnel$PortFunnel$makeModuleDesc = F4(
 	function (name, encoder, decoder, processor) {
-		return $billstclair$elm_port_funnel$PortFunnel$ModuleDesc(
-			A4($billstclair$elm_port_funnel$PortFunnel$ModuleDescRecord, name, encoder, decoder, processor));
+		return A4($billstclair$elm_port_funnel$PortFunnel$ModuleDescRecord, name, encoder, decoder, processor);
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$GetResponse = function (a) {
-	return {$: 'GetResponse', a: a};
+	return {$: 1, a: a};
 };
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$ListKeysResponse = function (a) {
-	return {$: 'ListKeysResponse', a: a};
+	return {$: 2, a: a};
 };
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse = {$: 'NoResponse'};
-var $billstclair$elm_localstorage$PortFunnel$LocalStorage$State = function (a) {
-	return {$: 'State', a: a};
-};
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse = {$: 0};
+var $billstclair$elm_localstorage$PortFunnel$LocalStorage$State = $elm$core$Basics$identity;
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
 	while (true) {
-		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+		if ((dict.$ === -1) && (dict.d.$ === -1)) {
 			var left = dict.d;
 			var $temp$dict = left;
 			dict = $temp$dict;
@@ -6265,8 +6244,8 @@ var $elm$core$Dict$getMin = function (dict) {
 	}
 };
 var $elm$core$Dict$moveRedLeft = function (dict) {
-	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
-		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
+	if (((dict.$ === -1) && (dict.d.$ === -1)) && (dict.e.$ === -1)) {
+		if ((dict.e.d.$ === -1) && (!dict.e.d.a)) {
 			var clr = dict.a;
 			var k = dict.b;
 			var v = dict.c;
@@ -6289,17 +6268,17 @@ var $elm$core$Dict$moveRedLeft = function (dict) {
 			var rRight = _v2.e;
 			return A5(
 				$elm$core$Dict$RBNode_elm_builtin,
-				$elm$core$Dict$Red,
+				0,
 				rlK,
 				rlV,
 				A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
+					1,
 					k,
 					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
 					rlL),
-				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
+				A5($elm$core$Dict$RBNode_elm_builtin, 1, rK, rV, rlR, rRight));
 		} else {
 			var clr = dict.a;
 			var k = dict.b;
@@ -6316,22 +6295,22 @@ var $elm$core$Dict$moveRedLeft = function (dict) {
 			var rV = _v5.c;
 			var rLeft = _v5.d;
 			var rRight = _v5.e;
-			if (clr.$ === 'Black') {
+			if (clr === 1) {
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
+					1,
 					k,
 					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
 			} else {
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
+					1,
 					k,
 					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
 			}
 		}
 	} else {
@@ -6339,8 +6318,8 @@ var $elm$core$Dict$moveRedLeft = function (dict) {
 	}
 };
 var $elm$core$Dict$moveRedRight = function (dict) {
-	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
-		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
+	if (((dict.$ === -1) && (dict.d.$ === -1)) && (dict.e.$ === -1)) {
+		if ((dict.d.d.$ === -1) && (!dict.d.d.a)) {
 			var clr = dict.a;
 			var k = dict.b;
 			var v = dict.c;
@@ -6363,17 +6342,17 @@ var $elm$core$Dict$moveRedRight = function (dict) {
 			var rRight = _v4.e;
 			return A5(
 				$elm$core$Dict$RBNode_elm_builtin,
-				$elm$core$Dict$Red,
+				0,
 				lK,
 				lV,
-				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5($elm$core$Dict$RBNode_elm_builtin, 1, llK, llV, llLeft, llRight),
 				A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
+					1,
 					k,
 					v,
 					lRight,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight)));
 		} else {
 			var clr = dict.a;
 			var k = dict.b;
@@ -6390,22 +6369,22 @@ var $elm$core$Dict$moveRedRight = function (dict) {
 			var rV = _v6.c;
 			var rLeft = _v6.d;
 			var rRight = _v6.e;
-			if (clr.$ === 'Black') {
+			if (clr === 1) {
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
+					1,
 					k,
 					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
 			} else {
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
+					1,
 					k,
 					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, 0, rK, rV, rLeft, rRight));
 			}
 		}
 	} else {
@@ -6414,7 +6393,7 @@ var $elm$core$Dict$moveRedRight = function (dict) {
 };
 var $elm$core$Dict$removeHelpPrepEQGT = F7(
 	function (targetKey, dict, color, key, value, left, right) {
-		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+		if ((left.$ === -1) && (!left.a)) {
 			var _v1 = left.a;
 			var lK = left.b;
 			var lV = left.c;
@@ -6426,13 +6405,13 @@ var $elm$core$Dict$removeHelpPrepEQGT = F7(
 				lK,
 				lV,
 				lLeft,
-				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
+				A5($elm$core$Dict$RBNode_elm_builtin, 0, key, value, lRight, right));
 		} else {
 			_v2$2:
 			while (true) {
-				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
-					if (right.d.$ === 'RBNode_elm_builtin') {
-						if (right.d.a.$ === 'Black') {
+				if ((right.$ === -1) && (right.a === 1)) {
+					if (right.d.$ === -1) {
+						if (right.d.a === 1) {
 							var _v3 = right.a;
 							var _v4 = right.d;
 							var _v5 = _v4.a;
@@ -6453,7 +6432,7 @@ var $elm$core$Dict$removeHelpPrepEQGT = F7(
 		}
 	});
 var $elm$core$Dict$removeMin = function (dict) {
-	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+	if ((dict.$ === -1) && (dict.d.$ === -1)) {
 		var color = dict.a;
 		var key = dict.b;
 		var value = dict.c;
@@ -6461,8 +6440,8 @@ var $elm$core$Dict$removeMin = function (dict) {
 		var lColor = left.a;
 		var lLeft = left.d;
 		var right = dict.e;
-		if (lColor.$ === 'Black') {
-			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+		if (lColor === 1) {
+			if ((lLeft.$ === -1) && (!lLeft.a)) {
 				var _v3 = lLeft.a;
 				return A5(
 					$elm$core$Dict$RBNode_elm_builtin,
@@ -6473,7 +6452,7 @@ var $elm$core$Dict$removeMin = function (dict) {
 					right);
 			} else {
 				var _v4 = $elm$core$Dict$moveRedLeft(dict);
-				if (_v4.$ === 'RBNode_elm_builtin') {
+				if (_v4.$ === -1) {
 					var nColor = _v4.a;
 					var nKey = _v4.b;
 					var nValue = _v4.c;
@@ -6505,7 +6484,7 @@ var $elm$core$Dict$removeMin = function (dict) {
 };
 var $elm$core$Dict$removeHelp = F2(
 	function (targetKey, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
+		if (dict.$ === -2) {
 			return $elm$core$Dict$RBEmpty_elm_builtin;
 		} else {
 			var color = dict.a;
@@ -6514,10 +6493,10 @@ var $elm$core$Dict$removeHelp = F2(
 			var left = dict.d;
 			var right = dict.e;
 			if (_Utils_cmp(targetKey, key) < 0) {
-				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
+				if ((left.$ === -1) && (left.a === 1)) {
 					var _v4 = left.a;
 					var lLeft = left.d;
-					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+					if ((lLeft.$ === -1) && (!lLeft.a)) {
 						var _v6 = lLeft.a;
 						return A5(
 							$elm$core$Dict$RBNode_elm_builtin,
@@ -6528,7 +6507,7 @@ var $elm$core$Dict$removeHelp = F2(
 							right);
 					} else {
 						var _v7 = $elm$core$Dict$moveRedLeft(dict);
-						if (_v7.$ === 'RBNode_elm_builtin') {
+						if (_v7.$ === -1) {
 							var nColor = _v7.a;
 							var nKey = _v7.b;
 							var nValue = _v7.c;
@@ -6564,7 +6543,7 @@ var $elm$core$Dict$removeHelp = F2(
 	});
 var $elm$core$Dict$removeHelpEQGT = F2(
 	function (targetKey, dict) {
-		if (dict.$ === 'RBNode_elm_builtin') {
+		if (dict.$ === -1) {
 			var color = dict.a;
 			var key = dict.b;
 			var value = dict.c;
@@ -6572,7 +6551,7 @@ var $elm$core$Dict$removeHelpEQGT = F2(
 			var right = dict.e;
 			if (_Utils_eq(targetKey, key)) {
 				var _v1 = $elm$core$Dict$getMin(right);
-				if (_v1.$ === 'RBNode_elm_builtin') {
+				if (_v1.$ === -1) {
 					var minKey = _v1.b;
 					var minValue = _v1.c;
 					return A5(
@@ -6601,13 +6580,13 @@ var $elm$core$Dict$removeHelpEQGT = F2(
 var $elm$core$Dict$remove = F2(
 	function (key, dict) {
 		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+		if ((_v0.$ === -1) && (!_v0.a)) {
 			var _v1 = _v0.a;
 			var k = _v0.b;
 			var v = _v0.c;
 			var l = _v0.d;
 			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+			return A5($elm$core$Dict$RBNode_elm_builtin, 1, k, v, l, r);
 		} else {
 			var x = _v0;
 			return x;
@@ -6617,7 +6596,7 @@ var $elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
 		foldl:
 		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
+			if (dict.$ === -2) {
 				return acc;
 			} else {
 				var key = dict.b;
@@ -6668,9 +6647,9 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix = F2(
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$process = F2(
 	function (message, boxedState) {
-		var state = boxedState.a;
+		var state = boxedState;
 		switch (message.$) {
-			case 'Got':
+			case 2:
 				var label = message.a;
 				var key = message.b;
 				var value = message.c;
@@ -6678,11 +6657,11 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$process = F2(
 					boxedState,
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$GetResponse(
 						{
-							key: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.prefix, key),
-							label: label,
-							value: value
+							ao: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.n, key),
+							bI: label,
+							b4: value
 						}));
-			case 'Keys':
+			case 5:
 				var label = message.a;
 				var prefix = message.b;
 				var keys = message.c;
@@ -6690,90 +6669,85 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$process = F2(
 					boxedState,
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$ListKeysResponse(
 						{
-							keys: A2(
+							ap: A2(
 								$elm$core$List$map,
-								$billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix(state.prefix),
+								$billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix(state.n),
 								keys),
-							label: label,
-							prefix: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.prefix, prefix)
+							bI: label,
+							n: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.n, prefix)
 						}));
-			case 'Startup':
+			case 0:
 				return _Utils_Tuple2(
-					$billstclair$elm_localstorage$PortFunnel$LocalStorage$State(
-						_Utils_update(
-							state,
-							{isLoaded: true})),
+					_Utils_update(
+						state,
+						{aD: true}),
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse);
-			case 'SimulateGet':
+			case 7:
 				var label = message.a;
 				var key = message.b;
 				return _Utils_Tuple2(
 					boxedState,
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$GetResponse(
 						{
-							key: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.prefix, key),
-							label: label,
-							value: A2($elm$core$Dict$get, key, state.simulationDict)
+							ao: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.n, key),
+							bI: label,
+							b4: A2($elm$core$Dict$get, key, state.D)
 						}));
-			case 'SimulatePut':
+			case 8:
 				var key = message.a;
 				var value = message.b;
 				return _Utils_Tuple2(
-					$billstclair$elm_localstorage$PortFunnel$LocalStorage$State(
-						_Utils_update(
-							state,
-							{
-								simulationDict: function () {
-									if (value.$ === 'Nothing') {
-										return A2($elm$core$Dict$remove, key, state.simulationDict);
-									} else {
-										var v = value.a;
-										return A3($elm$core$Dict$insert, key, v, state.simulationDict);
-									}
-								}()
-							})),
+					_Utils_update(
+						state,
+						{
+							D: function () {
+								if (value.$ === 1) {
+									return A2($elm$core$Dict$remove, key, state.D);
+								} else {
+									var v = value.a;
+									return A3($elm$core$Dict$insert, key, v, state.D);
+								}
+							}()
+						}),
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse);
-			case 'SimulateListKeys':
+			case 9:
 				var label = message.a;
 				var prefix = message.b;
 				return _Utils_Tuple2(
 					boxedState,
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$ListKeysResponse(
 						{
-							keys: A3(
+							ap: A3(
 								$elm$core$Dict$foldr,
 								F3(
 									function (k, _v2, res) {
 										return A2($elm$core$String$startsWith, prefix, k) ? A2(
 											$elm$core$List$cons,
-											A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.prefix, k),
+											A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.n, k),
 											res) : res;
 									}),
 								_List_Nil,
-								state.simulationDict),
-							label: label,
-							prefix: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.prefix, prefix)
+								state.D),
+							bI: label,
+							n: A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$stripPrefix, state.n, prefix)
 						}));
-			case 'SimulateClear':
+			case 10:
 				var prefix = message.a;
 				return _Utils_Tuple2(
-					$billstclair$elm_localstorage$PortFunnel$LocalStorage$State(
-						_Utils_update(
-							state,
-							{
-								simulationDict: A2(
-									$elm_community$dict_extra$Dict$Extra$removeWhen,
-									F2(
-										function (k, _v3) {
-											return A2($elm$core$String$startsWith, prefix, k);
-										}),
-									state.simulationDict)
-							})),
+					_Utils_update(
+						state,
+						{
+							D: A2(
+								$elm_community$dict_extra$Dict$Extra$removeWhen,
+								F2(
+									function (k, _v3) {
+										return A2($elm$core$String$startsWith, prefix, k);
+									}),
+								state.D)
+						}),
 					$billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse);
 			default:
-				return _Utils_Tuple2(
-					$billstclair$elm_localstorage$PortFunnel$LocalStorage$State(state),
-					$billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse);
+				return _Utils_Tuple2(state, $billstclair$elm_localstorage$PortFunnel$LocalStorage$NoResponse);
 		}
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleDesc = A4($billstclair$elm_port_funnel$PortFunnel$makeModuleDesc, $billstclair$elm_localstorage$PortFunnel$LocalStorage$moduleName, $billstclair$elm_localstorage$PortFunnel$LocalStorage$encode, $billstclair$elm_localstorage$PortFunnel$LocalStorage$decode, $billstclair$elm_localstorage$PortFunnel$LocalStorage$process);
@@ -6783,18 +6757,18 @@ var $billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage = function (mes
 			[
 				_Utils_Tuple2(
 				'module',
-				$elm$json$Json$Encode$string(message.moduleName)),
+				$elm$json$Json$Encode$string(message.bL)),
 				_Utils_Tuple2(
 				'tag',
-				$elm$json$Json$Encode$string(message.tag)),
-				_Utils_Tuple2('args', message.args)
+				$elm$json$Json$Encode$string(message.b$)),
+				_Utils_Tuple2('args', message.bs)
 			]));
 };
 var $billstclair$elm_port_funnel$PortFunnel$messageToValue = F2(
 	function (_v0, message) {
-		var moduleDesc = _v0.a;
+		var moduleDesc = _v0;
 		return $billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage(
-			moduleDesc.encoder(message));
+			moduleDesc.az(message));
 	});
 var $billstclair$elm_port_funnel$PortFunnel$sendMessage = F3(
 	function (moduleDesc, cmdPort, message) {
@@ -6803,32 +6777,32 @@ var $billstclair$elm_port_funnel$PortFunnel$sendMessage = F3(
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$send = F3(
 	function (wrapper, message, _v0) {
-		var state = _v0.a;
-		var prefix = state.prefix;
+		var state = _v0;
+		var prefix = state.n;
 		var mess = function () {
 			switch (message.$) {
-				case 'Get':
+				case 1:
 					var label = message.a;
 					var key = message.b;
 					return A2(
 						$billstclair$elm_localstorage$PortFunnel$InternalTypes$Get,
 						label,
 						A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$addPrefix, prefix, key));
-				case 'Put':
+				case 3:
 					var key = message.a;
 					var value = message.b;
 					return A2(
 						$billstclair$elm_localstorage$PortFunnel$InternalTypes$Put,
 						A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$addPrefix, prefix, key),
 						value);
-				case 'ListKeys':
+				case 4:
 					var label = message.a;
 					var pref = message.b;
 					return A2(
 						$billstclair$elm_localstorage$PortFunnel$InternalTypes$ListKeys,
 						label,
 						A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$addPrefix, prefix, pref));
-				case 'Clear':
+				case 6:
 					var pref = message.a;
 					return $billstclair$elm_localstorage$PortFunnel$InternalTypes$Clear(
 						A2($billstclair$elm_localstorage$PortFunnel$LocalStorage$addPrefix, prefix, pref));
@@ -6840,7 +6814,7 @@ var $billstclair$elm_localstorage$PortFunnel$LocalStorage$send = F3(
 	});
 var $author$project$Main$sendLocalStorage = F2(
 	function (model, message) {
-		return A3($billstclair$elm_localstorage$PortFunnel$LocalStorage$send, $author$project$Main$cmdPort, message, model.funnelState.storage);
+		return A3($billstclair$elm_localstorage$PortFunnel$LocalStorage$send, $author$project$Main$cmdPort, message, model.S.bY);
 	});
 var $author$project$Main$getLocalStorageString = F2(
 	function (model, key) {
@@ -6850,41 +6824,35 @@ var $author$project$Main$getLocalStorageString = F2(
 			$billstclair$elm_localstorage$PortFunnel$LocalStorage$get(key));
 	});
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$initialState = function (prefix) {
-	return $billstclair$elm_localstorage$PortFunnel$LocalStorage$State(
-		{isLoaded: false, prefix: prefix, simulationDict: $elm$core$Dict$empty});
+	return {aD: false, n: prefix, D: $elm$core$Dict$empty};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$State = function (a) {
-	return {$: 'State', a: a};
-};
-var $elm$core$Set$Set_elm_builtin = function (a) {
-	return {$: 'Set_elm_builtin', a: a};
-};
-var $elm$core$Set$empty = $elm$core$Set$Set_elm_builtin($elm$core$Dict$empty);
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$initialState = $billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-	{continuationCounter: 0, continuations: $elm$core$Dict$empty, isLoaded: false, noAutoReopenKeys: $elm$core$Set$empty, queues: $elm$core$Dict$empty, socketStates: $elm$core$Dict$empty});
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$State = $elm$core$Basics$identity;
+var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
+var $elm$core$Set$empty = $elm$core$Dict$empty;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$initialState = {aj: 0, o: $elm$core$Dict$empty, aD: false, J: $elm$core$Set$empty, C: $elm$core$Dict$empty, a: $elm$core$Dict$empty};
 var $author$project$PortFunnels$initialState = function (prefix) {
 	return {
-		storage: $billstclair$elm_localstorage$PortFunnel$LocalStorage$initialState(prefix),
-		websocket: $billstclair$elm_websocket_client$PortFunnel$WebSocket$initialState
+		bY: $billstclair$elm_localstorage$PortFunnel$LocalStorage$initialState(prefix),
+		b6: $billstclair$elm_websocket_client$PortFunnel$WebSocket$initialState
 	};
 };
 var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		var formFields = {
-			gameId: function () {
-				var _v0 = url.fragment;
-				if (_v0.$ === 'Just') {
+			s: function () {
+				var _v0 = url.al;
+				if (!_v0.$) {
 					var f = _v0.a;
 					return f;
 				} else {
 					return '';
 				}
 			}(),
-			text: '',
-			username: '',
-			usernamePlaceholder: ''
+			at: '',
+			e: '',
+			av: ''
 		};
-		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)($elm$core$Maybe$Nothing)(true)($elm$core$Maybe$Nothing)(
+		var model = $author$project$Main$Model(key)(url)(0)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)($elm$core$Maybe$Nothing)(true)($elm$core$Maybe$Nothing)(
 			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
@@ -6894,16 +6862,16 @@ var $author$project$Main$init = F3(
 						A2($elm$core$Task$perform, $author$project$Main$Tick, $elm$time$Time$now),
 						A2(
 						$elm$random$Random$generate,
-						$author$project$Main$SetField($author$project$Main$UsernamePlaceholder),
+						$author$project$Main$SetField(2),
 						$author$project$Names$generator),
 						A2($author$project$Main$getLocalStorageString, model, 'username')
 					])));
 	});
 var $author$project$Main$SendImage = function (a) {
-	return {$: 'SendImage', a: a};
+	return {$: 23, a: a};
 };
 var $author$project$Main$ShownConfirmDialog = function (a) {
-	return {$: 'ShownConfirmDialog', a: a};
+	return {$: 22, a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $author$project$Main$canvasReturnPort = _Platform_incomingPort('canvasReturnPort', $elm$json$Json$Decode$string);
@@ -6927,11 +6895,11 @@ var $author$project$Main$confirmReturnPort = _Platform_incomingPort(
 		A2($elm$json$Json$Decode$index, 0, $elm$json$Json$Decode$bool)));
 var $elm$time$Time$Every = F2(
 	function (a, b) {
-		return {$: 'Every', a: a, b: b};
+		return {$: 0, a: a, b: b};
 	});
 var $elm$time$Time$State = F2(
 	function (taggers, processes) {
-		return {processes: processes, taggers: taggers};
+		return {a9: processes, bl: taggers};
 	});
 var $elm$time$Time$init = $elm$core$Task$succeed(
 	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
@@ -6940,7 +6908,7 @@ var $elm$time$Time$addMySub = F2(
 		var interval = _v0.a;
 		var tagger = _v0.b;
 		var _v1 = A2($elm$core$Dict$get, interval, state);
-		if (_v1.$ === 'Nothing') {
+		if (_v1.$ === 1) {
 			return A3(
 				$elm$core$Dict$insert,
 				interval,
@@ -7045,7 +7013,7 @@ var $elm$time$Time$spawnHelp = F3(
 	});
 var $elm$time$Time$onEffects = F3(
 	function (router, subs, _v0) {
-		var processes = _v0.processes;
+		var processes = _v0.a9;
 		var rightStep = F3(
 			function (_v6, id, _v7) {
 				var spawns = _v7.a;
@@ -7092,7 +7060,7 @@ var $elm$time$Time$onEffects = F3(
 			_Utils_Tuple3(
 				_List_Nil,
 				$elm$core$Dict$empty,
-				$elm$core$Task$succeed(_Utils_Tuple0)));
+				$elm$core$Task$succeed(0)));
 		var spawnList = _v1.a;
 		var existingDict = _v1.b;
 		var killTask = _v1.c;
@@ -7111,8 +7079,8 @@ var $elm$time$Time$onEffects = F3(
 	});
 var $elm$time$Time$onSelfMsg = F3(
 	function (router, interval, state) {
-		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
-		if (_v0.$ === 'Nothing') {
+		var _v0 = A2($elm$core$Dict$get, interval, state.bl);
+		if (_v0.$ === 1) {
 			return $elm$core$Task$succeed(state);
 		} else {
 			var taggers = _v0.a;
@@ -7173,56 +7141,56 @@ var $author$project$Main$subscriptions = function (model) {
 			]));
 };
 var $author$project$Protocol$ErrorResponse = function (a) {
-	return {$: 'ErrorResponse', a: a};
+	return {$: 0, a: a};
 };
 var $author$project$Protocol$ExtendDeadlineCommand = function (a) {
-	return {$: 'ExtendDeadlineCommand', a: a};
+	return {$: 10, a: a};
 };
-var $author$project$Main$GameIdField = {$: 'GameIdField'};
-var $author$project$Protocol$GameOver = {$: 'GameOver'};
+var $author$project$Main$GameIdField = 0;
+var $author$project$Protocol$GameOver = 5;
 var $author$project$Protocol$ImagePackage = function (a) {
-	return {$: 'ImagePackage', a: a};
+	return {$: 1, a: a};
 };
 var $author$project$Protocol$ImagePackageCommand = function (a) {
-	return {$: 'ImagePackageCommand', a: a};
+	return {$: 8, a: a};
 };
 var $author$project$Protocol$JoinCommand = F2(
 	function (a, b) {
-		return {$: 'JoinCommand', a: a, b: b};
+		return {$: 2, a: a, b: b};
 	});
 var $author$project$Protocol$KickCommand = function (a) {
-	return {$: 'KickCommand', a: a};
+	return {$: 3, a: a};
 };
-var $author$project$Protocol$LeaveCommand = {$: 'LeaveCommand'};
-var $author$project$Protocol$LeftGameResponse = {$: 'LeftGameResponse'};
+var $author$project$Protocol$LeaveCommand = {$: 5};
+var $author$project$Protocol$LeftGameResponse = {$: 5};
 var $author$project$PortFunnels$LocalStorageHandler = function (a) {
-	return {$: 'LocalStorageHandler', a: a};
+	return {$: 1, a: a};
 };
 var $author$project$Protocol$NewGameCommand = function (a) {
-	return {$: 'NewGameCommand', a: a};
+	return {$: 1, a: a};
 };
-var $author$project$Protocol$NextRoundCommand = {$: 'NextRoundCommand'};
+var $author$project$Protocol$NextRoundCommand = {$: 9};
 var $author$project$Main$SocketReceive = function (a) {
-	return {$: 'SocketReceive', a: a};
+	return {$: 17, a: a};
 };
-var $author$project$Protocol$StartCommand = {$: 'StartCommand'};
+var $author$project$Protocol$StartCommand = {$: 4};
 var $author$project$Main$StorageReceive = F2(
 	function (a, b) {
-		return {$: 'StorageReceive', a: a, b: b};
+		return {$: 18, a: a, b: b};
 	});
-var $author$project$Protocol$Stuck = {$: 'Stuck'};
+var $author$project$Protocol$Stuck = {$: 3};
 var $author$project$Protocol$TextPackage = function (a) {
-	return {$: 'TextPackage', a: a};
+	return {$: 0, a: a};
 };
 var $author$project$Protocol$TextPackageCommand = function (a) {
-	return {$: 'TextPackageCommand', a: a};
+	return {$: 7, a: a};
 };
-var $author$project$Main$UsernameField = {$: 'UsernameField'};
+var $author$project$Main$UsernameField = 1;
 var $author$project$Protocol$UuidCommand = function (a) {
-	return {$: 'UuidCommand', a: a};
+	return {$: 6, a: a};
 };
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
-	return {$: 'WebSocketHandler', a: a};
+	return {$: 0, a: a};
 };
 var $Janiczek$cmd_extra$Cmd$Extra$addCmd = F2(
 	function (cmd, _v0) {
@@ -7236,7 +7204,7 @@ var $Janiczek$cmd_extra$Cmd$Extra$addCmd = F2(
 	});
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
+		if (!maybeValue.$) {
 			var value = maybeValue.a;
 			return callback(value);
 		} else {
@@ -7245,7 +7213,7 @@ var $elm$core$Maybe$andThen = F2(
 	});
 var $elm$core$Maybe$destruct = F3(
 	function (_default, func, maybe) {
-		if (maybe.$ === 'Just') {
+		if (!maybe.$) {
 			var a = maybe.a;
 			return func(a);
 		} else {
@@ -7269,38 +7237,38 @@ var $author$project$Main$canvasPort = _Platform_outgoingPort(
 				]));
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeToString = function (code) {
-	switch (code.$) {
-		case 'NormalClosure':
+	switch (code) {
+		case 0:
 			return 'Normal';
-		case 'GoingAwayClosure':
+		case 1:
 			return 'GoingAway';
-		case 'ProtocolErrorClosure':
+		case 2:
 			return 'ProtocolError';
-		case 'UnsupportedDataClosure':
+		case 3:
 			return 'UnsupportedData';
-		case 'NoStatusRecvdClosure':
+		case 4:
 			return 'NoStatusRecvd';
-		case 'AbnormalClosure':
+		case 5:
 			return 'Abnormal';
-		case 'InvalidFramePayloadDataClosure':
+		case 6:
 			return 'InvalidFramePayloadData';
-		case 'PolicyViolationClosure':
+		case 7:
 			return 'PolicyViolation';
-		case 'MessageTooBigClosure':
+		case 8:
 			return 'MessageTooBig';
-		case 'MissingExtensionClosure':
+		case 9:
 			return 'MissingExtension';
-		case 'InternalErrorClosure':
+		case 10:
 			return 'InternalError';
-		case 'ServiceRestartClosure':
+		case 11:
 			return 'ServiceRestart';
-		case 'TryAgainLaterClosure':
+		case 12:
 			return 'TryAgainLater';
-		case 'BadGatewayClosure':
+		case 13:
 			return 'BadGateway';
-		case 'TLSHandshakeClosure':
+		case 14:
 			return 'TLSHandshake';
-		case 'TimedOutOnReconnect':
+		case 15:
 			return 'TimedOutOnReconnect';
 		default:
 			return 'UnknownClosureCode';
@@ -7323,7 +7291,7 @@ var $author$project$Main$confirmPort = _Platform_outgoingPort(
 	});
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Main$ShowError = function (a) {
-	return {$: 'ShowError', a: a};
+	return {$: 19, a: a};
 };
 var $author$project$Main$errorPort = _Platform_outgoingPort('errorPort', $elm$json$Json$Encode$string);
 var $author$project$Main$errorLog = function (message) {
@@ -7343,7 +7311,7 @@ var $author$project$Protocol$errorParser = _Utils_Tuple2(
 		return $author$project$Protocol$ErrorResponse(s);
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeStringToString = function (string) {
-	if (string.$ === 'Nothing') {
+	if (string.$ === 1) {
 		return 'Nothing';
 	} else {
 		var s = string.a;
@@ -7351,7 +7319,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeStringToString =
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeString = function (s) {
-	if (s.$ === 'Nothing') {
+	if (s.$ === 1) {
 		return 'Nothing';
 	} else {
 		var string = s.a;
@@ -7360,142 +7328,142 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeString = functio
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$toString = function (mess) {
 	switch (mess.$) {
-		case 'Startup':
+		case 0:
 			return '<Startup>';
-		case 'PWillOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
-			var keepAlive = mess.a.keepAlive;
+		case 6:
+			var key = mess.a.ao;
+			var url = mess.a.au;
+			var keepAlive = mess.a.w;
 			return 'PWillOpen { key = \"' + (key + ('\", url = \"' + (url + ('\", keepAlive = ' + (keepAlive ? 'True' : ('False' + '}'))))));
-		case 'POOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
+		case 1:
+			var key = mess.a.ao;
+			var url = mess.a.au;
 			return 'POOpen { key = \"' + (key + ('\", url = \"' + (url + '\"}')));
-		case 'PIConnected':
-			var key = mess.a.key;
-			var description = mess.a.description;
+		case 9:
+			var key = mess.a.ao;
+			var description = mess.a.j;
 			return 'PIConnected { key = \"' + (key + ('\", description = \"' + (description + '\"}')));
-		case 'PWillSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
+		case 7:
+			var key = mess.a.ao;
+			var message = mess.a.bJ;
 			return 'PWillSend { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
-		case 'POSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
+		case 2:
+			var key = mess.a.ao;
+			var message = mess.a.bJ;
 			return 'POSend { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
-		case 'PIMessageReceived':
-			var key = mess.a.key;
-			var message = mess.a.message;
+		case 10:
+			var key = mess.a.ao;
+			var message = mess.a.bJ;
 			return 'PIMessageReceived { key = \"' + (key + ('\", message = \"' + (message + '\"}')));
-		case 'PWillClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
+		case 8:
+			var key = mess.a.ao;
+			var reason = mess.a.g;
 			return 'PWillClose { key = \"' + (key + ('\", reason = \"' + (reason + '\"}')));
-		case 'POClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
+		case 3:
+			var key = mess.a.ao;
+			var reason = mess.a.g;
 			return 'POClose { key = \"' + (key + ('\", reason = \"' + (reason + '\"}')));
-		case 'PIClosed':
-			var key = mess.a.key;
-			var bytesQueued = mess.a.bytesQueued;
-			var code = mess.a.code;
-			var reason = mess.a.reason;
-			var wasClean = mess.a.wasClean;
+		case 11:
+			var key = mess.a.ao;
+			var bytesQueued = mess.a.P;
+			var code = mess.a.bw;
+			var reason = mess.a.g;
+			var wasClean = mess.a.G;
 			return 'PIClosed { key = \"' + (key + ('\", bytesQueued = \"' + ($elm$core$String$fromInt(bytesQueued) + ('\", code = \"' + ($elm$core$String$fromInt(code) + ('\", reason = \"' + (reason + ('\", wasClean = \"' + (wasClean ? 'True' : ('False' + '\"}'))))))))));
-		case 'POBytesQueued':
-			var key = mess.a.key;
+		case 4:
+			var key = mess.a.ao;
 			return 'POBytesQueued { key = \"' + (key + '\"}');
-		case 'PIBytesQueued':
-			var key = mess.a.key;
-			var bufferedAmount = mess.a.bufferedAmount;
+		case 12:
+			var key = mess.a.ao;
+			var bufferedAmount = mess.a.ac;
 			return 'PIBytesQueued { key = \"' + (key + ('\", bufferedAmount = \"' + ($elm$core$String$fromInt(bufferedAmount) + '\"}')));
-		case 'PODelay':
-			var millis = mess.a.millis;
-			var id = mess.a.id;
+		case 5:
+			var millis = mess.a.T;
+			var id = mess.a.u;
 			return 'PODelay { millis = \"' + ($elm$core$String$fromInt(millis) + ('\" id = \"' + (id + '\"}')));
-		case 'PIDelayed':
-			var id = mess.a.id;
+		case 13:
+			var id = mess.a.u;
 			return 'PIDelayed { id = \"' + (id + '\"}');
 		default:
-			var key = mess.a.key;
-			var code = mess.a.code;
-			var description = mess.a.description;
-			var name = mess.a.name;
+			var key = mess.a.ao;
+			var code = mess.a.bw;
+			var description = mess.a.j;
+			var name = mess.a.U;
 			return 'PIError { key = \"' + ($billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeString(key) + ('\" code = \"' + (code + ('\" description = \"' + (description + ('\" name = \"' + ($billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeString(name) + '\"}')))))));
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString = function (theError) {
 	switch (theError.$) {
-		case 'SocketAlreadyOpenError':
+		case 0:
 			var key = theError.a;
 			return 'SocketAlreadyOpenError \"' + (key + '\"');
-		case 'SocketConnectingError':
+		case 1:
 			var key = theError.a;
 			return 'SocketConnectingError \"' + (key + '\"');
-		case 'SocketClosingError':
+		case 2:
 			var key = theError.a;
 			return 'SocketClosingError \"' + (key + '\"');
-		case 'SocketNotOpenError':
+		case 3:
 			var key = theError.a;
 			return 'SocketNotOpenError \"' + (key + '\"');
-		case 'UnexpectedConnectedError':
-			var key = theError.a.key;
-			var description = theError.a.description;
+		case 4:
+			var key = theError.a.ao;
+			var description = theError.a.j;
 			return 'UnexpectedConnectedError\n { key = \"' + (key + ('\", description = \"' + (description + '\" }')));
-		case 'UnexpectedMessageError':
-			var key = theError.a.key;
-			var message = theError.a.message;
+		case 5:
+			var key = theError.a.ao;
+			var message = theError.a.bJ;
 			return 'UnexpectedMessageError { key = \"' + (key + ('\", message = \"' + (message + '\" }')));
-		case 'LowLevelError':
-			var key = theError.a.key;
-			var code = theError.a.code;
-			var description = theError.a.description;
-			var name = theError.a.name;
+		case 6:
+			var key = theError.a.ao;
+			var code = theError.a.bw;
+			var description = theError.a.j;
+			var name = theError.a.U;
 			return 'LowLevelError { key = \"' + ($billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeStringToString(key) + ('\", code = \"' + (code + ('\", description = \"' + (description + ('\", code = \"' + ($billstclair$elm_websocket_client$PortFunnel$WebSocket$maybeStringToString(name) + '\" }')))))));
 		default:
-			var message = theError.a.message;
+			var message = theError.a.bJ;
 			return 'InvalidMessageError: ' + $billstclair$elm_websocket_client$PortFunnel$WebSocket$toString(message);
 	}
 };
 var $author$project$Protocol$GameDetails = F5(
 	function (alias, status, players, uuid, currentStage) {
-		return {alias: alias, currentStage: currentStage, players: players, status: status, uuid: uuid};
+		return {bq: alias, bx: currentStage, l: players, c: status, aw: uuid};
 	});
 var $author$project$Protocol$GameDetailsResponse = function (a) {
-	return {$: 'GameDetailsResponse', a: a};
+	return {$: 2, a: a};
 };
-var $author$project$Protocol$Drawing = {$: 'Drawing'};
-var $author$project$Protocol$Lobby = {$: 'Lobby'};
-var $author$project$Protocol$Starting = {$: 'Starting'};
-var $author$project$Protocol$Understanding = {$: 'Understanding'};
+var $author$project$Protocol$Drawing = 3;
+var $author$project$Protocol$Lobby = 1;
+var $author$project$Protocol$Starting = 2;
+var $author$project$Protocol$Understanding = 4;
 var $author$project$Protocol$gameStatusFromString = function (string) {
 	switch (string) {
 		case 'Lobby':
-			return $author$project$Protocol$Lobby;
+			return 1;
 		case 'Starting':
-			return $author$project$Protocol$Starting;
+			return 2;
 		case 'Drawing':
-			return $author$project$Protocol$Drawing;
+			return 3;
 		case 'Understanding':
-			return $author$project$Protocol$Understanding;
+			return 4;
 		case 'GameOver':
-			return $author$project$Protocol$GameOver;
+			return 5;
 		default:
-			return $author$project$Protocol$Lobby;
+			return 1;
 	}
 };
 var $elm$json$Json$Decode$map5 = _Json_map5;
 var $author$project$Protocol$PlayerDetails = F6(
 	function (username, imageUrl, status, isAdmin, deadline, stuck) {
-		return {deadline: deadline, imageUrl: imageUrl, isAdmin: isAdmin, status: status, stuck: stuck, username: username};
+		return {ad: deadline, bE: imageUrl, bH: isAdmin, c: status, bZ: stuck, e: username};
 	});
 var $elm$json$Json$Decode$map6 = _Json_map6;
-var $author$project$Protocol$Done = {$: 'Done'};
+var $author$project$Protocol$Done = {$: 0};
 var $author$project$Protocol$Uploading = function (a) {
-	return {$: 'Uploading', a: a};
+	return {$: 2, a: a};
 };
 var $author$project$Protocol$Working = function (a) {
-	return {$: 'Working', a: a};
+	return {$: 1, a: a};
 };
 var $author$project$Protocol$playerStatusFromString = function (string) {
 	switch (string) {
@@ -7540,20 +7508,20 @@ var $author$project$Protocol$gameDetailsParser = _Utils_Tuple2(
 		return $author$project$Protocol$GameDetailsResponse(v);
 	});
 var $author$project$Main$getGameLink = function (model) {
-	var url = model.url;
-	var _v0 = model.gameId;
-	if (_v0.$ === 'Just') {
+	var url = model.au;
+	var _v0 = model.s;
+	if (!_v0.$) {
 		var gameId = _v0.a;
 		return _Utils_update(
 			url,
 			{
-				fragment: $elm$core$Maybe$Just(gameId)
+				al: $elm$core$Maybe$Just(gameId)
 			});
 	} else {
 		return url;
 	}
 };
-var $author$project$Main$imageUrl = 'http://192.168.1.11:3030/images/';
+var $author$project$Main$imageUrl = 'https://drawtice.helit.org/images/';
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
 var $elm$core$Array$indexedMap = F2(
@@ -7562,9 +7530,9 @@ var $elm$core$Array$indexedMap = F2(
 		var tree = _v0.c;
 		var tail = _v0.d;
 		var initialBuilder = {
-			nodeList: _List_Nil,
-			nodeListSize: 0,
-			tail: A3(
+			f: _List_Nil,
+			b: 0,
+			d: A3(
 				$elm$core$Elm$JsArray$indexedMap,
 				func,
 				$elm$core$Array$tailIndex(len),
@@ -7572,18 +7540,18 @@ var $elm$core$Array$indexedMap = F2(
 		};
 		var helper = F2(
 			function (node, builder) {
-				if (node.$ === 'SubTree') {
+				if (!node.$) {
 					var subTree = node.a;
 					return A3($elm$core$Elm$JsArray$foldl, helper, builder, subTree);
 				} else {
 					var leaf = node.a;
-					var offset = builder.nodeListSize * $elm$core$Array$branchFactor;
+					var offset = builder.b * $elm$core$Array$branchFactor;
 					var mappedLeaf = $elm$core$Array$Leaf(
 						A3($elm$core$Elm$JsArray$indexedMap, func, offset, leaf));
 					return {
-						nodeList: A2($elm$core$List$cons, mappedLeaf, builder.nodeList),
-						nodeListSize: builder.nodeListSize + 1,
-						tail: builder.tail
+						f: A2($elm$core$List$cons, mappedLeaf, builder.f),
+						b: builder.b + 1,
+						d: builder.d
 					};
 				}
 			});
@@ -7595,26 +7563,26 @@ var $elm$core$Array$indexedMap = F2(
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 	function (key, _v0) {
-		var state = _v0.a;
+		var state = _v0;
 		return !_Utils_eq(
-			A2($elm$core$Dict$get, key, state.socketStates),
+			A2($elm$core$Dict$get, key, state.a),
 			$elm$core$Maybe$Nothing);
 	});
 var $author$project$Main$leaveGame = function (model) {
 	return _Utils_update(
 		model,
-		{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, playerCapture: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, showingGameoverSelf: false, status: $author$project$Protocol$NoGame, workloads: $elm$core$Maybe$Nothing});
+		{v: 0, s: $elm$core$Maybe$Nothing, am: $elm$core$Maybe$Nothing, A: $elm$core$Maybe$Nothing, as: $elm$core$Maybe$Nothing, l: $elm$core$Array$empty, W: $elm$core$Maybe$Nothing, Y: false, c: 0, N: $elm$core$Maybe$Nothing});
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
 	function (accessors, moduleDesc, commander, handler) {
-		return {accessors: accessors, commander: commander, handler: handler, moduleDesc: moduleDesc};
+		return {aR: accessors, aU: commander, a_: handler, a2: moduleDesc};
 	});
 var $author$project$PortFunnels$LocalStorageFunnel = function (a) {
-	return {$: 'LocalStorageFunnel', a: a};
+	return {$: 1, a: a};
 };
 var $author$project$PortFunnels$WebSocketFunnel = function (a) {
-	return {$: 'WebSocketFunnel', a: a};
+	return {$: 0, a: a};
 };
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$commander = F2(
@@ -7645,11 +7613,11 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 			return A3($billstclair$elm_port_funnel$PortFunnel$GenericMessage, $billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleName, tag, args);
 		});
 	switch (mess.$) {
-		case 'Startup':
+		case 0:
 			return A2(gm, 'startup', $elm$json$Json$Encode$null);
-		case 'POOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
+		case 1:
+			var key = mess.a.ao;
+			var url = mess.a.au;
 			return A2(
 				gm,
 				'open',
@@ -7663,9 +7631,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'url',
 							$elm$json$Json$Encode$string(url))
 						])));
-		case 'POSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
+		case 2:
+			var key = mess.a.ao;
+			var message = mess.a.bJ;
 			return A2(
 				gm,
 				'send',
@@ -7679,9 +7647,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'message',
 							$elm$json$Json$Encode$string(message))
 						])));
-		case 'POClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
+		case 3:
+			var key = mess.a.ao;
+			var reason = mess.a.g;
 			return A2(
 				gm,
 				'close',
@@ -7695,8 +7663,8 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'reason',
 							$elm$json$Json$Encode$string(reason))
 						])));
-		case 'POBytesQueued':
-			var key = mess.a.key;
+		case 4:
+			var key = mess.a.ao;
 			return A2(
 				gm,
 				'getBytesQueued',
@@ -7707,9 +7675,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'key',
 							$elm$json$Json$Encode$string(key))
 						])));
-		case 'PODelay':
-			var millis = mess.a.millis;
-			var id = mess.a.id;
+		case 5:
+			var millis = mess.a.T;
+			var id = mess.a.u;
 			return A2(
 				gm,
 				'delay',
@@ -7723,10 +7691,10 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'id',
 							$elm$json$Json$Encode$string(id))
 						])));
-		case 'PWillOpen':
-			var key = mess.a.key;
-			var url = mess.a.url;
-			var keepAlive = mess.a.keepAlive;
+		case 6:
+			var key = mess.a.ao;
+			var url = mess.a.au;
+			var keepAlive = mess.a.w;
 			return A2(
 				gm,
 				'willopen',
@@ -7743,9 +7711,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'keepAlive',
 							$elm$json$Json$Encode$bool(keepAlive))
 						])));
-		case 'PWillSend':
-			var key = mess.a.key;
-			var message = mess.a.message;
+		case 7:
+			var key = mess.a.ao;
+			var message = mess.a.bJ;
 			return A2(
 				gm,
 				'willsend',
@@ -7759,9 +7727,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'message',
 							$elm$json$Json$Encode$string(message))
 						])));
-		case 'PWillClose':
-			var key = mess.a.key;
-			var reason = mess.a.reason;
+		case 8:
+			var key = mess.a.ao;
+			var reason = mess.a.g;
 			return A2(
 				gm,
 				'willclose',
@@ -7775,9 +7743,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'reason',
 							$elm$json$Json$Encode$string(reason))
 						])));
-		case 'PIConnected':
-			var key = mess.a.key;
-			var description = mess.a.description;
+		case 9:
+			var key = mess.a.ao;
+			var description = mess.a.j;
 			return A2(
 				gm,
 				'connected',
@@ -7791,9 +7759,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'description',
 							$elm$json$Json$Encode$string(description))
 						])));
-		case 'PIMessageReceived':
-			var key = mess.a.key;
-			var message = mess.a.message;
+		case 10:
+			var key = mess.a.ao;
+			var message = mess.a.bJ;
 			return A2(
 				gm,
 				'messageReceived',
@@ -7807,12 +7775,12 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'message',
 							$elm$json$Json$Encode$string(message))
 						])));
-		case 'PIClosed':
-			var key = mess.a.key;
-			var bytesQueued = mess.a.bytesQueued;
-			var code = mess.a.code;
-			var reason = mess.a.reason;
-			var wasClean = mess.a.wasClean;
+		case 11:
+			var key = mess.a.ao;
+			var bytesQueued = mess.a.P;
+			var code = mess.a.bw;
+			var reason = mess.a.g;
+			var wasClean = mess.a.G;
 			return A2(
 				gm,
 				'closed',
@@ -7835,9 +7803,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'wasClean',
 							$elm$json$Json$Encode$bool(wasClean))
 						])));
-		case 'PIBytesQueued':
-			var key = mess.a.key;
-			var bufferedAmount = mess.a.bufferedAmount;
+		case 12:
+			var key = mess.a.ao;
+			var bufferedAmount = mess.a.ac;
 			return A2(
 				gm,
 				'bytesQueued',
@@ -7851,8 +7819,8 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							'bufferedAmount',
 							$elm$json$Json$Encode$int(bufferedAmount))
 						])));
-		case 'PIDelayed':
-			var id = mess.a.id;
+		case 13:
+			var id = mess.a.u;
 			return A2(
 				gm,
 				'delayed',
@@ -7864,11 +7832,11 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 							$elm$json$Json$Encode$string(id))
 						])));
 		default:
-			var key = mess.a.key;
-			var code = mess.a.code;
-			var description = mess.a.description;
-			var name = mess.a.name;
-			var message = mess.a.message;
+			var key = mess.a.ao;
+			var code = mess.a.bw;
+			var description = mess.a.j;
+			var name = mess.a.U;
+			var message = mess.a.bJ;
 			return A2(
 				gm,
 				'error',
@@ -7877,7 +7845,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 						_List_fromArray(
 							[
 								function () {
-								if (key.$ === 'Just') {
+								if (!key.$) {
 									var k = key.a;
 									return _List_fromArray(
 										[
@@ -7899,7 +7867,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 									$elm$json$Json$Encode$string(description))
 								]),
 								function () {
-								if (name.$ === 'Just') {
+								if (!name.$) {
 									var n = name.a;
 									return _List_fromArray(
 										[
@@ -7912,7 +7880,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 								}
 							}(),
 								function () {
-								if (message.$ === 'Just') {
+								if (!message.$) {
 									var m = message.a;
 									return _List_fromArray(
 										[
@@ -7930,11 +7898,11 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode = function (me
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$commander = F2(
 	function (gfPort, response) {
 		switch (response.$) {
-			case 'CmdResponse':
+			case 1:
 				var message = response.a;
 				return gfPort(
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$encode(message));
-			case 'ListResponse':
+			case 2:
 				var responses = response.a;
 				return $elm$core$Platform$Cmd$batch(
 					A2(
@@ -7944,7 +7912,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$commander = F2(
 							$elm$core$List$foldl,
 							F2(
 								function (rsp, res) {
-									if (rsp.$ === 'CmdResponse') {
+									if (rsp.$ === 1) {
 										var message = rsp.a;
 										return A2($elm$core$List$cons, message, res);
 									} else {
@@ -7959,98 +7927,98 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$commander = F2(
 	});
 var $billstclair$elm_port_funnel$PortFunnel$StateAccessors = F2(
 	function (get, set) {
-		return {get: get, set: set};
+		return {aZ: get, bh: set};
 	});
 var $author$project$PortFunnels$localStorageAccessors = A2(
 	$billstclair$elm_port_funnel$PortFunnel$StateAccessors,
 	function ($) {
-		return $.storage;
+		return $.bY;
 	},
 	F2(
 		function (substate, state) {
 			return _Utils_update(
 				state,
-				{storage: substate});
+				{bY: substate});
 		}));
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyBufferedAmount = F2(
 	function (key, bufferedAmount) {
-		return {bufferedAmount: bufferedAmount, key: key};
+		return {ac: bufferedAmount, ao: key};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyDescription = F2(
 	function (key, description) {
-		return {description: description, key: key};
+		return {j: description, ao: key};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyMessage = F2(
 	function (key, message) {
-		return {key: key, message: message};
+		return {ao: key, bJ: message};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyReason = F2(
 	function (key, reason) {
-		return {key: key, reason: reason};
+		return {ao: key, g: reason};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyUrl = F2(
 	function (key, url) {
-		return {key: key, url: url};
+		return {ao: key, au: url};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$KeyUrlKeepAlive = F3(
 	function (key, url, keepAlive) {
-		return {keepAlive: keepAlive, key: key, url: url};
+		return {w: keepAlive, ao: key, au: url};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$MillisId = F2(
 	function (millis, id) {
-		return {id: id, millis: millis};
+		return {u: id, T: millis};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIBytesQueued = function (a) {
-	return {$: 'PIBytesQueued', a: a};
+	return {$: 12, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIClosed = function (a) {
-	return {$: 'PIClosed', a: a};
+	return {$: 11, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIClosedRecord = F5(
 	function (key, bytesQueued, code, reason, wasClean) {
-		return {bytesQueued: bytesQueued, code: code, key: key, reason: reason, wasClean: wasClean};
+		return {P: bytesQueued, bw: code, ao: key, g: reason, G: wasClean};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIConnected = function (a) {
-	return {$: 'PIConnected', a: a};
+	return {$: 9, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIDelayed = function (a) {
-	return {$: 'PIDelayed', a: a};
+	return {$: 13, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIError = function (a) {
-	return {$: 'PIError', a: a};
+	return {$: 14, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIErrorRecord = F5(
 	function (key, code, description, name, message) {
-		return {code: code, description: description, key: key, message: message, name: name};
+		return {bw: code, j: description, ao: key, bJ: message, U: name};
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PIMessageReceived = function (a) {
-	return {$: 'PIMessageReceived', a: a};
+	return {$: 10, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POBytesQueued = function (a) {
-	return {$: 'POBytesQueued', a: a};
+	return {$: 4, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POClose = function (a) {
-	return {$: 'POClose', a: a};
+	return {$: 3, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PODelay = function (a) {
-	return {$: 'PODelay', a: a};
+	return {$: 5, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POOpen = function (a) {
-	return {$: 'POOpen', a: a};
+	return {$: 1, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POSend = function (a) {
-	return {$: 'POSend', a: a};
+	return {$: 2, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillClose = function (a) {
-	return {$: 'PWillClose', a: a};
+	return {$: 8, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillOpen = function (a) {
-	return {$: 'PWillOpen', a: a};
+	return {$: 6, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillSend = function (a) {
-	return {$: 'PWillSend', a: a};
+	return {$: 7, a: a};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$Startup = {$: 'Startup'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$Startup = {$: 0};
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $elm$json$Json$Decode$fail = _Json_fail;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3(
@@ -8065,13 +8033,13 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$optionalDecoder = F3
 		};
 		var handleResult = function (input) {
 			var _v0 = A2($elm$json$Json$Decode$decodeValue, pathDecoder, input);
-			if (_v0.$ === 'Ok') {
+			if (!_v0.$) {
 				var rawValue = _v0.a;
 				var _v1 = A2(
 					$elm$json$Json$Decode$decodeValue,
 					nullOr(valDecoder),
 					rawValue);
-				if (_v1.$ === 'Ok') {
+				if (!_v1.$) {
 					var finalResult = _v1.a;
 					return $elm$json$Json$Decode$succeed(finalResult);
 				} else {
@@ -8106,7 +8074,7 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$valueDecode = F2(
 	function (value, decoder) {
 		var _v0 = A2($elm$json$Json$Decode$decodeValue, decoder, value);
-		if (_v0.$ === 'Ok') {
+		if (!_v0.$) {
 			var a = _v0.a;
 			return $elm$core$Result$Ok(a);
 		} else {
@@ -8116,8 +8084,8 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$valueDecode = F2(
 		}
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$decode = function (_v0) {
-	var tag = _v0.tag;
-	var args = _v0.args;
+	var tag = _v0.b$;
+	var args = _v0.bs;
 	switch (tag) {
 		case 'startup':
 			return $elm$core$Result$Ok($billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$Startup);
@@ -8182,7 +8150,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$decode = function (_v
 						$elm$json$Json$Decode$string,
 						$elm$json$Json$Decode$succeed(
 							function (key) {
-								return {key: key};
+								return {ao: key};
 							}))));
 		case 'delay':
 			return A2(
@@ -8341,7 +8309,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$decode = function (_v
 						$elm$json$Json$Decode$string,
 						$elm$json$Json$Decode$succeed(
 							function (id) {
-								return {id: id};
+								return {u: id};
 							}))));
 		case 'error':
 			return A2(
@@ -8378,81 +8346,81 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$decode = function (_v
 			return $elm$core$Result$Err('Unknown tag: ' + tag);
 	}
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$AbnormalClosure = {$: 'AbnormalClosure'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$AbnormalClosure = 5;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosedResponse = function (a) {
-	return {$: 'ClosedResponse', a: a};
+	return {$: 6, a: a};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosingPhase = {$: 'ClosingPhase'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosingPhase = 3;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$CmdResponse = function (a) {
-	return {$: 'CmdResponse', a: a};
+	return {$: 1, a: a};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase = {$: 'ConnectedPhase'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase = 2;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedResponse = function (a) {
-	return {$: 'ConnectedResponse', a: a};
+	return {$: 3, a: a};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectingPhase = {$: 'ConnectingPhase'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectingPhase = 1;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse = function (a) {
-	return {$: 'ErrorResponse', a: a};
+	return {$: 8, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InvalidMessageError = function (a) {
-	return {$: 'InvalidMessageError', a: a};
+	return {$: 7, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$LowLevelError = function (a) {
-	return {$: 'LowLevelError', a: a};
+	return {$: 6, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$MessageReceivedResponse = function (a) {
-	return {$: 'MessageReceivedResponse', a: a};
+	return {$: 5, a: a};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse = {$: 'NoResponse'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse = {$: 0};
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ReconnectedResponse = function (a) {
-	return {$: 'ReconnectedResponse', a: a};
+	return {$: 4, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnexpectedConnectedError = function (a) {
-	return {$: 'UnexpectedConnectedError', a: a};
+	return {$: 4, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnexpectedMessageError = function (a) {
-	return {$: 'UnexpectedMessageError', a: a};
+	return {$: 5, a: a};
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnknownClosure = {$: 'UnknownClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$BadGatewayClosure = {$: 'BadGatewayClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$GoingAwayClosure = {$: 'GoingAwayClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalErrorClosure = {$: 'InternalErrorClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InvalidFramePayloadDataClosure = {$: 'InvalidFramePayloadDataClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$MessageTooBigClosure = {$: 'MessageTooBigClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$MissingExtensionClosure = {$: 'MissingExtensionClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoStatusRecvdClosure = {$: 'NoStatusRecvdClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$NormalClosure = {$: 'NormalClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$PolicyViolationClosure = {$: 'PolicyViolationClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ProtocolErrorClosure = {$: 'ProtocolErrorClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ServiceRestartClosure = {$: 'ServiceRestartClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$TLSHandshakeClosure = {$: 'TLSHandshakeClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$TimedOutOnReconnect = {$: 'TimedOutOnReconnect'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$TryAgainLaterClosure = {$: 'TryAgainLaterClosure'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnsupportedDataClosure = {$: 'UnsupportedDataClosure'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnknownClosure = 16;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$BadGatewayClosure = 13;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$GoingAwayClosure = 1;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalErrorClosure = 10;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$InvalidFramePayloadDataClosure = 6;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$MessageTooBigClosure = 8;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$MissingExtensionClosure = 9;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoStatusRecvdClosure = 4;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$NormalClosure = 0;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$PolicyViolationClosure = 7;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ProtocolErrorClosure = 2;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ServiceRestartClosure = 11;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$TLSHandshakeClosure = 14;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$TimedOutOnReconnect = 15;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$TryAgainLaterClosure = 12;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnsupportedDataClosure = 3;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closurePairs = _List_fromArray(
 	[
-		_Utils_Tuple2(1000, $billstclair$elm_websocket_client$PortFunnel$WebSocket$NormalClosure),
-		_Utils_Tuple2(1001, $billstclair$elm_websocket_client$PortFunnel$WebSocket$GoingAwayClosure),
-		_Utils_Tuple2(1002, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ProtocolErrorClosure),
-		_Utils_Tuple2(1003, $billstclair$elm_websocket_client$PortFunnel$WebSocket$UnsupportedDataClosure),
-		_Utils_Tuple2(1005, $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoStatusRecvdClosure),
-		_Utils_Tuple2(1006, $billstclair$elm_websocket_client$PortFunnel$WebSocket$AbnormalClosure),
-		_Utils_Tuple2(1007, $billstclair$elm_websocket_client$PortFunnel$WebSocket$InvalidFramePayloadDataClosure),
-		_Utils_Tuple2(1008, $billstclair$elm_websocket_client$PortFunnel$WebSocket$PolicyViolationClosure),
-		_Utils_Tuple2(1009, $billstclair$elm_websocket_client$PortFunnel$WebSocket$MessageTooBigClosure),
-		_Utils_Tuple2(1010, $billstclair$elm_websocket_client$PortFunnel$WebSocket$MissingExtensionClosure),
-		_Utils_Tuple2(1011, $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalErrorClosure),
-		_Utils_Tuple2(1012, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ServiceRestartClosure),
-		_Utils_Tuple2(1013, $billstclair$elm_websocket_client$PortFunnel$WebSocket$TryAgainLaterClosure),
-		_Utils_Tuple2(1014, $billstclair$elm_websocket_client$PortFunnel$WebSocket$BadGatewayClosure),
-		_Utils_Tuple2(1015, $billstclair$elm_websocket_client$PortFunnel$WebSocket$TLSHandshakeClosure),
-		_Utils_Tuple2(4000, $billstclair$elm_websocket_client$PortFunnel$WebSocket$TimedOutOnReconnect)
+		_Utils_Tuple2(1000, 0),
+		_Utils_Tuple2(1001, 1),
+		_Utils_Tuple2(1002, 2),
+		_Utils_Tuple2(1003, 3),
+		_Utils_Tuple2(1005, 4),
+		_Utils_Tuple2(1006, 5),
+		_Utils_Tuple2(1007, 6),
+		_Utils_Tuple2(1008, 7),
+		_Utils_Tuple2(1009, 8),
+		_Utils_Tuple2(1010, 9),
+		_Utils_Tuple2(1011, 10),
+		_Utils_Tuple2(1012, 11),
+		_Utils_Tuple2(1013, 12),
+		_Utils_Tuple2(1014, 13),
+		_Utils_Tuple2(1015, 14),
+		_Utils_Tuple2(4000, 15)
 	]);
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closureDict = $elm$core$Dict$fromList($billstclair$elm_websocket_client$PortFunnel$WebSocket$closurePairs);
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCode = function (code) {
 	return A2(
 		$elm$core$Maybe$withDefault,
-		$billstclair$elm_websocket_client$PortFunnel$WebSocket$UnknownClosure,
+		16,
 		A2($elm$core$Dict$get, code, $billstclair$elm_websocket_client$PortFunnel$WebSocket$closureDict));
 };
 var $elm_community$list_extra$List$Extra$find = F2(
@@ -8484,7 +8452,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeNumber = fu
 			return _Utils_eq(c, code);
 		},
 		$billstclair$elm_websocket_client$PortFunnel$WebSocket$closurePairs);
-	if (_v0.$ === 'Just') {
+	if (!_v0.$) {
 		var _v2 = _v0.a;
 		var _int = _v2.a;
 		return _int;
@@ -8492,83 +8460,81 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeNumber = fu
 		return 0;
 	}
 };
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$IdlePhase = {$: 'IdlePhase'};
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$emptySocketState = {backoff: 0, continuationId: $elm$core$Maybe$Nothing, keepAlive: false, phase: $billstclair$elm_websocket_client$PortFunnel$WebSocket$IdlePhase, url: ''};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$IdlePhase = 0;
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$emptySocketState = {H: 0, Q: $elm$core$Maybe$Nothing, w: false, m: 0, au: ''};
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState = F2(
 	function (key, state) {
 		return A2(
 			$elm$core$Maybe$withDefault,
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$emptySocketState,
-			A2($elm$core$Dict$get, key, state.socketStates));
+			A2($elm$core$Dict$get, key, state.a));
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$doClose = F3(
 	function (state, key, reason) {
 		var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-		return (!_Utils_eq(socketState.phase, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase)) ? _Utils_Tuple2(
-			$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-				_Utils_update(
-					state,
-					{
-						continuations: function () {
-							var _v0 = socketState.continuationId;
-							if (_v0.$ === 'Nothing') {
-								return state.continuations;
-							} else {
-								var id = _v0.a;
-								return A2($elm$core$Dict$remove, id, state.continuations);
-							}
-						}(),
-						socketStates: A2($elm$core$Dict$remove, key, state.socketStates)
-					})),
+		return (socketState.m !== 2) ? _Utils_Tuple2(
+			_Utils_update(
+				state,
+				{
+					o: function () {
+						var _v0 = socketState.Q;
+						if (_v0.$ === 1) {
+							return state.o;
+						} else {
+							var id = _v0.a;
+							return A2($elm$core$Dict$remove, id, state.o);
+						}
+					}(),
+					a: A2($elm$core$Dict$remove, key, state.a)
+				}),
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse) : _Utils_Tuple2(
-			$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-				_Utils_update(
-					state,
-					{
-						socketStates: A3(
-							$elm$core$Dict$insert,
-							key,
-							_Utils_update(
-								socketState,
-								{phase: $billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosingPhase}),
-							state.socketStates)
-					})),
+			_Utils_update(
+				state,
+				{
+					a: A3(
+						$elm$core$Dict$insert,
+						key,
+						_Utils_update(
+							socketState,
+							{m: 3}),
+						state.a)
+				}),
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$CmdResponse(
 				$billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POClose(
-					{key: key, reason: 'user request'})));
+					{ao: key, g: 'user request'})));
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketAlreadyOpenError = function (a) {
-	return {$: 'SocketAlreadyOpenError', a: a};
+	return {$: 0, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketClosingError = function (a) {
-	return {$: 'SocketClosingError', a: a};
+	return {$: 2, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketConnectingError = function (a) {
-	return {$: 'SocketConnectingError', a: a};
+	return {$: 1, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$checkUsedSocket = F2(
 	function (state, key) {
 		var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-		var _v0 = socketState.phase;
-		switch (_v0.$) {
-			case 'IdlePhase':
+		var _v0 = socketState.m;
+		switch (_v0) {
+			case 0:
 				return $elm$core$Result$Ok(socketState);
-			case 'ConnectedPhase':
+			case 2:
 				return $elm$core$Result$Err(
 					_Utils_Tuple2(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+						state,
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 							$billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketAlreadyOpenError(key))));
-			case 'ConnectingPhase':
+			case 1:
 				return $elm$core$Result$Err(
 					_Utils_Tuple2(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+						state,
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 							$billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketConnectingError(key))));
 			default:
 				return $elm$core$Result$Err(
 					_Utils_Tuple2(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+						state,
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 							$billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketClosingError(key))));
 		}
@@ -8576,35 +8542,34 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$checkUsedSocket = F2(
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$doOpen = F4(
 	function (state, key, url, keepAlive) {
 		var _v0 = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$checkUsedSocket, state, key);
-		if (_v0.$ === 'Err') {
+		if (_v0.$ === 1) {
 			var res = _v0.a;
 			return res;
 		} else {
 			var socketState = _v0.a;
 			return _Utils_Tuple2(
-				$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-					_Utils_update(
-						state,
-						{
-							socketStates: A3(
-								$elm$core$Dict$insert,
-								key,
-								_Utils_update(
-									socketState,
-									{keepAlive: keepAlive, phase: $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectingPhase, url: url}),
-								state.socketStates)
-						})),
+				_Utils_update(
+					state,
+					{
+						a: A3(
+							$elm$core$Dict$insert,
+							key,
+							_Utils_update(
+								socketState,
+								{w: keepAlive, m: 1, au: url}),
+							state.a)
+					}),
 				$billstclair$elm_websocket_client$PortFunnel$WebSocket$CmdResponse(
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POOpen(
-						{key: key, url: url})));
+						{ao: key, au: url})));
 		}
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketNotOpenError = function (a) {
-	return {$: 'SocketNotOpenError', a: a};
+	return {$: 3, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$queueSend = F3(
 	function (state, key, message) {
-		var queues = state.queues;
+		var queues = state.C;
 		var current = A2(
 			$elm$core$Maybe$withDefault,
 			_List_Nil,
@@ -8615,77 +8580,76 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$queueSend = F3(
 			_List_fromArray(
 				[message]));
 		return _Utils_Tuple2(
-			$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-				_Utils_update(
-					state,
-					{
-						queues: A3($elm$core$Dict$insert, key, _new, queues)
-					})),
+			_Utils_update(
+				state,
+				{
+					C: A3($elm$core$Dict$insert, key, _new, queues)
+				}),
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$doSend = F3(
 	function (state, key, message) {
 		var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-		return (!_Utils_eq(socketState.phase, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase)) ? ((!socketState.backoff) ? _Utils_Tuple2(
-			$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+		return (socketState.m !== 2) ? ((!socketState.H) ? _Utils_Tuple2(
+			state,
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 				$billstclair$elm_websocket_client$PortFunnel$WebSocket$SocketNotOpenError(key))) : A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$queueSend, state, key, message)) : (_Utils_eq(
-			A2($elm$core$Dict$get, key, state.queues),
+			A2($elm$core$Dict$get, key, state.C),
 			$elm$core$Maybe$Nothing) ? _Utils_Tuple2(
-			$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+			state,
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$CmdResponse(
 				$billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POSend(
-					{key: key, message: message}))) : A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$queueSend, state, key, message));
+					{ao: key, bJ: message}))) : A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$queueSend, state, key, message));
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$getContinuation = F2(
 	function (id, state) {
-		var _v0 = A2($elm$core$Dict$get, id, state.continuations);
-		if (_v0.$ === 'Nothing') {
+		var _v0 = A2($elm$core$Dict$get, id, state.o);
+		if (_v0.$ === 1) {
 			return $elm$core$Maybe$Nothing;
 		} else {
 			var continuation = _v0.a;
 			return $elm$core$Maybe$Just(
 				_Utils_Tuple3(
-					continuation.key,
-					continuation.kind,
+					continuation.ao,
+					continuation.aE,
 					_Utils_update(
 						state,
 						{
-							continuations: A2($elm$core$Dict$remove, id, state.continuations)
+							o: A2($elm$core$Dict$remove, id, state.o)
 						})));
 		}
 	});
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$RetryConnection = {$: 'RetryConnection'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$RetryConnection = 0;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$allocateContinuation = F3(
 	function (key, kind, state) {
-		var counter = state.continuationCounter + 1;
+		var counter = state.aj + 1;
 		var id = $elm$core$String$fromInt(counter);
-		var continuation = {key: key, kind: kind};
+		var continuation = {ao: key, aE: kind};
 		var _v0 = function () {
-			var _v1 = A2($elm$core$Dict$get, key, state.socketStates);
-			if (_v1.$ === 'Nothing') {
+			var _v1 = A2($elm$core$Dict$get, key, state.a);
+			if (_v1.$ === 1) {
 				return _Utils_Tuple2(
-					state.continuations,
+					state.o,
 					A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state));
 			} else {
 				var sockState = _v1.a;
-				var _v2 = sockState.continuationId;
-				if (_v2.$ === 'Nothing') {
+				var _v2 = sockState.Q;
+				if (_v2.$ === 1) {
 					return _Utils_Tuple2(
-						state.continuations,
+						state.o,
 						_Utils_update(
 							sockState,
 							{
-								continuationId: $elm$core$Maybe$Just(id)
+								Q: $elm$core$Maybe$Just(id)
 							}));
 				} else {
 					var oldid = _v2.a;
 					return _Utils_Tuple2(
-						A2($elm$core$Dict$remove, oldid, state.continuations),
+						A2($elm$core$Dict$remove, oldid, state.o),
 						_Utils_update(
 							sockState,
 							{
-								continuationId: $elm$core$Maybe$Just(id)
+								Q: $elm$core$Maybe$Just(id)
 							}));
 				}
 			}
@@ -8697,9 +8661,9 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$allocateContinuation 
 			_Utils_update(
 				state,
 				{
-					continuationCounter: counter,
-					continuations: A3($elm$core$Dict$insert, id, continuation, continuations),
-					socketStates: A3($elm$core$Dict$insert, key, socketState, state.socketStates)
+					aj: counter,
+					o: A3($elm$core$Dict$insert, id, continuation, continuations),
+					a: A3($elm$core$Dict$insert, key, socketState, state.a)
 				}));
 	});
 var $elm$core$Basics$pow = _Basics_pow;
@@ -8709,65 +8673,63 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$backoffMillis = funct
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$maxBackoff = 10;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$unexpectedClose = F2(
 	function (state, _v0) {
-		var key = _v0.key;
-		var code = _v0.code;
-		var reason = _v0.reason;
-		var wasClean = _v0.wasClean;
+		var key = _v0.ao;
+		var code = _v0.bw;
+		var reason = _v0.g;
+		var wasClean = _v0.G;
 		return _Utils_Tuple2(
-			$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-				_Utils_update(
-					state,
-					{
-						socketStates: A2($elm$core$Dict$remove, key, state.socketStates)
-					})),
+			_Utils_update(
+				state,
+				{
+					a: A2($elm$core$Dict$remove, key, state.a)
+				}),
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosedResponse(
 				{
-					code: $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCode(code),
-					expected: false,
-					key: key,
-					reason: reason,
-					wasClean: wasClean
+					bw: $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCode(code),
+					aY: false,
+					ao: key,
+					g: reason,
+					G: wasClean
 				}));
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$handleUnexpectedClose = F2(
 	function (state, closedRecord) {
-		var key = closedRecord.key;
+		var key = closedRecord.ao;
 		var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-		var backoff = 1 + socketState.backoff;
-		if ((_Utils_cmp(backoff, $billstclair$elm_websocket_client$PortFunnel$WebSocket$maxBackoff) > 0) || (((backoff === 1) && (!_Utils_eq(socketState.phase, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase))) || (closedRecord.bytesQueued > 0))) {
+		var backoff = 1 + socketState.H;
+		if ((_Utils_cmp(backoff, $billstclair$elm_websocket_client$PortFunnel$WebSocket$maxBackoff) > 0) || (((backoff === 1) && (socketState.m !== 2)) || (closedRecord.P > 0))) {
 			return A2(
 				$billstclair$elm_websocket_client$PortFunnel$WebSocket$unexpectedClose,
 				state,
 				_Utils_update(
 					closedRecord,
 					{
-						code: (_Utils_cmp(backoff, $billstclair$elm_websocket_client$PortFunnel$WebSocket$maxBackoff) > 0) ? $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeNumber($billstclair$elm_websocket_client$PortFunnel$WebSocket$TimedOutOnReconnect) : closedRecord.code
+						bw: (_Utils_cmp(backoff, $billstclair$elm_websocket_client$PortFunnel$WebSocket$maxBackoff) > 0) ? $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeNumber(15) : closedRecord.bw
 					}));
 		} else {
-			if (socketState.url === '') {
+			if (socketState.au === '') {
 				return A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$unexpectedClose, state, closedRecord);
 			} else {
-				var _v0 = A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$allocateContinuation, key, $billstclair$elm_websocket_client$PortFunnel$WebSocket$RetryConnection, state);
+				var _v0 = A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$allocateContinuation, key, 0, state);
 				var id = _v0.a;
 				var state2 = _v0.b;
 				var delay = $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PODelay(
 					{
-						id: id,
-						millis: $billstclair$elm_websocket_client$PortFunnel$WebSocket$backoffMillis(backoff)
+						u: id,
+						T: $billstclair$elm_websocket_client$PortFunnel$WebSocket$backoffMillis(backoff)
 					});
 				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-						_Utils_update(
-							state2,
-							{
-								socketStates: A3(
-									$elm$core$Dict$insert,
-									key,
-									_Utils_update(
-										socketState,
-										{backoff: backoff}),
-									state.socketStates)
-							})),
+					_Utils_update(
+						state2,
+						{
+							a: A3(
+								$elm$core$Dict$insert,
+								key,
+								_Utils_update(
+									socketState,
+									{H: backoff}),
+								state.a)
+						}),
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$CmdResponse(delay));
 			}
 		}
@@ -8775,7 +8737,7 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$handleUnexpectedClose
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
 		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (_v0.$ === 'Just') {
+		if (!_v0.$) {
 			return true;
 		} else {
 			return false;
@@ -8783,48 +8745,45 @@ var $elm$core$Dict$member = F2(
 	});
 var $elm$core$Set$member = F2(
 	function (key, _v0) {
-		var dict = _v0.a;
+		var dict = _v0;
 		return A2($elm$core$Dict$member, key, dict);
 	});
-var $billstclair$elm_websocket_client$PortFunnel$WebSocket$DrainOutputQueue = {$: 'DrainOutputQueue'};
+var $billstclair$elm_websocket_client$PortFunnel$WebSocket$DrainOutputQueue = 1;
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$ListResponse = function (a) {
-	return {$: 'ListResponse', a: a};
+	return {$: 2, a: a};
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$processQueuedMessage = F3(
 	function (state, key, reconnectedResponse) {
-		var queues = state.queues;
+		var queues = state.C;
 		var _v0 = A2($elm$core$Dict$get, key, queues);
-		if (_v0.$ === 'Nothing') {
-			return _Utils_Tuple2(
-				$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
-				reconnectedResponse);
+		if (_v0.$ === 1) {
+			return _Utils_Tuple2(state, reconnectedResponse);
 		} else {
 			if (!_v0.a.b) {
 				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-						_Utils_update(
-							state,
-							{
-								queues: A2($elm$core$Dict$remove, key, queues)
-							})),
+					_Utils_update(
+						state,
+						{
+							C: A2($elm$core$Dict$remove, key, queues)
+						}),
 					reconnectedResponse);
 			} else {
 				var _v1 = _v0.a;
 				var message = _v1.a;
 				var tail = _v1.b;
 				var posend = $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POSend(
-					{key: key, message: message});
-				var _v2 = A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$allocateContinuation, key, $billstclair$elm_websocket_client$PortFunnel$WebSocket$DrainOutputQueue, state);
+					{ao: key, bJ: message});
+				var _v2 = A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$allocateContinuation, key, 1, state);
 				var id = _v2.a;
 				var state2 = _v2.b;
 				var podelay = $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PODelay(
-					{id: id, millis: 20});
+					{u: id, T: 20});
 				var response = $billstclair$elm_websocket_client$PortFunnel$WebSocket$ListResponse(
 					$elm$core$List$concat(
 						_List_fromArray(
 							[
 								function () {
-								if (reconnectedResponse.$ === 'NoResponse') {
+								if (!reconnectedResponse.$) {
 									return _List_Nil;
 								} else {
 									return _List_fromArray(
@@ -8838,191 +8797,183 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$processQueuedMessage 
 								])
 							])));
 				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-						_Utils_update(
-							state2,
-							{
-								queues: A3($elm$core$Dict$insert, key, tail, queues)
-							})),
+					_Utils_update(
+						state2,
+						{
+							C: A3($elm$core$Dict$insert, key, tail, queues)
+						}),
 					response);
 			}
 		}
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$process = F2(
 	function (mess, unboxed) {
-		var state = unboxed.a;
+		var state = unboxed;
 		switch (mess.$) {
-			case 'Startup':
+			case 0:
 				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-						_Utils_update(
-							state,
-							{isLoaded: true})),
+					_Utils_update(
+						state,
+						{aD: true}),
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
-			case 'PWillOpen':
-				var key = mess.a.key;
-				var url = mess.a.url;
-				var keepAlive = mess.a.keepAlive;
+			case 6:
+				var key = mess.a.ao;
+				var url = mess.a.au;
+				var keepAlive = mess.a.w;
 				return A4($billstclair$elm_websocket_client$PortFunnel$WebSocket$doOpen, state, key, url, keepAlive);
-			case 'PWillSend':
-				var key = mess.a.key;
-				var message = mess.a.message;
+			case 7:
+				var key = mess.a.ao;
+				var message = mess.a.bJ;
 				return A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$doSend, state, key, message);
-			case 'PWillClose':
-				var key = mess.a.key;
-				var reason = mess.a.reason;
+			case 8:
+				var key = mess.a.ao;
+				var reason = mess.a.g;
 				return A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$doClose, state, key, reason);
-			case 'PIConnected':
-				var key = mess.a.key;
-				var description = mess.a.description;
+			case 9:
+				var key = mess.a.ao;
+				var description = mess.a.j;
 				var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-				if (!_Utils_eq(socketState.phase, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectingPhase)) {
+				if (socketState.m !== 1) {
 					return _Utils_Tuple2(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+						state,
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 							$billstclair$elm_websocket_client$PortFunnel$WebSocket$UnexpectedConnectedError(
-								{description: description, key: key})));
+								{j: description, ao: key})));
 				} else {
 					var newState = _Utils_update(
 						state,
 						{
-							socketStates: A3(
+							a: A3(
 								$elm$core$Dict$insert,
 								key,
 								_Utils_update(
 									socketState,
-									{backoff: 0, phase: $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase}),
-								state.socketStates)
+									{H: 0, m: 2}),
+								state.a)
 						});
-					return (!socketState.backoff) ? _Utils_Tuple2(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(newState),
+					return (!socketState.H) ? _Utils_Tuple2(
+						newState,
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedResponse(
-							{description: description, key: key})) : A3(
+							{j: description, ao: key})) : A3(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$processQueuedMessage,
 						newState,
 						key,
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$ReconnectedResponse(
-							{description: description, key: key}));
+							{j: description, ao: key}));
 				}
-			case 'PIMessageReceived':
-				var key = mess.a.key;
-				var message = mess.a.message;
+			case 10:
+				var key = mess.a.ao;
+				var message = mess.a.bJ;
 				var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-				return (!_Utils_eq(socketState.phase, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectedPhase)) ? _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+				return (socketState.m !== 2) ? _Utils_Tuple2(
+					state,
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$UnexpectedMessageError(
-							{key: key, message: message}))) : _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
-					socketState.keepAlive ? $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse : $billstclair$elm_websocket_client$PortFunnel$WebSocket$MessageReceivedResponse(
-						{key: key, message: message}));
-			case 'PIClosed':
+							{ao: key, bJ: message}))) : _Utils_Tuple2(
+					state,
+					socketState.w ? $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse : $billstclair$elm_websocket_client$PortFunnel$WebSocket$MessageReceivedResponse(
+						{ao: key, bJ: message}));
+			case 11:
 				var closedRecord = mess.a;
-				var key = closedRecord.key;
-				var bytesQueued = closedRecord.bytesQueued;
-				var code = closedRecord.code;
-				var reason = closedRecord.reason;
-				var wasClean = closedRecord.wasClean;
+				var key = closedRecord.ao;
+				var bytesQueued = closedRecord.P;
+				var code = closedRecord.bw;
+				var reason = closedRecord.g;
+				var wasClean = closedRecord.G;
 				var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-				var expected = _Utils_eq(socketState.phase, $billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosingPhase);
-				return ((!expected) && (!A2($elm$core$Set$member, key, state.noAutoReopenKeys))) ? A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$handleUnexpectedClose, state, closedRecord) : _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-						_Utils_update(
-							state,
-							{
-								socketStates: A2($elm$core$Dict$remove, key, state.socketStates)
-							})),
+				var expected = socketState.m === 3;
+				return ((!expected) && (!A2($elm$core$Set$member, key, state.J))) ? A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$handleUnexpectedClose, state, closedRecord) : _Utils_Tuple2(
+					_Utils_update(
+						state,
+						{
+							a: A2($elm$core$Dict$remove, key, state.a)
+						}),
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$ClosedResponse(
 						{
-							code: $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCode(code),
-							expected: expected,
-							key: key,
-							reason: reason,
-							wasClean: wasClean
+							bw: $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCode(code),
+							aY: expected,
+							ao: key,
+							g: reason,
+							G: wasClean
 						}));
-			case 'PIBytesQueued':
-				var key = mess.a.key;
-				var bufferedAmount = mess.a.bufferedAmount;
-				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
-			case 'PIDelayed':
-				var id = mess.a.id;
+			case 12:
+				var key = mess.a.ao;
+				var bufferedAmount = mess.a.ac;
+				return _Utils_Tuple2(state, $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
+			case 13:
+				var id = mess.a.u;
 				var _v1 = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getContinuation, id, state);
-				if (_v1.$ === 'Nothing') {
-					return _Utils_Tuple2(
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
-						$billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
+				if (_v1.$ === 1) {
+					return _Utils_Tuple2(state, $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
 				} else {
 					var _v2 = _v1.a;
 					var key = _v2.a;
 					var kind = _v2.b;
 					var state2 = _v2.c;
-					if (kind.$ === 'DrainOutputQueue') {
+					if (kind === 1) {
 						return A3($billstclair$elm_websocket_client$PortFunnel$WebSocket$processQueuedMessage, state2, key, $billstclair$elm_websocket_client$PortFunnel$WebSocket$NoResponse);
 					} else {
 						var socketState = A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$getSocketState, key, state);
-						var url = socketState.url;
+						var url = socketState.au;
 						return (url !== '') ? _Utils_Tuple2(
-							$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(
-								_Utils_update(
-									state2,
-									{
-										socketStates: A3(
-											$elm$core$Dict$insert,
-											key,
-											_Utils_update(
-												socketState,
-												{phase: $billstclair$elm_websocket_client$PortFunnel$WebSocket$ConnectingPhase}),
-											state.socketStates)
-									})),
+							_Utils_update(
+								state2,
+								{
+									a: A3(
+										$elm$core$Dict$insert,
+										key,
+										_Utils_update(
+											socketState,
+											{m: 1}),
+										state.a)
+								}),
 							$billstclair$elm_websocket_client$PortFunnel$WebSocket$CmdResponse(
 								$billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$POOpen(
-									{key: key, url: url}))) : A2(
+									{ao: key, au: url}))) : A2(
 							$billstclair$elm_websocket_client$PortFunnel$WebSocket$unexpectedClose,
 							state,
 							{
-								bytesQueued: 0,
-								code: $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeNumber($billstclair$elm_websocket_client$PortFunnel$WebSocket$AbnormalClosure),
-								key: key,
-								reason: 'Missing URL for reconnect',
-								wasClean: false
+								P: 0,
+								bw: $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeNumber(5),
+								ao: key,
+								g: 'Missing URL for reconnect',
+								G: false
 							});
 					}
 				}
-			case 'PIError':
-				var key = mess.a.key;
-				var code = mess.a.code;
-				var description = mess.a.description;
-				var name = mess.a.name;
-				var message = mess.a.message;
+			case 14:
+				var key = mess.a.ao;
+				var code = mess.a.bw;
+				var description = mess.a.j;
+				var name = mess.a.U;
+				var message = mess.a.bJ;
 				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+					state,
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$LowLevelError(
-							{code: code, description: description, key: key, message: message, name: name})));
+							{bw: code, j: description, ao: key, bJ: message, U: name})));
 			default:
 				return _Utils_Tuple2(
-					$billstclair$elm_websocket_client$PortFunnel$WebSocket$State(state),
+					state,
 					$billstclair$elm_websocket_client$PortFunnel$WebSocket$ErrorResponse(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$InvalidMessageError(
-							{message: mess})));
+							{bJ: mess})));
 		}
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleDesc = A4($billstclair$elm_port_funnel$PortFunnel$makeModuleDesc, $billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleName, $billstclair$elm_websocket_client$PortFunnel$WebSocket$encode, $billstclair$elm_websocket_client$PortFunnel$WebSocket$decode, $billstclair$elm_websocket_client$PortFunnel$WebSocket$process);
 var $author$project$PortFunnels$websocketAccessors = A2(
 	$billstclair$elm_port_funnel$PortFunnel$StateAccessors,
 	function ($) {
-		return $.websocket;
+		return $.b6;
 	},
 	F2(
 		function (substate, state) {
 			return _Utils_update(
 				state,
-				{websocket: substate});
+				{b6: substate});
 		}));
 var $author$project$PortFunnels$handlerToFunnel = function (handler) {
-	if (handler.$ === 'WebSocketHandler') {
+	if (!handler.$) {
 		var websocketHandler = handler.a;
 		return _Utils_Tuple2(
 			$billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleName,
@@ -9046,7 +8997,7 @@ var $author$project$PortFunnels$makeFunnelDict = F2(
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeOpenWithKey = F2(
 	function (key, url) {
 		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillOpen(
-			{keepAlive: false, key: key, url: url});
+			{w: false, ao: key, au: url});
 	});
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
@@ -9056,7 +9007,7 @@ var $elm$core$Array$map = F2(
 		var tree = _v0.c;
 		var tail = _v0.d;
 		var helper = function (node) {
-			if (node.$ === 'SubTree') {
+			if (!node.$) {
 				var subTree = node.a;
 				return $elm$core$Array$SubTree(
 					A2($elm$core$Elm$JsArray$map, helper, subTree));
@@ -9075,7 +9026,7 @@ var $elm$core$Array$map = F2(
 	});
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
-		if (maybe.$ === 'Just') {
+		if (!maybe.$) {
 			var value = maybe.a;
 			return $elm$core$Maybe$Just(
 				f(value));
@@ -9085,34 +9036,34 @@ var $elm$core$Maybe$map = F2(
 	});
 var $author$project$Main$setField = F3(
 	function (field, value, model) {
-		var oldForm = model.formFields;
+		var oldForm = model.r;
 		var newForm = function () {
-			switch (field.$) {
-				case 'GameIdField':
+			switch (field) {
+				case 0:
 					return _Utils_update(
 						oldForm,
-						{gameId: value});
-				case 'UsernameField':
+						{s: value});
+				case 1:
 					return _Utils_update(
 						oldForm,
-						{username: value});
-				case 'UsernamePlaceholder':
+						{e: value});
+				case 2:
 					return _Utils_update(
 						oldForm,
-						{usernamePlaceholder: value});
+						{av: value});
 				default:
 					return _Utils_update(
 						oldForm,
-						{text: value});
+						{at: value});
 			}
 		}();
 		return _Utils_update(
 			model,
-			{formFields: newForm});
+			{r: newForm});
 	});
 var $author$project$Main$maybeSetField = F2(
 	function (field, value) {
-		if (value.$ === 'Just') {
+		if (!value.$) {
 			var v = value.a;
 			return A2($author$project$Main$setField, field, v);
 		} else {
@@ -9121,10 +9072,10 @@ var $author$project$Main$maybeSetField = F2(
 	});
 var $author$project$Protocol$PersonalDetails = F2(
 	function (myId, amAdministrator) {
-		return {amAdministrator: amAdministrator, myId: myId};
+		return {O: amAdministrator, A: myId};
 	});
 var $author$project$Protocol$PersonalDetailsResponse = function (a) {
-	return {$: 'PersonalDetailsResponse', a: a};
+	return {$: 3, a: a};
 };
 var $author$project$Protocol$personalDetailsParser = _Utils_Tuple2(
 	A3(
@@ -9136,7 +9087,7 @@ var $author$project$Protocol$personalDetailsParser = _Utils_Tuple2(
 		return $author$project$Protocol$PersonalDetailsResponse(v);
 	});
 var $author$project$Protocol$PreviousImagePackageResponse = function (a) {
-	return {$: 'PreviousImagePackageResponse', a: a};
+	return {$: 7, a: a};
 };
 var $author$project$Protocol$previousImagePackageParser = _Utils_Tuple2(
 	A2($elm$json$Json$Decode$field, 'url', $elm$json$Json$Decode$string),
@@ -9144,7 +9095,7 @@ var $author$project$Protocol$previousImagePackageParser = _Utils_Tuple2(
 		return $author$project$Protocol$PreviousImagePackageResponse(v);
 	});
 var $author$project$Protocol$PreviousTextPackageResponse = function (a) {
-	return {$: 'PreviousTextPackageResponse', a: a};
+	return {$: 6, a: a};
 };
 var $author$project$Protocol$previousTextPackageParser = _Utils_Tuple2(
 	A2($elm$json$Json$Decode$field, 'text', $elm$json$Json$Decode$string),
@@ -9153,20 +9104,20 @@ var $author$project$Protocol$previousTextPackageParser = _Utils_Tuple2(
 	});
 var $billstclair$elm_port_funnel$PortFunnel$process = F4(
 	function (accessors, _v0, genericMessage, state) {
-		var moduleDesc = _v0.a;
-		var _v1 = moduleDesc.decoder(genericMessage);
-		if (_v1.$ === 'Err') {
+		var moduleDesc = _v0;
+		var _v1 = moduleDesc.ay(genericMessage);
+		if (_v1.$ === 1) {
 			var err = _v1.a;
 			return $elm$core$Result$Err(err);
 		} else {
 			var message = _v1.a;
-			var substate = accessors.get(state);
-			var _v2 = A2(moduleDesc.process, message, substate);
+			var substate = accessors.aZ(state);
+			var _v2 = A2(moduleDesc.aK, message, substate);
 			var substate2 = _v2.a;
 			var response = _v2.b;
 			return $elm$core$Result$Ok(
 				_Utils_Tuple2(
-					A2(accessors.set, substate2, state),
+					A2(accessors.bh, substate2, state),
 					response));
 		}
 	});
@@ -9178,8 +9129,8 @@ var $Janiczek$cmd_extra$Cmd$Extra$withCmds = F2(
 	});
 var $billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
 	function (cmdPort, genericMessage, funnel, state, model) {
-		var _v0 = A4($billstclair$elm_port_funnel$PortFunnel$process, funnel.accessors, funnel.moduleDesc, genericMessage, state);
-		if (_v0.$ === 'Err') {
+		var _v0 = A4($billstclair$elm_port_funnel$PortFunnel$process, funnel.aR, funnel.a2, genericMessage, state);
+		if (_v0.$ === 1) {
 			var error = _v0.a;
 			return $elm$core$Result$Err(error);
 		} else {
@@ -9190,8 +9141,8 @@ var $billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
 				return cmdPort(
 					$billstclair$elm_port_funnel$PortFunnel$encodeGenericMessage(gm));
 			};
-			var cmd = A2(funnel.commander, gmToCmdPort, response);
-			var _v2 = A3(funnel.handler, response, state2, model);
+			var cmd = A2(funnel.aU, gmToCmdPort, response);
+			var _v2 = A3(funnel.a_, response, state2, model);
 			var model2 = _v2.a;
 			var cmd2 = _v2.b;
 			return $elm$core$Result$Ok(
@@ -9204,7 +9155,7 @@ var $billstclair$elm_port_funnel$PortFunnel$appProcess = F5(
 	});
 var $author$project$PortFunnels$appTrampoline = F5(
 	function (portGetter, genericMessage, funnel, state, model) {
-		if (funnel.$ === 'WebSocketFunnel') {
+		if (!funnel.$) {
 			var appFunnel = funnel.a;
 			return A5(
 				$billstclair$elm_port_funnel$PortFunnel$appProcess,
@@ -9227,7 +9178,7 @@ var $author$project$PortFunnels$appTrampoline = F5(
 var $billstclair$elm_port_funnel$PortFunnel$decodeValue = F2(
 	function (decoder, value) {
 		var _v0 = A2($elm$json$Json$Decode$decodeValue, decoder, value);
-		if (_v0.$ === 'Ok') {
+		if (!_v0.$) {
 			var res = _v0.a;
 			return $elm$core$Result$Ok(res);
 		} else {
@@ -9248,17 +9199,17 @@ var $billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage = function (val
 var $billstclair$elm_port_funnel$PortFunnel$processValue = F5(
 	function (funnels, appTrampoline, value, state, model) {
 		var _v0 = $billstclair$elm_port_funnel$PortFunnel$decodeGenericMessage(value);
-		if (_v0.$ === 'Err') {
+		if (_v0.$ === 1) {
 			var error = _v0.a;
 			return $elm$core$Result$Err(error);
 		} else {
 			var genericMessage = _v0.a;
-			var moduleName = genericMessage.moduleName;
+			var moduleName = genericMessage.bL;
 			var _v1 = A2($elm$core$Dict$get, moduleName, funnels);
-			if (_v1.$ === 'Just') {
+			if (!_v1.$) {
 				var funnel = _v1.a;
 				var _v2 = A4(appTrampoline, genericMessage, funnel, state, model);
-				if (_v2.$ === 'Err') {
+				if (_v2.$ === 1) {
 					var error = _v2.a;
 					return $elm$core$Result$Err(error);
 				} else {
@@ -9310,7 +9261,7 @@ var $elm$core$List$filter = F2(
 			list);
 	});
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse = function (response) {
-	if (response.$ === 'ReconnectedResponse') {
+	if (response.$ === 4) {
 		return true;
 	} else {
 		return false;
@@ -9318,10 +9269,10 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses = function (response) {
 	switch (response.$) {
-		case 'ReconnectedResponse':
+		case 4:
 			return _List_fromArray(
 				[response]);
-		case 'ListResponse':
+		case 2:
 			var list = response.a;
 			return A2($elm$core$List$filter, $billstclair$elm_websocket_client$PortFunnel$WebSocket$isReconnectedResponse, list);
 		default:
@@ -9336,11 +9287,11 @@ var $elm$core$Tuple$second = function (_v0) {
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend = F2(
 	function (key, message) {
 		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillSend(
-			{key: key, message: message});
+			{ao: key, bJ: message});
 	});
 var $author$project$Protocol$prepareSocketCommandJson = F2(
 	function (commandType, data) {
-		if (data.$ === 'Nothing') {
+		if (data.$ === 1) {
 			return $elm$json$Json$Encode$object(
 				_List_fromArray(
 					[
@@ -9362,9 +9313,9 @@ var $author$project$Protocol$prepareSocketCommandJson = F2(
 	});
 var $author$project$Protocol$prepareSocketCommand = function (command) {
 	switch (command.$) {
-		case 'Ping':
+		case 0:
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'ping', $elm$core$Maybe$Nothing);
-		case 'NewGameCommand':
+		case 1:
 			var username = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
@@ -9377,9 +9328,9 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'username',
 								$elm$json$Json$Encode$string(username))
 							]))));
-		case 'LeaveCommand':
+		case 5:
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'leave_game', $elm$core$Maybe$Nothing);
-		case 'JoinCommand':
+		case 2:
 			var gameId = command.a;
 			var username = command.b;
 			return A2(
@@ -9396,9 +9347,9 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'username',
 								$elm$json$Json$Encode$string(username))
 							]))));
-		case 'StartCommand':
+		case 4:
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'start_game', $elm$core$Maybe$Nothing);
-		case 'KickCommand':
+		case 3:
 			var playerId = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
@@ -9411,14 +9362,14 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'player_id',
 								$elm$json$Json$Encode$int(playerId))
 							]))));
-		case 'UuidCommand':
+		case 6:
 			var uuid = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
 				'my_uuid',
 				$elm$core$Maybe$Just(
 					$elm$json$Json$Encode$string(uuid)));
-		case 'TextPackageCommand':
+		case 7:
 			var text = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
@@ -9431,7 +9382,7 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'text',
 								$elm$json$Json$Encode$string(text))
 							]))));
-		case 'ImagePackageCommand':
+		case 8:
 			var image = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
@@ -9444,7 +9395,7 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 								'data',
 								$elm$json$Json$Encode$string(image))
 							]))));
-		case 'NextRoundCommand':
+		case 9:
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'next_round', $elm$core$Maybe$Nothing);
 		default:
 			var secs = command.a;
@@ -9471,7 +9422,7 @@ var $author$project$Main$sendSocketCommand = function (command) {
 				$author$project$Protocol$prepareSocketCommand(command))));
 };
 var $elm$core$Result$toMaybe = function (result) {
-	if (result.$ === 'Ok') {
+	if (!result.$) {
 		var v = result.a;
 		return $elm$core$Maybe$Just(v);
 	} else {
@@ -9480,7 +9431,7 @@ var $elm$core$Result$toMaybe = function (result) {
 };
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
-		if (maybePort.$ === 'Nothing') {
+		if (maybePort.$ === 1) {
 			return starter;
 		} else {
 			var port_ = maybePort.a;
@@ -9489,7 +9440,7 @@ var $elm$url$Url$addPort = F2(
 	});
 var $elm$url$Url$addPrefixed = F3(
 	function (prefix, maybeSegment, starter) {
-		if (maybeSegment.$ === 'Nothing') {
+		if (maybeSegment.$ === 1) {
 			return starter;
 		} else {
 			var segment = maybeSegment.a;
@@ -9500,8 +9451,8 @@ var $elm$url$Url$addPrefixed = F3(
 	});
 var $elm$url$Url$toString = function (url) {
 	var http = function () {
-		var _v0 = url.protocol;
-		if (_v0.$ === 'Http') {
+		var _v0 = url.bR;
+		if (!_v0) {
 			return 'http://';
 		} else {
 			return 'https://';
@@ -9510,17 +9461,17 @@ var $elm$url$Url$toString = function (url) {
 	return A3(
 		$elm$url$Url$addPrefixed,
 		'#',
-		url.fragment,
+		url.al,
 		A3(
 			$elm$url$Url$addPrefixed,
 			'?',
-			url.query,
+			url.ba,
 			_Utils_ap(
 				A2(
 					$elm$url$Url$addPort,
-					url.port_,
-					_Utils_ap(http, url.host)),
-				url.path)));
+					url.bQ,
+					_Utils_ap(http, url.bD)),
+				url.bP)));
 };
 var $author$project$Main$posixTimeDifferenceSeconds = F2(
 	function (a, b) {
@@ -9528,13 +9479,13 @@ var $author$project$Main$posixTimeDifferenceSeconds = F2(
 	});
 var $author$project$Main$updatePlayerTime = F2(
 	function (currentTime, player) {
-		var _v0 = player.status;
-		if (_v0.$ === 'Working') {
+		var _v0 = player.c;
+		if (_v0.$ === 1) {
 			var timeLeft = _v0.a;
 			return _Utils_update(
 				player,
 				{
-					status: $author$project$Protocol$Working(
+					c: $author$project$Protocol$Working(
 						A2(
 							$elm$core$Maybe$withDefault,
 							0,
@@ -9543,14 +9494,14 @@ var $author$project$Main$updatePlayerTime = F2(
 								function (d) {
 									return A2($author$project$Main$posixTimeDifferenceSeconds, d, currentTime);
 								},
-								player.deadline)))
+								player.ad)))
 				});
 		} else {
 			return player;
 		}
 	});
 var $author$project$Protocol$UuidResponse = function (a) {
-	return {$: 'UuidResponse', a: a};
+	return {$: 4, a: a};
 };
 var $author$project$Protocol$uuidParser = _Utils_Tuple2(
 	$elm$json$Json$Decode$string,
@@ -9559,7 +9510,7 @@ var $author$project$Protocol$uuidParser = _Utils_Tuple2(
 	});
 var $elm$core$Result$withDefault = F2(
 	function (def, result) {
-		if (result.$ === 'Ok') {
+		if (!result.$) {
 			var a = result.a;
 			return a;
 		} else {
@@ -9567,12 +9518,12 @@ var $elm$core$Result$withDefault = F2(
 		}
 	});
 var $author$project$Protocol$AllWorkloadsResponse = function (a) {
-	return {$: 'AllWorkloadsResponse', a: a};
+	return {$: 8, a: a};
 };
 var $elm$json$Json$Decode$array = _Json_decodeArray;
 var $author$project$Protocol$WorkPackageDetails = F2(
 	function (playerId, data) {
-		return {data: data, playerId: playerId};
+		return {ax: data, a7: playerId};
 	});
 var $author$project$Protocol$workpackageDecoder = $elm$json$Json$Decode$oneOf(
 	_List_fromArray(
@@ -9603,15 +9554,15 @@ var $author$project$Protocol$workloadsParser = _Utils_Tuple2(
 	function (v) {
 		return $author$project$Protocol$AllWorkloadsResponse(v);
 	});
-var $author$project$Main$wsUrl = 'ws://192.168.1.11:3030/ws';
+var $author$project$Main$wsUrl = 'ws://drawtice.helit.org/ws';
 var $author$project$Main$socketHandler = F3(
 	function (response, state, mdl) {
 		var model = _Utils_update(
 			mdl,
-			{funnelState: state});
+			{S: state});
 		switch (response.$) {
-			case 'MessageReceivedResponse':
-				var message = response.a.message;
+			case 5:
+				var message = response.a.bJ;
 				var typeDecoder = A2($elm$json$Json$Decode$field, 'type', $elm$json$Json$Decode$string);
 				var typeString = A2($elm$json$Json$Decode$decodeString, typeDecoder, message);
 				var decodeData = function (decoder) {
@@ -9622,7 +9573,7 @@ var $author$project$Main$socketHandler = F3(
 				};
 				var decodeDataUsingParser = function (parser) {
 					var _v18 = decodeData(parser.a);
-					if (_v18.$ === 'Err') {
+					if (_v18.$ === 1) {
 						var e = _v18.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
@@ -9632,7 +9583,7 @@ var $author$project$Main$socketHandler = F3(
 					}
 				};
 				var received = function () {
-					if (typeString.$ === 'Err') {
+					if (typeString.$ === 1) {
 						var e = typeString.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
@@ -9666,17 +9617,17 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$update,
 					$author$project$Main$SocketReceive(received),
 					model);
-			case 'ConnectedResponse':
+			case 3:
 				return _Utils_Tuple2(
 					model,
 					A2($author$project$Main$getLocalStorageString, model, 'uuid'));
-			case 'ClosedResponse':
-				var code = response.a.code;
+			case 6:
+				var code = response.a.bw;
 				return _Utils_Tuple2(
 					model,
 					$author$project$Main$errorLog(
 						'Websocket connection closed: ' + $billstclair$elm_websocket_client$PortFunnel$WebSocket$closedCodeToString(code)));
-			case 'ErrorResponse':
+			case 8:
 				var error = response.a;
 				return _Utils_Tuple2(
 					model,
@@ -9687,7 +9638,7 @@ var $author$project$Main$socketHandler = F3(
 				if (!_v19.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v19.a.$ === 'ReconnectedResponse') && (!_v19.b.b)) {
+					if ((_v19.a.$ === 4) && (!_v19.b.b)) {
 						var r = _v19.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
@@ -9701,13 +9652,13 @@ var $author$project$Main$storageHandler = F3(
 	function (response, state, mdl) {
 		var model = _Utils_update(
 			mdl,
-			{funnelState: state});
-		if (response.$ === 'GetResponse') {
-			var label = response.a.label;
-			var key = response.a.key;
-			var value = response.a.value;
+			{S: state});
+		if (response.$ === 1) {
+			var label = response.a.bI;
+			var key = response.a.ao;
+			var value = response.a.b4;
 			var string = function () {
-				if (value.$ === 'Nothing') {
+				if (value.$ === 1) {
 					return $elm$core$Maybe$Nothing;
 				} else {
 					var v = value.a;
@@ -9728,15 +9679,15 @@ var $author$project$Main$update = F2(
 		update:
 		while (true) {
 			switch (msg.$) {
-				case 'LinkClicked':
+				case 0:
 					var urlRequest = msg.a;
-					if (urlRequest.$ === 'Internal') {
+					if (!urlRequest.$) {
 						var url = urlRequest.a;
 						return _Utils_Tuple2(
 							model,
 							A2(
 								$elm$browser$Browser$Navigation$pushUrl,
-								model.key,
+								model.ao,
 								$elm$url$Url$toString(url)));
 					} else {
 						var href = urlRequest.a;
@@ -9744,13 +9695,13 @@ var $author$project$Main$update = F2(
 							model,
 							$elm$browser$Browser$Navigation$load(href));
 					}
-				case 'UrlChanged':
+				case 1:
 					var url = msg.a;
 					var mdl = function () {
-						var _v2 = url.fragment;
-						if (_v2.$ === 'Just') {
+						var _v2 = url.al;
+						if (!_v2.$) {
 							var f = _v2.a;
-							return A3($author$project$Main$setField, $author$project$Main$GameIdField, f, model);
+							return A3($author$project$Main$setField, 0, f, model);
 						} else {
 							return model;
 						}
@@ -9758,124 +9709,124 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							mdl,
-							{url: url}),
+							{au: url}),
 						$elm$core$Platform$Cmd$none);
-				case 'Tick':
+				case 2:
 					var newTime = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								lastUpdate: $elm$core$Maybe$Just(newTime),
-								players: function () {
-									var _v3 = model.lastUpdate;
-									if (_v3.$ === 'Nothing') {
-										return model.players;
+								aF: $elm$core$Maybe$Just(newTime),
+								l: function () {
+									var _v3 = model.aF;
+									if (_v3.$ === 1) {
+										return model.l;
 									} else {
 										var lastUpdate = _v3.a;
 										return A2(
 											$elm$core$Array$map,
 											$author$project$Main$updatePlayerTime(newTime),
-											model.players);
+											model.l);
 									}
 								}()
 							}),
-						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected, $author$project$Main$wsKey, model.funnelState.websocket) ? $elm$core$Platform$Cmd$none : $elm$core$Platform$Cmd$none);
-				case 'NoAction':
+						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected, $author$project$Main$wsKey, model.S.b6) ? $elm$core$Platform$Cmd$none : $elm$core$Platform$Cmd$none);
+				case 3:
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				case 'NewGame':
+				case 4:
 					return _Utils_Tuple2(
 						model,
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
 									$author$project$Main$sendSocketCommand(
-									$author$project$Protocol$NewGameCommand(model.formFields.username)),
-									A3($author$project$Main$putLocalStorageString, model, 'username', model.formFields.username)
+									$author$project$Protocol$NewGameCommand(model.r.e)),
+									A3($author$project$Main$putLocalStorageString, model, 'username', model.r.e)
 								])));
-				case 'JoinGame':
+				case 5:
 					return _Utils_Tuple2(
 						model,
 						$elm$core$Platform$Cmd$batch(
 							_List_fromArray(
 								[
 									$author$project$Main$sendSocketCommand(
-									A2($author$project$Protocol$JoinCommand, model.formFields.gameId, model.formFields.username)),
-									A3($author$project$Main$putLocalStorageString, model, 'username', model.formFields.username)
+									A2($author$project$Protocol$JoinCommand, model.r.s, model.r.e)),
+									A3($author$project$Main$putLocalStorageString, model, 'username', model.r.e)
 								])));
-				case 'StartGame':
+				case 6:
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand($author$project$Protocol$StartCommand));
-				case 'LeaveGame':
+				case 7:
 					return _Utils_Tuple2(
 						$author$project$Main$leaveGame(model),
 						$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
-				case 'SubmitText':
+				case 11:
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
-							$author$project$Protocol$TextPackageCommand(model.formFields.text)));
-				case 'SubmitImage':
+							$author$project$Protocol$TextPackageCommand(model.r.at)));
+				case 12:
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$canvasPort(
 							_Utils_Tuple2('snap', $elm$core$Maybe$Nothing)));
-				case 'KickPlayer':
+				case 8:
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$KickCommand(value)));
-				case 'NextRound':
+				case 9:
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand($author$project$Protocol$NextRoundCommand));
-				case 'ExtendDeadline':
+				case 10:
 					var value = msg.a;
 					var secs = $elm$core$Basics$round(value * 60);
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$ExtendDeadlineCommand(secs)));
-				case 'SetField':
+				case 13:
 					var field = msg.a;
 					var value = msg.b;
 					return _Utils_Tuple2(
 						A3($author$project$Main$setField, field, value, model),
 						$elm$core$Platform$Cmd$none);
-				case 'MoveWorkload':
+				case 14:
 					var dir = msg.a;
 					var workload = function () {
-						if (dir.$ === 'Forward') {
-							return model.currentWorkload + 1;
+						if (!dir) {
+							return model.v + 1;
 						} else {
-							return model.currentWorkload - 1;
+							return model.v - 1;
 						}
 					}();
 					var workload2 = (workload < 0) ? 0 : workload;
 					var maxWorkload = $elm$core$Array$length(
-						A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)) - 1;
+						A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.N)) - 1;
 					var workload3 = (_Utils_cmp(workload2, maxWorkload) > 0) ? maxWorkload : workload2;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{currentWorkload: workload3}),
+							{v: workload3}),
 						$elm$core$Platform$Cmd$none);
-				case 'Send':
+				case 15:
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$cmdPort(value));
-				case 'Receive':
+				case 16:
 					var value = msg.a;
 					var _v5 = A4(
 						$author$project$PortFunnels$processValue,
 						$author$project$Main$cyclic$funnelDict(),
 						value,
-						model.funnelState,
+						model.S,
 						model);
-					if (_v5.$ === 'Err') {
+					if (_v5.$ === 1) {
 						var error = _v5.a;
 						return _Utils_Tuple2(
 							model,
@@ -9894,7 +9845,7 @@ var $author$project$Main$update = F2(
 								$elm$json$Json$Decode$decodeValue,
 								A2($elm$json$Json$Decode$field, 'tag', $elm$json$Json$Decode$string),
 								value);
-							if ((_v6.$ === 'Ok') && (_v6.a === 'startup')) {
+							if ((!_v6.$) && (_v6.a === 'startup')) {
 								return A2(
 									$Janiczek$cmd_extra$Cmd$Extra$addCmd,
 									$author$project$Main$sendWebSocket(
@@ -9907,7 +9858,7 @@ var $author$project$Main$update = F2(
 							return res;
 						}
 					}
-				case 'StorageReceive':
+				case 18:
 					var key = msg.a;
 					var value = msg.b;
 					switch (key) {
@@ -9915,18 +9866,18 @@ var $author$project$Main$update = F2(
 							return _Utils_Tuple2(
 								A3(
 									$author$project$Main$setField,
-									$author$project$Main$UsernameField,
+									1,
 									A2($elm$core$Maybe$withDefault, '', value),
 									model),
 								$elm$core$Platform$Cmd$none);
 						case 'uuid':
-							if (value.$ === 'Just') {
+							if (!value.$) {
 								var uuid = value.a;
 								return _Utils_Tuple2(
 									_Utils_update(
 										model,
 										{
-											uuid: $elm$core$Maybe$Just(uuid)
+											aw: $elm$core$Maybe$Just(uuid)
 										}),
 									$author$project$Main$sendSocketCommand(
 										$author$project$Protocol$UuidCommand(uuid)));
@@ -9936,20 +9887,20 @@ var $author$project$Main$update = F2(
 						default:
 							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
-				case 'SocketReceive':
+				case 17:
 					var value = msg.a;
 					switch (value.$) {
-						case 'GameDetailsResponse':
+						case 2:
 							var details = value.a;
-							var showingGameoverSelf = model.showingGameoverSelf || (_Utils_eq(details.status, $author$project$Protocol$GameOver) && (!_Utils_eq(model.status, $author$project$Protocol$GameOver)));
+							var showingGameoverSelf = model.Y || ((details.c === 5) && (model.c !== 5));
 							var playerCreator = F2(
 								function (id, player) {
 									return {
-										deadline: (!player.deadline) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-											$elm$time$Time$millisToPosix(player.deadline * 1000)),
-										image: player.imageUrl,
-										isAdministrator: player.isAdmin,
-										isMe: A2(
+										ad: (!player.ad) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+											$elm$time$Time$millisToPosix(player.ad * 1000)),
+										aB: player.bE,
+										a1: player.bH,
+										an: A2(
 											$elm$core$Maybe$withDefault,
 											false,
 											A2(
@@ -9957,40 +9908,40 @@ var $author$project$Main$update = F2(
 												function (i) {
 													return _Utils_eq(i, id);
 												},
-												model.myId)),
-										status: player.stuck ? $author$project$Protocol$Stuck : player.status,
-										username: player.username
+												model.A)),
+										c: player.bZ ? $author$project$Protocol$Stuck : player.c,
+										e: player.e
 									};
 								});
 							var players = A2(
 								$elm$core$Array$indexedMap,
 								playerCreator,
-								$elm$core$Array$fromList(details.players));
+								$elm$core$Array$fromList(details.l));
 							var me = A2(
 								$elm$core$Maybe$andThen,
 								function (id) {
 									return A2($elm$core$Array$get, id, players);
 								},
-								model.myId);
+								model.A);
 							var username = A2(
 								$elm$core$Maybe$map,
 								function (p) {
-									return p.username;
+									return p.e;
 								},
 								me);
 							var mdl = A3(
 								$author$project$Main$maybeSetField,
-								$author$project$Main$UsernameField,
+								1,
 								username,
 								_Utils_update(
 									model,
 									{
-										gameId: $elm$core$Maybe$Just(details.alias),
-										gameKey: $elm$core$Maybe$Just(
-											details.uuid + ('-' + $elm$core$String$fromInt(details.currentStage))),
-										players: players,
-										showingGameoverSelf: showingGameoverSelf,
-										status: details.status
+										s: $elm$core$Maybe$Just(details.bq),
+										am: $elm$core$Maybe$Just(
+											details.aw + ('-' + $elm$core$String$fromInt(details.bx))),
+										l: players,
+										Y: showingGameoverSelf,
+										c: details.c
 									}));
 							return _Utils_Tuple2(
 								mdl,
@@ -10003,76 +9954,76 @@ var $author$project$Main$update = F2(
 											A2(
 												$elm$core$Maybe$map,
 												function (p) {
-													return A3($author$project$Main$putLocalStorageString, mdl, 'username', p.username);
+													return A3($author$project$Main$putLocalStorageString, mdl, 'username', p.e);
 												},
 												me)),
 											_Utils_eq(
-											mdl.url,
+											mdl.au,
 											$author$project$Main$getGameLink(mdl)) ? $elm$core$Platform$Cmd$none : A2(
 											$elm$browser$Browser$Navigation$pushUrl,
-											mdl.key,
+											mdl.ao,
 											$elm$url$Url$toString(
 												$author$project$Main$getGameLink(mdl)))
 										])));
-						case 'ErrorResponse':
+						case 0:
 							var error = value.a;
 							return _Utils_Tuple2(
 								model,
 								$author$project$Main$errorLog(error));
-						case 'PongResponse':
+						case 1:
 							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-						case 'PersonalDetailsResponse':
+						case 3:
 							var details = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
-										amAdministrator: details.amAdministrator,
-										myId: $elm$core$Maybe$Just(details.myId),
-										players: A2(
+										O: details.O,
+										A: $elm$core$Maybe$Just(details.A),
+										l: A2(
 											$elm$core$Array$indexedMap,
 											function (i) {
 												return function (p) {
 													return _Utils_update(
 														p,
 														{
-															isMe: _Utils_eq(i, details.myId)
+															an: _Utils_eq(i, details.A)
 														});
 												};
 											},
-											model.players)
+											model.l)
 									}),
 								$elm$core$Platform$Cmd$none);
-						case 'UuidResponse':
+						case 4:
 							var uuid = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
-										uuid: $elm$core$Maybe$Just(uuid)
+										aw: $elm$core$Maybe$Just(uuid)
 									}),
 								A3($author$project$Main$putLocalStorageString, model, 'uuid', uuid));
-						case 'LeftGameResponse':
+						case 5:
 							return _Utils_Tuple2(
 								$author$project$Main$leaveGame(model),
 								$elm$core$Platform$Cmd$none);
-						case 'PreviousTextPackageResponse':
+						case 6:
 							var text = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
-										previousPackage: $elm$core$Maybe$Just(
+										W: $elm$core$Maybe$Just(
 											$author$project$Protocol$TextPackage(text))
 									}),
 								$elm$core$Platform$Cmd$none);
-						case 'PreviousImagePackageResponse':
+						case 7:
 							var path = value.a;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
 									{
-										previousPackage: $elm$core$Maybe$Just(
+										W: $elm$core$Maybe$Just(
 											$author$project$Protocol$ImagePackage(
 												_Utils_ap($author$project$Main$imageUrl, path)))
 									}),
@@ -10080,7 +10031,7 @@ var $author$project$Main$update = F2(
 						default:
 							var workloads = value.a;
 							var correctURL = function (data) {
-								if ((data.$ === 'Just') && (data.a.$ === 'ImagePackage')) {
+								if ((!data.$) && (data.a.$ === 1)) {
 									var url = data.a.a;
 									return $elm$core$Maybe$Just(
 										$author$project$Protocol$ImagePackage(
@@ -10093,7 +10044,7 @@ var $author$project$Main$update = F2(
 								return _Utils_update(
 									workpackage,
 									{
-										data: correctURL(workpackage.data)
+										ax: correctURL(workpackage.ax)
 									});
 							};
 							var correctionOuter = function (workload) {
@@ -10106,49 +10057,49 @@ var $author$project$Main$update = F2(
 								_Utils_update(
 									model,
 									{
-										playerCapture: $elm$core$Maybe$Just(model.players),
-										workloads: $elm$core$Maybe$Just(
+										as: $elm$core$Maybe$Just(model.l),
+										N: $elm$core$Maybe$Just(
 											correctURLs(workloads))
 									}),
 								$elm$core$Platform$Cmd$none);
 					}
-				case 'ShowError':
+				case 19:
 					var value = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								error: $elm$core$Maybe$Just(value)
+								ak: $elm$core$Maybe$Just(value)
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'RemoveError':
+				case 20:
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{error: $elm$core$Maybe$Nothing}),
+							{ak: $elm$core$Maybe$Nothing}),
 						$elm$core$Platform$Cmd$none);
-				case 'ShowConfirmDialog':
+				case 21:
 					var message = msg.a;
 					var newMsg = msg.b;
-					var nextDialogId = model.nextDialogId;
-					var dict = A3($elm$core$Dict$insert, nextDialogId, newMsg, model.pendingDialogs);
+					var nextDialogId = model.aH;
+					var dict = A3($elm$core$Dict$insert, nextDialogId, newMsg, model.V);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{nextDialogId: nextDialogId + 1, pendingDialogs: dict}),
+							{aH: nextDialogId + 1, V: dict}),
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
-				case 'ShownConfirmDialog':
+				case 22:
 					var _v11 = msg.a;
 					var pressed = _v11.a;
 					var dialogId = _v11.b;
-					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
-					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
+					var newMsg = A2($elm$core$Dict$get, dialogId, model.V);
+					var dict = A2($elm$core$Dict$remove, dialogId, model.V);
 					var mdl = _Utils_update(
 						model,
-						{pendingDialogs: dict});
+						{V: dict});
 					if (pressed) {
-						if (newMsg.$ === 'Just') {
+						if (!newMsg.$) {
 							var m = newMsg.a;
 							var $temp$msg = m,
 								$temp$model = mdl;
@@ -10161,13 +10112,13 @@ var $author$project$Main$update = F2(
 					} else {
 						return _Utils_Tuple2(mdl, $elm$core$Platform$Cmd$none);
 					}
-				case 'SendImage':
+				case 23:
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
 							$author$project$Protocol$ImagePackageCommand(value)));
-				case 'ShowLightbox':
+				case 24:
 					var value = msg.a;
 					return _Utils_Tuple2(
 						model,
@@ -10179,7 +10130,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{showingGameoverSelf: false}),
+							{Y: false}),
 						$elm$core$Platform$Cmd$none);
 			}
 		}
@@ -10200,17 +10151,14 @@ function $author$project$Main$cyclic$handlers() {
 			$author$project$PortFunnels$LocalStorageHandler($author$project$Main$storageHandler)
 		]);
 }
-try {
-	var $author$project$Main$funnelDict = $author$project$Main$cyclic$funnelDict();
-	$author$project$Main$cyclic$funnelDict = function () {
-		return $author$project$Main$funnelDict;
-	};
-	var $author$project$Main$handlers = $author$project$Main$cyclic$handlers();
-	$author$project$Main$cyclic$handlers = function () {
-		return $author$project$Main$handlers;
-	};
-} catch ($) {
-	throw 'Some top-level definitions from `Main` are causing infinite recursion:\n\n  ┌─────┐\n  │    funnelDict\n  │     ↓\n  │    handlers\n  │     ↓\n  │    socketHandler\n  │     ↓\n  │    storageHandler\n  │     ↓\n  │    update\n  └─────┘\n\nThese errors are very tricky, so read https://elm-lang.org/0.19.1/bad-recursion to learn how to fix it!';}
+var $author$project$Main$funnelDict = $author$project$Main$cyclic$funnelDict();
+$author$project$Main$cyclic$funnelDict = function () {
+	return $author$project$Main$funnelDict;
+};
+var $author$project$Main$handlers = $author$project$Main$cyclic$handlers();
+$author$project$Main$cyclic$handlers = function () {
+	return $author$project$Main$handlers;
+};
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -10221,7 +10169,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $author$project$Main$SubmitImage = {$: 'SubmitImage'};
+var $author$project$Main$SubmitImage = {$: 12};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -10235,8 +10183,8 @@ var $author$project$Main$getWorkPackageText = function (model) {
 	var previousPackage = A2(
 		$elm$core$Maybe$withDefault,
 		$author$project$Protocol$TextPackage('an armadillo'),
-		model.previousPackage);
-	if (previousPackage.$ === 'TextPackage') {
+		model.W);
+	if (!previousPackage.$) {
 		var t = previousPackage.a;
 		return t;
 	} else {
@@ -10249,7 +10197,7 @@ var $elm$virtual_dom$VirtualDom$node = function (tag) {
 };
 var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
+	return {$: 0, a: a};
 };
 var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$on = F2(
@@ -10316,7 +10264,7 @@ var $author$project$Main$viewDrawing = function (model) {
 						A2(
 						$elm$html$Html$Attributes$attribute,
 						'key',
-						A2($elm$core$Maybe$withDefault, '', model.gameKey))
+						A2($elm$core$Maybe$withDefault, '', model.am))
 					]),
 				_List_Nil),
 				A2(
@@ -10336,22 +10284,22 @@ var $author$project$Main$getMe = function (model) {
 	return A2(
 		$elm$core$Maybe$andThen,
 		function (i) {
-			return A2($elm$core$Array$get, i, model.players);
+			return A2($elm$core$Array$get, i, model.l);
 		},
-		model.myId);
+		model.A);
 };
 var $author$project$Main$isGameRunning = function (model) {
-	var _v0 = model.status;
-	switch (_v0.$) {
-		case 'NoGame':
+	var _v0 = model.c;
+	switch (_v0) {
+		case 0:
 			return false;
-		case 'Lobby':
+		case 1:
 			return false;
-		case 'GameOver':
+		case 5:
 			return false;
-		case 'Starting':
+		case 2:
 			return true;
-		case 'Drawing':
+		case 3:
 			return true;
 		default:
 			return true;
@@ -10359,9 +10307,9 @@ var $author$project$Main$isGameRunning = function (model) {
 };
 var $author$project$Main$amDone = function (model) {
 	var _v0 = $author$project$Main$getMe(model);
-	if (_v0.$ === 'Just') {
+	if (!_v0.$) {
 		var me = _v0.a;
-		return $author$project$Main$isGameRunning(model) && _Utils_eq(me.status, $author$project$Protocol$Done);
+		return $author$project$Main$isGameRunning(model) && _Utils_eq(me.c, $author$project$Protocol$Done);
 	} else {
 		return false;
 	}
@@ -10399,12 +10347,12 @@ var $author$project$Main$formatTimeDifference = function (seconds) {
 	return ((seconds < 0) ? '-' : '') + (A3(
 		$elm$core$String$padLeft,
 		2,
-		_Utils_chr('0'),
+		'0',
 		$elm$core$String$fromInt(
 			$elm$core$Basics$abs((seconds / 60) | 0))) + (':' + A3(
 		$elm$core$String$padLeft,
 		2,
-		_Utils_chr('0'),
+		'0',
 		$elm$core$String$fromInt(
 			$elm$core$Basics$abs(seconds % 60)))));
 };
@@ -10424,8 +10372,8 @@ var $author$project$Main$viewPlayerAvatar = function (player) {
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$class('avatar'),
-				$elm$html$Html$Attributes$alt(player.username + ' Avatar'),
-				$elm$html$Html$Attributes$src(player.image)
+				$elm$html$Html$Attributes$alt(player.e + ' Avatar'),
+				$elm$html$Html$Attributes$src(player.aB)
 			]),
 		_List_Nil);
 };
@@ -10440,7 +10388,7 @@ var $author$project$Main$viewHeader = function (model) {
 		_Utils_ap(
 			function () {
 				var _v0 = $author$project$Main$getMe(model);
-				if (_v0.$ === 'Nothing') {
+				if (_v0.$ === 1) {
 					return _List_Nil;
 				} else {
 					var me = _v0.a;
@@ -10463,7 +10411,7 @@ var $author$project$Main$viewHeader = function (model) {
 										]),
 									_List_fromArray(
 										[
-											$elm$html$Html$text(me.username)
+											$elm$html$Html$text(me.e)
 										]))
 								])),
 							A2(
@@ -10475,9 +10423,9 @@ var $author$project$Main$viewHeader = function (model) {
 							_List_fromArray(
 								[
 									function () {
-									var _v1 = me.status;
+									var _v1 = me.c;
 									switch (_v1.$) {
-										case 'Done':
+										case 0:
 											return A2(
 												$elm$html$Html$span,
 												_List_fromArray(
@@ -10488,7 +10436,7 @@ var $author$project$Main$viewHeader = function (model) {
 													[
 														$elm$html$Html$text('Ready')
 													]));
-										case 'Working':
+										case 1:
 											var timeLeft = _v1.a;
 											return A2(
 												$elm$html$Html$span,
@@ -10502,7 +10450,7 @@ var $author$project$Main$viewHeader = function (model) {
 														$author$project$Main$formatTimeDifference(
 															$elm$core$Basics$round(timeLeft)))
 													]));
-										case 'Uploading':
+										case 2:
 											var percentage = _v1.a;
 											return A2(
 												$elm$html$Html$span,
@@ -10545,17 +10493,17 @@ var $author$project$Main$viewHeader = function (model) {
 						[
 							$elm$html$Html$text(
 							function () {
-								var _v2 = model.status;
-								switch (_v2.$) {
-									case 'NoGame':
+								var _v2 = model.c;
+								switch (_v2) {
+									case 0:
 										return 'Ready';
-									case 'Lobby':
+									case 1:
 										return 'Waiting for Players…';
-									case 'Starting':
+									case 2:
 										return 'Starting…';
-									case 'Drawing':
+									case 3:
 										return 'Drawing…';
-									case 'Understanding':
+									case 4:
 										return 'Understanding…';
 									default:
 										return 'Game Over';
@@ -10564,8 +10512,8 @@ var $author$project$Main$viewHeader = function (model) {
 						]))
 				])));
 };
-var $author$project$Main$JoinGame = {$: 'JoinGame'};
-var $author$project$Main$NewGame = {$: 'NewGame'};
+var $author$project$Main$JoinGame = {$: 5};
+var $author$project$Main$NewGame = {$: 4};
 var $elm$html$Html$Attributes$autocomplete = function (bool) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -10582,7 +10530,7 @@ var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
+	return {$: 1, a: a};
 };
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
@@ -10613,7 +10561,7 @@ var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
 	return _Utils_Tuple2(msg, true);
 };
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
+	return {$: 2, a: a};
 };
 var $elm$html$Html$Events$preventDefaultOn = F2(
 	function (event, decoder) {
@@ -10680,12 +10628,12 @@ var $author$project$Main$viewLanding = function (model) {
 									[
 										$elm$html$Html$Attributes$class('landing-username'),
 										$elm$html$Html$Attributes$name('username'),
-										$elm$html$Html$Attributes$placeholder(model.formFields.usernamePlaceholder),
+										$elm$html$Html$Attributes$placeholder(model.r.av),
 										$elm$html$Html$Attributes$required(true),
 										$elm$html$Html$Events$onInput(
-										$author$project$Main$SetField($author$project$Main$UsernameField)),
+										$author$project$Main$SetField(1)),
 										$elm$html$Html$Attributes$autocomplete(true),
-										$elm$html$Html$Attributes$value(model.formFields.username)
+										$elm$html$Html$Attributes$value(model.r.e)
 									]),
 								_List_Nil),
 								A2(
@@ -10723,8 +10671,8 @@ var $author$project$Main$viewLanding = function (model) {
 								$elm$html$Html$Attributes$placeholder('GameId'),
 								$elm$html$Html$Attributes$required(true),
 								$elm$html$Html$Events$onInput(
-								$author$project$Main$SetField($author$project$Main$GameIdField)),
-								$elm$html$Html$Attributes$value(model.formFields.gameId),
+								$author$project$Main$SetField(0)),
+								$elm$html$Html$Attributes$value(model.r.s),
 								$elm$html$Html$Attributes$class('text-tt')
 							]),
 						_List_Nil),
@@ -10753,8 +10701,8 @@ var $author$project$Main$viewLanding = function (model) {
 					]))
 			]));
 };
-var $author$project$Main$LeaveGame = {$: 'LeaveGame'};
-var $author$project$Main$StartGame = {$: 'StartGame'};
+var $author$project$Main$LeaveGame = {$: 7};
+var $author$project$Main$StartGame = {$: 6};
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$Attributes$href = function (url) {
@@ -10816,8 +10764,8 @@ var $author$project$Main$viewLobby = function (model) {
 										[
 											$elm$html$Html$text(
 											function () {
-												var _v0 = url.protocol;
-												if (_v0.$ === 'Http') {
+												var _v0 = url.bR;
+												if (!_v0) {
 													return 'http://';
 												} else {
 													return 'https://';
@@ -10834,7 +10782,7 @@ var $author$project$Main$viewLobby = function (model) {
 										[
 											$elm$html$Html$text(
 											_Utils_ap(
-												url.host,
+												url.bD,
 												_Utils_ap(
 													A2(
 														$elm$core$Maybe$withDefault,
@@ -10844,8 +10792,8 @@ var $author$project$Main$viewLobby = function (model) {
 															function (p) {
 																return ':' + $elm$core$String$fromInt(p);
 															},
-															url.port_)),
-													url.path)))
+															url.bQ)),
+													url.bP)))
 										])),
 									A2(
 									$elm$html$Html$span,
@@ -10856,12 +10804,12 @@ var $author$project$Main$viewLobby = function (model) {
 									_List_fromArray(
 										[
 											$elm$html$Html$text(
-											'#' + A2($elm$core$Maybe$withDefault, '', url.fragment))
+											'#' + A2($elm$core$Maybe$withDefault, '', url.al))
 										]))
 								]));
 					}()
 					])),
-			model.amAdministrator ? _List_fromArray(
+			model.O ? _List_fromArray(
 				[
 					A2(
 					$elm$html$Html$button,
@@ -10880,7 +10828,7 @@ var $author$project$Main$viewLobby = function (model) {
 						[
 							$elm$html$Html$Attributes$class('pure-button pure-button-success landing-button'),
 							$elm$html$Html$Attributes$disabled(
-							$elm$core$Array$length(model.players) <= 1),
+							$elm$core$Array$length(model.l) <= 1),
 							$elm$html$Html$Events$onClick($author$project$Main$StartGame)
 						]),
 					_List_fromArray(
@@ -10902,11 +10850,11 @@ var $author$project$Main$viewLobby = function (model) {
 						]))
 				])));
 };
-var $author$project$Main$NoAction = {$: 'NoAction'};
-var $author$project$Main$RemoveError = {$: 'RemoveError'};
+var $author$project$Main$NoAction = {$: 3};
+var $author$project$Main$RemoveError = {$: 20};
 var $author$project$Main$hasGameStarted = function (model) {
-	var _v0 = model.gameId;
-	if (_v0.$ === 'Nothing') {
+	var _v0 = model.s;
+	if (_v0.$ === 1) {
 		return false;
 	} else {
 		return true;
@@ -10987,8 +10935,8 @@ var $author$project$Main$viewNav = function (model) {
 						]),
 					_Utils_ap(
 						function () {
-							var _v0 = model.gameId;
-							if (_v0.$ === 'Nothing') {
+							var _v0 = model.s;
+							if (_v0.$ === 1) {
 								return _List_Nil;
 							} else {
 								return _List_fromArray(
@@ -11041,8 +10989,8 @@ var $author$project$Main$viewNav = function (model) {
 							}
 						}(),
 						function () {
-							var _v1 = model.error;
-							if (_v1.$ === 'Nothing') {
+							var _v1 = model.ak;
+							if (_v1.$ === 1) {
 								return _List_Nil;
 							} else {
 								var err = _v1.a;
@@ -11144,7 +11092,7 @@ var $author$project$Main$viewNav = function (model) {
 					]))
 			]));
 };
-var $author$project$Main$CloseSelfSummary = {$: 'CloseSelfSummary'};
+var $author$project$Main$CloseSelfSummary = {$: 25};
 var $elm$core$Array$filter = F2(
 	function (isGood, array) {
 		return $elm$core$Array$fromList(
@@ -11186,7 +11134,7 @@ var $author$project$Main$lastElem = function (list) {
 	}
 };
 var $author$project$Main$ShowLightbox = function (a) {
-	return {$: 'ShowLightbox', a: a};
+	return {$: 24, a: a};
 };
 var $elm$html$Html$Attributes$download = function (fileName) {
 	return A2($elm$html$Html$Attributes$stringProperty, 'download', fileName);
@@ -11213,19 +11161,19 @@ var $author$project$Main$viewWorkpackage = F4(
 			A2(
 				$elm$core$Maybe$map,
 				function (p) {
-					return p.username;
+					return p.e;
 				},
 				A2(
 					$elm$core$Maybe$andThen,
 					function (a) {
-						return A2($elm$core$Array$get, _package.playerId, a);
+						return A2($elm$core$Array$get, _package.a7, a);
 					},
-					model.playerCapture)));
+					model.as)));
 		var uniqId = 'summary-image-' + ($elm$core$String$fromInt(loadId) + ('-' + $elm$core$String$fromInt(packageId)));
 		var html = function () {
-			var _v0 = _package.data;
-			if (_v0.$ === 'Just') {
-				if (_v0.a.$ === 'TextPackage') {
+			var _v0 = _package.ax;
+			if (!_v0.$) {
+				if (!_v0.a.$) {
 					var t = _v0.a.a;
 					return A2(
 						$elm$html$Html$p,
@@ -11313,14 +11261,14 @@ var $author$project$Main$viewSelfSummary = function (model) {
 							A2(
 								$elm$core$Maybe$map,
 								function (p) {
-									return p.playerId;
+									return p.a7;
 								},
 								$elm$core$List$head(w))),
 						id);
 				},
-				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)));
+				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.N)));
 	};
-	var workload = A2($elm$core$Maybe$andThen, workloadFinder, model.myId);
+	var workload = A2($elm$core$Maybe$andThen, workloadFinder, model.A);
 	var lastPackage = A2($elm$core$Maybe$andThen, $author$project$Main$lastElem, workload);
 	var firstPackage = A2($elm$core$Maybe$andThen, $elm$core$List$head, workload);
 	return A2(
@@ -11379,12 +11327,12 @@ var $author$project$Main$viewSelfSummary = function (model) {
 			]));
 };
 var $author$project$Main$ExtendDeadline = function (a) {
-	return {$: 'ExtendDeadline', a: a};
+	return {$: 10, a: a};
 };
-var $author$project$Main$NextRound = {$: 'NextRound'};
+var $author$project$Main$NextRound = {$: 9};
 var $author$project$Main$ShowConfirmDialog = F2(
 	function (a, b) {
-		return {$: 'ShowConfirmDialog', a: a, b: b};
+		return {$: 21, a: a, b: b};
 	});
 var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$html$Html$em = _VirtualDom_node('em');
@@ -11393,7 +11341,7 @@ var $elm$core$Array$isEmpty = function (_v0) {
 	return !len;
 };
 var $author$project$Main$KickPlayer = function (a) {
-	return {$: 'KickPlayer', a: a};
+	return {$: 8, a: a};
 };
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Main$viewPlayer = F3(
@@ -11403,7 +11351,7 @@ var $author$project$Main$viewPlayer = F3(
 			_List_fromArray(
 				[
 					$elm$html$Html$Attributes$class(
-					'player' + (player.isMe ? ' me' : ''))
+					'player' + (player.an ? ' me' : ''))
 				]),
 			_List_fromArray(
 				[
@@ -11416,7 +11364,7 @@ var $author$project$Main$viewPlayer = F3(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(player.username)
+							$elm$html$Html$text(player.e)
 						])),
 					A2(
 					$elm$html$Html$span,
@@ -11424,16 +11372,16 @@ var $author$project$Main$viewPlayer = F3(
 					A2(
 						$elm$core$List$cons,
 						function () {
-							var _v0 = player.status;
+							var _v0 = player.c;
 							switch (_v0.$) {
-								case 'Done':
+								case 0:
 									return $elm$html$Html$text('Done');
-								case 'Working':
+								case 1:
 									var timeLeft = _v0.a;
 									return $elm$html$Html$text(
 										'Working, ' + ($author$project$Main$formatTimeDifference(
 											$elm$core$Basics$round(timeLeft)) + ' left'));
-								case 'Uploading':
+								case 2:
 									var fraction = _v0.a;
 									return $elm$html$Html$text(
 										'Uploading (' + ($elm$core$String$fromFloat(fraction * 100) + '% done)'));
@@ -11441,7 +11389,7 @@ var $author$project$Main$viewPlayer = F3(
 									return $elm$html$Html$text('Hit a wall');
 							}
 						}(),
-						model.amAdministrator ? _List_fromArray(
+						model.O ? _List_fromArray(
 							[
 								A2(
 								$elm$html$Html$a,
@@ -11452,7 +11400,7 @@ var $author$project$Main$viewPlayer = F3(
 										$elm$html$Html$Events$onClick(
 										A2(
 											$author$project$Main$ShowConfirmDialog,
-											'Are you sure you want to kick ' + (player.username + '?'),
+											'Are you sure you want to kick ' + (player.e + '?'),
 											$author$project$Main$KickPlayer(id)))
 									]),
 								_List_fromArray(
@@ -11463,7 +11411,7 @@ var $author$project$Main$viewPlayer = F3(
 				]));
 	});
 var $author$project$Main$viewSidebar = function (model) {
-	var playerList = $elm$core$Array$isEmpty(model.players) ? _List_Nil : _List_fromArray(
+	var playerList = $elm$core$Array$isEmpty(model.l) ? _List_Nil : _List_fromArray(
 		[
 			A2(
 			$elm$html$Html$div,
@@ -11475,9 +11423,9 @@ var $author$project$Main$viewSidebar = function (model) {
 				A2(
 					$elm$core$Array$indexedMap,
 					$author$project$Main$viewPlayer(model),
-					model.players)))
+					model.l)))
 		]);
-	var gameoverActions = _Utils_eq(model.status, $author$project$Protocol$GameOver) ? _List_fromArray(
+	var gameoverActions = (model.c === 5) ? _List_fromArray(
 		[
 			A2(
 			$elm$html$Html$div,
@@ -11510,8 +11458,8 @@ var $author$project$Main$viewSidebar = function (model) {
 		_List_fromArray(
 			[
 				function () {
-				var _v0 = model.gameId;
-				if (_v0.$ === 'Nothing') {
+				var _v0 = model.s;
+				if (_v0.$ === 1) {
 					return A2(
 						$elm$html$Html$em,
 						_List_fromArray(
@@ -11537,7 +11485,7 @@ var $author$project$Main$viewSidebar = function (model) {
 				}
 			}()
 			]));
-	var adminActions = (model.amAdministrator && $author$project$Main$isGameRunning(model)) ? _List_fromArray(
+	var adminActions = (model.O && $author$project$Main$isGameRunning(model)) ? _List_fromArray(
 		[
 			A2(
 			$elm$html$Html$div,
@@ -11598,8 +11546,8 @@ var $author$project$Main$viewSidebar = function (model) {
 				playerList,
 				_Utils_ap(adminActions, gameoverActions))));
 };
-var $author$project$Main$SubmitText = {$: 'SubmitText'};
-var $author$project$Main$TextField = {$: 'TextField'};
+var $author$project$Main$SubmitText = {$: 11};
+var $author$project$Main$TextField = 3;
 var $elm$html$Html$Attributes$action = function (uri) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -11651,7 +11599,7 @@ var $author$project$Main$viewStarting = function (model) {
 							[
 								$elm$html$Html$Attributes$class('text-starting-input'),
 								$elm$html$Html$Events$onInput(
-								$author$project$Main$SetField($author$project$Main$TextField))
+								$author$project$Main$SetField(3))
 							]),
 						_List_Nil),
 						A2(
@@ -11667,18 +11615,18 @@ var $author$project$Main$viewStarting = function (model) {
 					]))
 			]));
 };
-var $author$project$Main$Backward = {$: 'Backward'};
-var $author$project$Main$Forward = {$: 'Forward'};
+var $author$project$Main$Backward = 1;
+var $author$project$Main$Forward = 0;
 var $author$project$Main$MoveWorkload = function (a) {
-	return {$: 'MoveWorkload', a: a};
+	return {$: 14, a: a};
 };
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
 var $author$project$Main$isAtWorkloadEnd = F2(
 	function (model, dir) {
-		return ((!model.currentWorkload) && _Utils_eq(dir, $author$project$Main$Backward)) ? true : (_Utils_eq(
-			model.currentWorkload,
+		return ((!model.v) && (dir === 1)) ? true : (_Utils_eq(
+			model.v,
 			$elm$core$Array$length(
-				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.workloads)) - 1) && _Utils_eq(dir, $author$project$Main$Forward));
+				A2($elm$core$Maybe$withDefault, $elm$core$Array$empty, model.N)) - 1) && (!dir));
 	});
 var $author$project$Main$viewSummary = function (model) {
 	var workload = A2(
@@ -11687,9 +11635,9 @@ var $author$project$Main$viewSummary = function (model) {
 		A2(
 			$elm$core$Maybe$andThen,
 			function (a) {
-				return A2($elm$core$Array$get, model.currentWorkload, a);
+				return A2($elm$core$Array$get, model.v, a);
 			},
-			model.workloads));
+			model.N));
 	return A2(
 		$elm$html$Html$section,
 		_List_fromArray(
@@ -11703,10 +11651,10 @@ var $author$project$Main$viewSummary = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class(
-						'summary-arrow summary-arrow-left' + (A2($author$project$Main$isAtWorkloadEnd, model, $author$project$Main$Backward) ? ' summary-arrow-disabled' : '')),
+						'summary-arrow summary-arrow-left' + (A2($author$project$Main$isAtWorkloadEnd, model, 1) ? ' summary-arrow-disabled' : '')),
 						$elm$html$Html$Attributes$href('#'),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$MoveWorkload($author$project$Main$Backward))
+						$author$project$Main$MoveWorkload(1))
 					]),
 				_List_fromArray(
 					[
@@ -11735,7 +11683,7 @@ var $author$project$Main$viewSummary = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								'Series ' + $elm$core$String$fromInt(model.currentWorkload + 1))
+								'Series ' + $elm$core$String$fromInt(model.v + 1))
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -11745,7 +11693,7 @@ var $author$project$Main$viewSummary = function (model) {
 							]),
 						A2(
 							$elm$core$List$indexedMap,
-							A2($author$project$Main$viewWorkpackage, model, model.currentWorkload),
+							A2($author$project$Main$viewWorkpackage, model, model.v),
 							workload))
 					])),
 				A2(
@@ -11753,10 +11701,10 @@ var $author$project$Main$viewSummary = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class(
-						'summary-arrow summary-arrow-right' + (A2($author$project$Main$isAtWorkloadEnd, model, $author$project$Main$Forward) ? ' summary-arrow-disabled' : '')),
+						'summary-arrow summary-arrow-right' + (A2($author$project$Main$isAtWorkloadEnd, model, 0) ? ' summary-arrow-disabled' : '')),
 						$elm$html$Html$Attributes$href('#'),
 						$elm$html$Html$Events$onClick(
-						$author$project$Main$MoveWorkload($author$project$Main$Forward))
+						$author$project$Main$MoveWorkload(0))
 					]),
 				_List_fromArray(
 					[
@@ -11775,8 +11723,8 @@ var $author$project$Main$getWorkPackageImage = function (model) {
 	var previousPackage = A2(
 		$elm$core$Maybe$withDefault,
 		$author$project$Protocol$ImagePackage(_default),
-		model.previousPackage);
-	if (previousPackage.$ === 'ImagePackage') {
+		model.W);
+	if (previousPackage.$ === 1) {
 		var p = previousPackage.a;
 		return p;
 	} else {
@@ -11847,7 +11795,7 @@ var $author$project$Main$viewUnderstanding = function (model) {
 							[
 								$elm$html$Html$Attributes$class('text-understanding-input'),
 								$elm$html$Html$Events$onInput(
-								$author$project$Main$SetField($author$project$Main$TextField))
+								$author$project$Main$SetField(3))
 							]),
 						_List_Nil),
 						A2(
@@ -11865,7 +11813,7 @@ var $author$project$Main$viewUnderstanding = function (model) {
 };
 var $author$project$Main$view = function (model) {
 	return {
-		body: _List_fromArray(
+		bu: _List_fromArray(
 			[
 				$author$project$Main$viewNav(model),
 				$author$project$Main$viewHeader(model),
@@ -11886,30 +11834,30 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								function () {
-								var _v0 = model.status;
-								switch (_v0.$) {
-									case 'NoGame':
+								var _v0 = model.c;
+								switch (_v0) {
+									case 0:
 										return $author$project$Main$viewLanding(model);
-									case 'Lobby':
+									case 1:
 										return $author$project$Main$viewLobby(model);
-									case 'Starting':
+									case 2:
 										return $author$project$Main$viewStarting(model);
-									case 'Drawing':
+									case 3:
 										return $author$project$Main$viewDrawing(model);
-									case 'Understanding':
+									case 4:
 										return $author$project$Main$viewUnderstanding(model);
 									default:
-										return model.showingGameoverSelf ? $author$project$Main$viewSelfSummary(model) : $author$project$Main$viewSummary(model);
+										return model.Y ? $author$project$Main$viewSelfSummary(model) : $author$project$Main$viewSummary(model);
 								}
 							}()
 							])),
 						$author$project$Main$viewSidebar(model)
 					]))
 			]),
-		title: 'Drawtice'
+		b1: 'Drawtice'
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(
-	{init: $author$project$Main$init, onUrlChange: $author$project$Main$UrlChanged, onUrlRequest: $author$project$Main$LinkClicked, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
+	{bG: $author$project$Main$init, bM: $author$project$Main$UrlChanged, bN: $author$project$Main$LinkClicked, b_: $author$project$Main$subscriptions, b2: $author$project$Main$update, b5: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
+	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

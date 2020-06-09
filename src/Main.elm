@@ -40,9 +40,9 @@ main =
 wsKey : String
 wsKey = "mainws"
 wsUrl : String
-wsUrl = "ws://192.168.1.11:3030/ws"
+wsUrl = "ws://drawtice.helit.org/ws"
 imageUrl : String
-imageUrl = "http://192.168.1.11:3030/images/"
+imageUrl = "https://drawtice.helit.org/images/"
 
 -- PORTS
 
