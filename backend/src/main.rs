@@ -79,15 +79,18 @@ impl User {
     }
 
     fn fetch_by_player<'a>(users: &'a mut Users, player: &Player) -> protocol::Result<&'a mut User> {
-        users.get_mut(&player.user_id)
+        player.user_id
+            .and_then(move |uid| users.get_mut(&uid))
             .ok_or(protocol::Error::from("Could not find user for player"))
     }
 
     fn fetch_many_by_player<'a>(users: &'a mut Users, player: &Player) -> HashMap<&'a usize, &'a mut User> {
-        let uuid = player.uuid;
+        let player_uuid = player.uuid;
 
         users.iter_mut()
-            .filter(|u| u.1.uuid == uuid)
+            .filter(|u| {
+                player_uuid.map_or(false, |uuid| uuid == u.1.uuid)
+            })
             .collect()
     }
 
@@ -402,8 +405,10 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                           protocol::PersonalDetailsResponse::new(player_id, &player2)
                       ),
             ).await;
-            tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
+            if let Some(uuid) = player2.uuid {
+                tx_direct(users, my_id, protocol::Response::YourUuid(uuid.to_string()))
                 .await;
+            }
         }
         protocol::Command::JoinGame(c) => {
             let player = Player::new(user.uuid, my_id, c.username.as_str(), false);
@@ -433,8 +438,10 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                           protocol::PersonalDetailsResponse::new(player_id, &player2)
                       ),
             ).await;
-            tx_direct(users, my_id, protocol::Response::YourUuid(player2.uuid.to_string()))
-                .await;
+            if let Some(uuid) = player2.uuid {
+                tx_direct(users, my_id, protocol::Response::YourUuid(uuid.to_string()))
+                    .await;
+            }
         }
         protocol::Command::KickPlayer(c) => {
             let game = user.fetch_game_mut(games)?;
@@ -458,7 +465,10 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             let game = user.fetch_game_mut(games)?;
             let (player, player_id) = user.fetch_player(game)?;
 
-            if player.is_admin && game.game_status != game::GameStatus::GameOver {
+            if game.game_status == game::GameStatus::GameOver {
+                game.soft_remove_player(player_id);
+                user.tx_direct(protocol::Response::LeftGame).await;
+            } else if player.is_admin && game.game_status != game::GameStatus::GameOver {
                 // Destroy the game
                 game.tx_game(users, my_id, protocol::Response::LeftGame, true).await;
                 game.end();
@@ -478,9 +488,9 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             // Search for this user in all our games
             for (&game_id, game) in games.iter_mut() {
                 for (player_id, player) in game.players.iter_mut().enumerate() {
-                    if player.uuid == uuid {
+                    if player.uuid.map_or(false, |pu| pu == uuid)  {
                         // Found the player!
-                        player.user_id = my_id;
+                        player.user_id = Some(my_id);
                         player.stuck = false;
                         user.game = Some((game_id, player_id));
 
@@ -605,6 +615,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             };
             game.restart();
 
+            game.reassign_users(users);
             game.tx_game_details(users, true).await;
         }
     }
@@ -622,7 +633,7 @@ async fn scheduler(users: &mut Users, games: &mut Games) {
     }
 
     // Garbage collection
-    games.retain(|_, game| game.players.len() != 0);
+    games.retain(|_, game| !game.is_over());
 }
 
 async fn tx_direct(users: &Users, my_id: usize, response: protocol::Response<'_>) {

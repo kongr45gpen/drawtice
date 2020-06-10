@@ -116,7 +116,6 @@ type alias Model =
   , previousPackage : Maybe WorkPackage
   , workloads : Maybe (Array.Array Workload)
   , currentWorkload : Int
-  , playerCapture : Maybe (Array.Array Player)
   , showingGameoverSelf : Bool
   , gameKey : Maybe String
   , funnelState : PortFunnels.State
@@ -132,7 +131,7 @@ init flags url key =
   let
     formFields : FormFields
     formFields = {
-      gameId = case url.fragment of
+      gameId = case getURLGameId url of
         Just f -> f
         Nothing -> ""
       ,
@@ -143,7 +142,7 @@ init flags url key =
 
     model = Model
       key url NoGame Nothing False Nothing
-      Array.empty Nothing Nothing Nothing Nothing 0 Nothing True Nothing
+      Array.empty Nothing Nothing Nothing Nothing 0 True Nothing
       (PortFunnels.initialState "drawtice") formFields Dict.empty 0 Nothing
   in
     ( model, Cmd.batch [
@@ -201,7 +200,7 @@ update msg model =
 
     UrlChanged url ->
       let
-        mdl = case url.fragment of
+        mdl = case getURLGameId url of
           Just f ->
             model |> setField GameIdField f
           Nothing ->
@@ -243,7 +242,7 @@ update msg model =
       (model, sendSocketCommand StartCommand)
 
     LeaveGame ->
-      (leaveGame model, sendSocketCommand LeaveCommand)
+      leaveGame model |> Cmd.Extra.addCmd (sendSocketCommand LeaveCommand)
 
     SubmitText source ->
       (model, sendSocketCommand <| TextPackageCommand model.formFields.text source )
@@ -367,7 +366,7 @@ update msg model =
         Protocol.UuidResponse uuid ->
           ({model | uuid = Just uuid}, putLocalStorageString model "uuid" uuid)
         Protocol.LeftGameResponse ->
-          (leaveGame model, Cmd.none)
+          leaveGame model
         Protocol.PreviousTextPackageResponse text ->
           ({model | previousPackage = Just <| TextPackage text}, Cmd.none)
         Protocol.PreviousImagePackageResponse path ->
@@ -383,7 +382,7 @@ update msg model =
             correctionOuter workload = List.map correctionInner workload
             correctURLs workloads_ = Array.map correctionOuter workloads_
           in
-            ({model | workloads = Just <| correctURLs workloads, playerCapture = Just model.players}, Cmd.none)
+            ({model | workloads = Just <| correctURLs workloads}, Cmd.none)
 
 
     ShowError value ->
@@ -467,19 +466,23 @@ updatePlayerTime currentTime player =
     _ ->
       player
 
-leaveGame : Model -> Model
+leaveGame : Model -> (Model, Cmd Msg)
 leaveGame model =
-  {model | status = NoGame
-         , gameId = Nothing
-         , gameKey = Nothing
-         , players = Array.empty
-         , myId = Nothing
-         , previousPackage = Nothing
-         , workloads = Nothing
-         , currentWorkload = 0
-         , playerCapture = Nothing
-         , showingGameoverSelf = False
-  }
+  let
+    url0 = model.url
+    url = { url0 | fragment = Nothing }
+  in
+    ({model | status = NoGame
+          , gameId = Nothing
+          , gameKey = Nothing
+          , players = Array.empty
+          , myId = Nothing
+          , previousPackage = Nothing
+          , workloads = Nothing
+          , currentWorkload = 0
+          , showingGameoverSelf = False
+          , url = url
+    }, Nav.pushUrl model.key (Url.toString url))
 
 getMe : Model -> Maybe Player
 getMe model =
@@ -795,7 +798,7 @@ viewLanding model =
   let
     url = model.url
     form =
-      case model.url.fragment of
+      case getURLGameId url of
         Just _ ->
           [
             button [ type_ "submit", class "pure-button pure-button-primary landing-button", onClick JoinGame ] [
@@ -954,9 +957,9 @@ viewWorkpackage model loadId packageId package =
         ]
       Nothing ->
         div [ class "summary-package-nothing", title "The player didn't have time to complete this!" ] [ text "???" ]
-    username = model.playerCapture |> Maybe.andThen (\a -> Array.get package.playerId a)
-                                   |> Maybe.map (\p -> p.username)
-                                   |> Maybe.withDefault "???"
+    username = (Just model.players) |> Maybe.andThen (\a -> Array.get package.playerId a)
+                                    |> Maybe.map (\p -> p.username)
+                                    |> Maybe.withDefault "???"
   in
     div [ class "summary-package" ] [
       div [ class "summary-package-prompt" ] [ text ("by " ++ username ++ ":") ],
@@ -974,6 +977,10 @@ formatTimeDifference seconds =
   ++ ":"
   ++ String.padLeft 2 '0' (String.fromInt (remainderBy 60 seconds |> abs))
 
+getURLGameId : Url.Url -> Maybe String
+getURLGameId url =
+  Maybe.andThen (\f -> if f == "" then Nothing else Just f) url.fragment
+
 getGameLink : Model -> Url.Url
 getGameLink model =
   let
@@ -981,7 +988,10 @@ getGameLink model =
   in
     case model.gameId of
       Just gameId ->
-        { url | fragment = Just gameId }
+        if gameId == "" then
+          url
+        else
+          { url | fragment = Just gameId }
       Nothing ->
         url
 

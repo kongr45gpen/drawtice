@@ -157,9 +157,7 @@ PortFunnel.subscribe(app);
                     var data = input[1];
                     if (command == "snap") {
                         const image = _this.drawer.api.getCanvasAsImage();
-                        app.ports.canvasReturnPort.send(image);
-                    } else if (data == "setkey") {
-                        // TODO: key using attrs
+                        app.ports.canvasReturnPort.send([image, data]);
                     }
                 }
                 app.ports.canvasPort.subscribe(this.portCallback);

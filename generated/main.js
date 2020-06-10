@@ -5245,16 +5245,14 @@ var $author$project$Main$Model = function (key) {
 									return function (previousPackage) {
 										return function (workloads) {
 											return function (currentWorkload) {
-												return function (playerCapture) {
-													return function (showingGameoverSelf) {
-														return function (gameKey) {
-															return function (funnelState) {
-																return function (formFields) {
-																	return function (pendingDialogs) {
-																		return function (nextDialogId) {
-																			return function (error) {
-																				return {amAdministrator: amAdministrator, currentWorkload: currentWorkload, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, playerCapture: playerCapture, players: players, previousPackage: previousPackage, showingGameoverSelf: showingGameoverSelf, status: status, url: url, uuid: uuid, workloads: workloads};
-																			};
+												return function (showingGameoverSelf) {
+													return function (gameKey) {
+														return function (funnelState) {
+															return function (formFields) {
+																return function (pendingDialogs) {
+																	return function (nextDialogId) {
+																		return function (error) {
+																			return {amAdministrator: amAdministrator, currentWorkload: currentWorkload, error: error, formFields: formFields, funnelState: funnelState, gameId: gameId, gameKey: gameKey, key: key, lastUpdate: lastUpdate, myId: myId, nextDialogId: nextDialogId, pendingDialogs: pendingDialogs, players: players, previousPackage: previousPackage, showingGameoverSelf: showingGameoverSelf, status: status, url: url, uuid: uuid, workloads: workloads};
 																		};
 																	};
 																};
@@ -6849,6 +6847,23 @@ var $author$project$Main$getLocalStorageString = F2(
 			model,
 			$billstclair$elm_localstorage$PortFunnel$LocalStorage$get(key));
 	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Main$getURLGameId = function (url) {
+	return A2(
+		$elm$core$Maybe$andThen,
+		function (f) {
+			return (f === '') ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(f);
+		},
+		url.fragment);
+};
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$initialState = function (prefix) {
 	return $billstclair$elm_localstorage$PortFunnel$LocalStorage$State(
 		{isLoaded: false, prefix: prefix, simulationDict: $elm$core$Dict$empty});
@@ -6872,7 +6887,7 @@ var $author$project$Main$init = F3(
 	function (flags, url, key) {
 		var formFields = {
 			gameId: function () {
-				var _v0 = url.fragment;
+				var _v0 = $author$project$Main$getURLGameId(url);
 				if (_v0.$ === 'Just') {
 					var f = _v0.a;
 					return f;
@@ -6884,7 +6899,7 @@ var $author$project$Main$init = F3(
 			username: '',
 			usernamePlaceholder: ''
 		};
-		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)($elm$core$Maybe$Nothing)(true)($elm$core$Maybe$Nothing)(
+		var model = $author$project$Main$Model(key)(url)($author$project$Protocol$NoGame)($elm$core$Maybe$Nothing)(false)($elm$core$Maybe$Nothing)($elm$core$Array$empty)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)($elm$core$Maybe$Nothing)(0)(true)($elm$core$Maybe$Nothing)(
 			$author$project$PortFunnels$initialState('drawtice'))(formFields)($elm$core$Dict$empty)(0)($elm$core$Maybe$Nothing);
 		return _Utils_Tuple2(
 			model,
@@ -7276,15 +7291,6 @@ var $Janiczek$cmd_extra$Cmd$Extra$addCmd = F2(
 				_List_fromArray(
 					[oldCmd, cmd])));
 	});
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $elm$core$Maybe$destruct = F3(
 	function (_default, func, maybe) {
 		if (maybe.$ === 'Just') {
@@ -7586,7 +7592,7 @@ var $author$project$Main$getGameLink = function (model) {
 	var _v0 = model.gameId;
 	if (_v0.$ === 'Just') {
 		var gameId = _v0.a;
-		return _Utils_update(
+		return (gameId === '') ? url : _Utils_update(
 			url,
 			{
 				fragment: $elm$core$Maybe$Just(gameId)
@@ -7642,10 +7648,64 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 			A2($elm$core$Dict$get, key, state.socketStates),
 			$elm$core$Maybe$Nothing);
 	});
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$url$Url$addPort = F2(
+	function (maybePort, starter) {
+		if (maybePort.$ === 'Nothing') {
+			return starter;
+		} else {
+			var port_ = maybePort.a;
+			return starter + (':' + $elm$core$String$fromInt(port_));
+		}
+	});
+var $elm$url$Url$addPrefixed = F3(
+	function (prefix, maybeSegment, starter) {
+		if (maybeSegment.$ === 'Nothing') {
+			return starter;
+		} else {
+			var segment = maybeSegment.a;
+			return _Utils_ap(
+				starter,
+				_Utils_ap(prefix, segment));
+		}
+	});
+var $elm$url$Url$toString = function (url) {
+	var http = function () {
+		var _v0 = url.protocol;
+		if (_v0.$ === 'Http') {
+			return 'http://';
+		} else {
+			return 'https://';
+		}
+	}();
+	return A3(
+		$elm$url$Url$addPrefixed,
+		'#',
+		url.fragment,
+		A3(
+			$elm$url$Url$addPrefixed,
+			'?',
+			url.query,
+			_Utils_ap(
+				A2(
+					$elm$url$Url$addPort,
+					url.port_,
+					_Utils_ap(http, url.host)),
+				url.path)));
+};
 var $author$project$Main$leaveGame = function (model) {
-	return _Utils_update(
-		model,
-		{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, playerCapture: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, showingGameoverSelf: false, status: $author$project$Protocol$NoGame, workloads: $elm$core$Maybe$Nothing});
+	var url0 = model.url;
+	var url = _Utils_update(
+		url0,
+		{fragment: $elm$core$Maybe$Nothing});
+	return _Utils_Tuple2(
+		_Utils_update(
+			model,
+			{currentWorkload: 0, gameId: $elm$core$Maybe$Nothing, gameKey: $elm$core$Maybe$Nothing, myId: $elm$core$Maybe$Nothing, players: $elm$core$Array$empty, previousPackage: $elm$core$Maybe$Nothing, showingGameoverSelf: false, status: $author$project$Protocol$NoGame, url: url, workloads: $elm$core$Maybe$Nothing}),
+		A2(
+			$elm$browser$Browser$Navigation$pushUrl,
+			model.key,
+			$elm$url$Url$toString(url)));
 };
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $billstclair$elm_port_funnel$PortFunnel$FunnelSpec = F4(
@@ -9337,7 +9397,6 @@ var $author$project$PortFunnels$processValue = F4(
 			state,
 			model);
 	});
-var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $billstclair$elm_localstorage$PortFunnel$LocalStorage$put = $billstclair$elm_localstorage$PortFunnel$InternalTypes$Put;
 var $author$project$Main$putLocalStorageString = F3(
 	function (model, key, value) {
@@ -9537,50 +9596,6 @@ var $elm$core$Result$toMaybe = function (result) {
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
-};
-var $elm$url$Url$addPort = F2(
-	function (maybePort, starter) {
-		if (maybePort.$ === 'Nothing') {
-			return starter;
-		} else {
-			var port_ = maybePort.a;
-			return starter + (':' + $elm$core$String$fromInt(port_));
-		}
-	});
-var $elm$url$Url$addPrefixed = F3(
-	function (prefix, maybeSegment, starter) {
-		if (maybeSegment.$ === 'Nothing') {
-			return starter;
-		} else {
-			var segment = maybeSegment.a;
-			return _Utils_ap(
-				starter,
-				_Utils_ap(prefix, segment));
-		}
-	});
-var $elm$url$Url$toString = function (url) {
-	var http = function () {
-		var _v0 = url.protocol;
-		if (_v0.$ === 'Http') {
-			return 'http://';
-		} else {
-			return 'https://';
-		}
-	}();
-	return A3(
-		$elm$url$Url$addPrefixed,
-		'#',
-		url.fragment,
-		A3(
-			$elm$url$Url$addPrefixed,
-			'?',
-			url.query,
-			_Utils_ap(
-				A2(
-					$elm$url$Url$addPort,
-					url.port_,
-					_Utils_ap(http, url.host)),
-				url.path)));
 };
 var $author$project$Main$posixTimeDifferenceSeconds = F2(
 	function (a, b) {
@@ -9807,7 +9822,7 @@ var $author$project$Main$update = F2(
 				case 'UrlChanged':
 					var url = msg.a;
 					var mdl = function () {
-						var _v2 = url.fragment;
+						var _v2 = $author$project$Main$getURLGameId(url);
 						if (_v2.$ === 'Just') {
 							var f = _v2.a;
 							return A3($author$project$Main$setField, $author$project$Main$GameIdField, f, model);
@@ -9868,9 +9883,10 @@ var $author$project$Main$update = F2(
 						model,
 						$author$project$Main$sendSocketCommand($author$project$Protocol$StartCommand));
 				case 'LeaveGame':
-					return _Utils_Tuple2(
-						$author$project$Main$leaveGame(model),
-						$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
+					return A2(
+						$Janiczek$cmd_extra$Cmd$Extra$addCmd,
+						$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand),
+						$author$project$Main$leaveGame(model));
 				case 'SubmitText':
 					var source = msg.a;
 					return _Utils_Tuple2(
@@ -10122,9 +10138,7 @@ var $author$project$Main$update = F2(
 									}),
 								A3($author$project$Main$putLocalStorageString, model, 'uuid', uuid));
 						case 'LeftGameResponse':
-							return _Utils_Tuple2(
-								$author$project$Main$leaveGame(model),
-								$elm$core$Platform$Cmd$none);
+							return $author$project$Main$leaveGame(model);
 						case 'PreviousTextPackageResponse':
 							var text = value.a;
 							return _Utils_Tuple2(
@@ -10175,7 +10189,6 @@ var $author$project$Main$update = F2(
 								_Utils_update(
 									model,
 									{
-										playerCapture: $elm$core$Maybe$Just(model.players),
 										workloads: $elm$core$Maybe$Just(
 											correctURLs(workloads))
 									}),
@@ -10725,7 +10738,7 @@ var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Main$viewLanding = function (model) {
 	var url = model.url;
 	var form = function () {
-		var _v0 = model.url.fragment;
+		var _v0 = $author$project$Main$getURLGameId(url);
 		if (_v0.$ === 'Just') {
 			return _List_fromArray(
 				[
@@ -11344,7 +11357,7 @@ var $author$project$Main$viewWorkpackage = F4(
 					function (a) {
 						return A2($elm$core$Array$get, _package.playerId, a);
 					},
-					model.playerCapture)));
+					$elm$core$Maybe$Just(model.players))));
 		var uniqId = 'summary-image-' + ($elm$core$String$fromInt(loadId) + ('-' + $elm$core$String$fromInt(packageId)));
 		var html = function () {
 			var _v0 = _package.data;

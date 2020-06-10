@@ -88,9 +88,9 @@ pub struct ImagePackage {
 #[derive(Serialize, Debug, Clone)]
 pub struct Player {
     #[serde(skip_serializing)]
-    pub uuid: Uuid,
+    pub uuid: Option<Uuid>,
     #[serde(skip_serializing)]
-    pub user_id: usize,
+    pub user_id: Option<usize>,
 
     pub username: String,
     image_url: String,
@@ -125,8 +125,8 @@ pub struct Game {
 impl Player {
     pub fn new(uuid: Uuid, user_id: usize, username: &str, is_admin: bool) -> Player {
         Player {
-            uuid,
-            user_id,
+            uuid: Some(uuid),
+            user_id: Some(user_id),
             username: username.to_string(),
             image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg?background=%23559&width=256", username),
             status: PlayerStatus::Done,
@@ -170,11 +170,21 @@ impl Game {
         }
     }
 
+    /// Stuck one player from the game by ID, if exists, and don't let them join again
+    pub fn soft_remove_player(&mut self, player_id: usize) {
+        if let Some(player) = self.players.get_mut(player_id) {
+            player.stuck = true;
+            player.uuid = None;
+            player.user_id = None;
+        }
+    }
+
     pub fn get_player_uuids(&self) -> HashMap<Uuid, usize> {
         self.players
             .iter()
             .enumerate()
-            .map(|player| (player.1.uuid, player.0))
+            .filter(|player| player.1.uuid.is_some())
+            .map(|player| (player.1.uuid.unwrap(), player.0))
             .collect()
     }
 
@@ -199,6 +209,7 @@ impl Game {
     }
 
     /// Kicks stuck players, returning a list of kicked user IDs
+    /// Requires reassigning users next
     pub fn kick_stuck_players(&mut self) -> Vec<usize> {
         let mut kicked : Vec<usize> = vec![];
 
@@ -231,6 +242,12 @@ impl Game {
                     || p.stuck
                     || p.deadline.map_or(false,|d| d < now)
             })
+    }
+
+    /// Returns whether the game has ended and all players have left
+    pub fn is_over(&self) -> bool {
+        self.players.is_empty()
+            || (self.game_status == GameStatus::GameOver && self.players.iter().all(|p| p.stuck))
     }
 
     /// Advance to the next game stage
@@ -344,11 +361,6 @@ impl Game {
     /// End the game, removing all players
     pub fn end(&mut self) {
         self.players.clear();
-    }
-
-    /// Return whether the game has ended
-    pub fn is_over(&self) -> bool {
-        return self.players.is_empty();
     }
 
     /// Mark a player as stuck, if they exist
