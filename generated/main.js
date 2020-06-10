@@ -7202,6 +7202,7 @@ var $author$project$Protocol$NewGameCommand = function (a) {
 	return {$: 'NewGameCommand', a: a};
 };
 var $author$project$Protocol$NextRoundCommand = {$: 'NextRoundCommand'};
+var $author$project$Protocol$RestartGameCommand = {$: 'RestartGameCommand'};
 var $author$project$Main$SocketReceive = function (a) {
 	return {$: 'SocketReceive', a: a};
 };
@@ -7553,7 +7554,7 @@ var $author$project$Main$getGameLink = function (model) {
 		return url;
 	}
 };
-var $author$project$Main$imageUrl = 'https://.org/images/';
+var $author$project$Main$imageUrl = 'http://localhost:3030/images/';
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
 var $elm$core$Array$indexedMap = F2(
@@ -9446,13 +9447,15 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 							]))));
 		case 'NextRoundCommand':
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'next_round', $elm$core$Maybe$Nothing);
-		default:
+		case 'ExtendDeadlineCommand':
 			var secs = command.a;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
 				'extend_deadline',
 				$elm$core$Maybe$Just(
 					$elm$json$Json$Encode$int(secs)));
+		default:
+			return A2($author$project$Protocol$prepareSocketCommandJson, 'restart_game', $elm$core$Maybe$Nothing);
 	}
 };
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$send = $billstclair$elm_port_funnel$PortFunnel$sendMessage($billstclair$elm_websocket_client$PortFunnel$WebSocket$moduleDesc);
@@ -9603,7 +9606,7 @@ var $author$project$Protocol$workloadsParser = _Utils_Tuple2(
 	function (v) {
 		return $author$project$Protocol$AllWorkloadsResponse(v);
 	});
-var $author$project$Main$wsUrl = 'ws://.org/ws';
+var $author$project$Main$wsUrl = 'ws://localhost:3030/ws';
 var $author$project$Main$socketHandler = F3(
 	function (response, state, mdl) {
 		var model = _Utils_update(
@@ -9844,6 +9847,10 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						A3($author$project$Main$setField, field, value, model),
 						$elm$core$Platform$Cmd$none);
+				case 'RestartGame':
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$sendSocketCommand($author$project$Protocol$RestartGameCommand));
 				case 'MoveWorkload':
 					var dir = msg.a;
 					var workload = function () {
@@ -11433,6 +11440,7 @@ var $author$project$Main$ExtendDeadline = function (a) {
 	return {$: 'ExtendDeadline', a: a};
 };
 var $author$project$Main$NextRound = {$: 'NextRound'};
+var $author$project$Main$RestartGame = {$: 'RestartGame'};
 var $author$project$Main$ShowConfirmDialog = F2(
 	function (a, b) {
 		return {$: 'ShowConfirmDialog', a: a, b: b};
@@ -11538,6 +11546,17 @@ var $author$project$Main$viewSidebar = function (model) {
 				]),
 			_List_fromArray(
 				[
+					model.amAdministrator ? A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('pure-button'),
+							$elm$html$Html$Events$onClick($author$project$Main$RestartGame)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Restart game')
+						])) : $elm$html$Html$text(''),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -11604,7 +11623,7 @@ var $author$project$Main$viewSidebar = function (model) {
 						[
 							$elm$html$Html$Attributes$class('pure-button'),
 							$elm$html$Html$Events$onClick(
-							$author$project$Main$ExtendDeadline(2.5))
+							$author$project$Main$ExtendDeadline(1))
 						]),
 					_List_fromArray(
 						[

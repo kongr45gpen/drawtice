@@ -19,6 +19,7 @@ type SocketCommand
   | ImagePackageCommand String
   | NextRoundCommand
   | ExtendDeadlineCommand Int
+  | RestartGameCommand
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
@@ -114,6 +115,8 @@ prepareSocketCommand command =
       prepareSocketCommandJson "extend_deadline" (Just (JE.int
         secs
       ))
+    RestartGameCommand ->
+      prepareSocketCommandJson "restart_game" Nothing
 
 
 prepareSocketCommandJson : String -> Maybe JE.Value -> JE.Value

@@ -579,6 +579,24 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
 
             game.extend_deadline(Duration::seconds(t as i64));
             game.tx_game_details(users, false).await;
+        },
+        protocol::Command::RestartGame => {
+            let game = user.fetch_game_mut(games)?;
+            let (player, _) = user.fetch_player(game)?;
+            player.expect_admin()?;
+
+            if game.game_status != game::GameStatus::GameOver {
+                return Err(protocol::Error::from("You can't restart a game in progress"));
+            }
+
+            for uid in game.kick_stuck_players().iter() {
+                if let Some(user) = users.get(uid) {
+                    user.tx_direct(protocol::Response::LeftGame).await
+                }
+            };
+            game.restart();
+
+            game.tx_game_details(users, true).await;
         }
     }
 

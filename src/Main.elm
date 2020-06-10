@@ -40,9 +40,9 @@ main =
 wsKey : String
 wsKey = "mainws"
 wsUrl : String
-wsUrl = "ws://.org/ws"
+wsUrl = "ws://localhost:3030/ws"
 imageUrl : String
-imageUrl = "https://.org/images/"
+imageUrl = "http://localhost:3030/images/"
 
 -- PORTS
 
@@ -174,6 +174,7 @@ type Msg
   | SubmitImage
   | SetField FormField String
   | MoveWorkload Direction
+  | RestartGame
   | Send JE.Value
   | Receive JE.Value
   | SocketReceive Protocol.Response
@@ -264,6 +265,9 @@ update msg model =
 
     SetField field value ->
       ( setField field value model, Cmd.none )
+
+    RestartGame ->
+      (model, sendSocketCommand <| RestartGameCommand)
 
     MoveWorkload dir ->
       let
@@ -742,7 +746,7 @@ viewSidebar model =
     adminActions = if model.amAdministrator && isGameRunning model
       then [
         div [ class "admin-actions" ] [
-          button [ class "pure-button", onClick (ExtendDeadline 2.5) ] [ text "Add more time" ],
+          button [ class "pure-button", onClick (ExtendDeadline 1) ] [ text "Add more time" ],
           button [ class "pure-button", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to prematurely end this game for all players?") ] [ text "Cancel Game" ],
           button [ class "pure-button", onClick (NextRound |> ShowConfirmDialog "Are you sure you want to quickly end this round?") ] [ text "End Round" ]
         ]
@@ -751,7 +755,11 @@ viewSidebar model =
     gameoverActions = if model.status == GameOver
       then [
         div [ class "admin-actions" ] [
-          button [ class "pure-button pure-button-danger", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to leave this game?") ] [ text "Leave Game" ]
+          if model.amAdministrator then
+            button [ class "pure-button", onClick RestartGame ] [ text "Restart game" ]
+          else
+            text ""
+          , button [ class "pure-button pure-button-danger", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to leave this game?") ] [ text "Leave Game" ]
         ]
       ]
       else []

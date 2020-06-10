@@ -174,6 +174,35 @@ impl Game {
         self.next_stage();
     }
 
+    /// Restart the game, resetting everything but keeping same players
+    pub fn restart(&mut self) {
+        self.uuid = Uuid::new_v4();
+        self.game_status = GameStatus::Lobby;
+        self.workloads = Vec::new();
+        self.current_stage = 0;
+        self.total_stages = 0;
+        self.stage_information_transmitted = false;
+
+        for player in self.players.iter_mut() {
+            player.status = PlayerStatus::Done;
+            player.deadline = None;
+        }
+    }
+
+    /// Kicks stuck players, returning a list of kicked user IDs
+    pub fn kick_stuck_players(&mut self) -> Vec<usize> {
+        let mut kicked : Vec<usize> = vec![];
+
+        for (id, player) in self.players.clone().iter().enumerate() {
+            if player.stuck {
+                self.remove_player(id);
+                kicked.push(id);
+            }
+        }
+
+        kicked
+    }
+
     /// Returns if all players have successfully submitted their job
     fn is_everyone_done(&self) -> bool {
         self.players.iter()
@@ -225,7 +254,7 @@ impl Game {
             player.status = if self.game_status == GameStatus::GameOver {
                 PlayerStatus::Done
             } else {
-                let duration = match game.status {
+                let duration = match self.game_status {
                     GameStatus::Understanding => self.default_time.1,
                     _ => self.default_time.0
                 };

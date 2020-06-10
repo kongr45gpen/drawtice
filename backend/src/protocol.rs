@@ -57,6 +57,7 @@ pub enum Command {
     ImagePackage(RawImagePackage),
     NextRound,
     ExtendDeadline(i32),
+    RestartGame,
 }
 
 #[derive(Debug)]
@@ -139,6 +140,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         },
         "next_round" => Command::NextRound,
         "extend_deadline" => Command::ExtendDeadline(i32::deserialize(data?)?),
+        "restart_game" => Command::RestartGame,
         _ => return Err(std::io::Error::new(ErrorKind::Other, "Unknown command type"))
     };
 
