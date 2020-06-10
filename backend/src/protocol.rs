@@ -70,7 +70,8 @@ pub enum Response<'a> {
     LeftGame,
     PreviousTextPackage(game::TextPackage),
     PreviousImagePackage(game::ImagePackage),
-    AllWorkloads(Vec<game::WorkLoad>)
+    AllWorkloads(Vec<game::WorkLoad>),
+    Rollcall
 }
 
 #[derive(Deserialize, Debug)]
@@ -174,6 +175,7 @@ pub fn encode(response: Response) -> serde_json::Result<String> {
         Response::PreviousTextPackage(p) => ("previous_text_package", Some(json!(p))),
         Response::PreviousImagePackage(p) => ("previous_image_package", Some(json!(p))),
         Response::AllWorkloads(w) => ("all_workloads", Some(json!(w))),
+        Response::Rollcall => ("rollcall", None),
     };
 
     let json = json!({

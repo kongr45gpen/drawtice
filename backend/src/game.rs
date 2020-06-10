@@ -46,7 +46,7 @@ pub enum WorkPackageData {
     ImagePackage(ImagePackage),
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum WorkPackageSource {
     Manual,
     Periodic,
@@ -279,8 +279,8 @@ impl Game {
                 PlayerStatus::Done
             } else {
                 let duration = match self.game_status {
-                    GameStatus::Understanding => self.default_time.1,
-                    _ => self.default_time.0
+                    GameStatus::Drawing => self.default_time.0,
+                    _ => self.default_time.1
                 };
                 let deadline = DateTime::from(SystemTime::now() + duration);
                 player.deadline = Some(deadline);
@@ -311,9 +311,11 @@ impl Game {
         package.data = Some(data);
         package.source = Some(source);
 
-        let player = self.players.get_mut(player_id)
-            .ok_or(protocol::Error::from("Nonexistent players cannot provide packages"))?;
-        player.status = PlayerStatus::Done;
+        if source != WorkPackageSource::Periodic {
+            let player = self.players.get_mut(player_id)
+                .ok_or(protocol::Error::from("Nonexistent players cannot provide packages"))?;
+            player.status = PlayerStatus::Done;
+        }
 
         if self.is_everyone_done() {
             debug!("Moving to the next round because all players submitted their data");

@@ -6914,6 +6914,9 @@ var $author$project$Main$init = F3(
 						A2($author$project$Main$getLocalStorageString, model, 'username')
 					])));
 	});
+var $author$project$Main$AutoSubmit = function (a) {
+	return {$: 'AutoSubmit', a: a};
+};
 var $author$project$Main$SendImage = F2(
 	function (a, b) {
 		return {$: 'SendImage', a: a, b: b};
@@ -7215,6 +7218,7 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[
 				A2($elm$time$Time$every, 1000, $author$project$Main$Tick),
+				A2($elm$time$Time$every, 7000, $author$project$Main$AutoSubmit),
 				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model),
 				$author$project$Main$confirmReturnPort($author$project$Main$ShownConfirmDialog),
 				$author$project$Main$canvasReturnPort(
@@ -7257,6 +7261,7 @@ var $author$project$Protocol$NewGameCommand = function (a) {
 	return {$: 'NewGameCommand', a: a};
 };
 var $author$project$Protocol$NextRoundCommand = {$: 'NextRoundCommand'};
+var $author$project$Main$NoAction = {$: 'NoAction'};
 var $author$project$Protocol$RestartGameCommand = {$: 'RestartGameCommand'};
 var $author$project$Main$SocketReceive = function (a) {
 	return {$: 'SocketReceive', a: a};
@@ -7648,6 +7653,23 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected = F2(
 			A2($elm$core$Dict$get, key, state.socketStates),
 			$elm$core$Maybe$Nothing);
 	});
+var $author$project$Main$isGameRunning = function (model) {
+	var _v0 = model.status;
+	switch (_v0.$) {
+		case 'NoGame':
+			return false;
+		case 'Lobby':
+			return false;
+		case 'GameOver':
+			return false;
+		case 'Starting':
+			return true;
+		case 'Drawing':
+			return true;
+		default:
+			return true;
+	}
+};
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
@@ -9589,6 +9611,20 @@ var $author$project$Main$sendSocketCommand = function (command) {
 				0,
 				$author$project$Protocol$prepareSocketCommand(command))));
 };
+var $author$project$Main$SubmitImage = function (a) {
+	return {$: 'SubmitImage', a: a};
+};
+var $author$project$Main$SubmitText = function (a) {
+	return {$: 'SubmitText', a: a};
+};
+var $author$project$Main$submitPackage = function (model) {
+	var _v0 = model.status;
+	if (_v0.$ === 'Drawing') {
+		return $author$project$Main$SubmitImage;
+	} else {
+		return $author$project$Main$SubmitText;
+	}
+};
 var $elm$core$Result$toMaybe = function (result) {
 	if (result.$ === 'Ok') {
 		var v = result.a;
@@ -9856,6 +9892,13 @@ var $author$project$Main$update = F2(
 								}()
 							}),
 						A2($billstclair$elm_websocket_client$PortFunnel$WebSocket$isConnected, $author$project$Main$wsKey, model.funnelState.websocket) ? $elm$core$Platform$Cmd$none : $elm$core$Platform$Cmd$none);
+				case 'AutoSubmit':
+					var newMsg = $author$project$Main$isGameRunning(model) ? A2($author$project$Main$submitPackage, model, $author$project$Protocol$Periodic) : $author$project$Main$NoAction;
+					var $temp$msg = newMsg,
+						$temp$model = model;
+					msg = $temp$msg;
+					model = $temp$model;
+					continue update;
 				case 'NoAction':
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				case 'NewGame':
@@ -10304,9 +10347,6 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $author$project$Main$SubmitImage = function (a) {
-	return {$: 'SubmitImage', a: a};
-};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -10425,23 +10465,6 @@ var $author$project$Main$getMe = function (model) {
 			return A2($elm$core$Array$get, i, model.players);
 		},
 		model.myId);
-};
-var $author$project$Main$isGameRunning = function (model) {
-	var _v0 = model.status;
-	switch (_v0.$) {
-		case 'NoGame':
-			return false;
-		case 'Lobby':
-			return false;
-		case 'GameOver':
-			return false;
-		case 'Starting':
-			return true;
-		case 'Drawing':
-			return true;
-		default:
-			return true;
-	}
 };
 var $author$project$Main$amDone = function (model) {
 	var _v0 = $author$project$Main$getMe(model);
@@ -11039,7 +11062,6 @@ var $author$project$Main$viewLobby = function (model) {
 						]))
 				])));
 };
-var $author$project$Main$NoAction = {$: 'NoAction'};
 var $author$project$Main$RemoveError = {$: 'RemoveError'};
 var $author$project$Main$hasGameStarted = function (model) {
 	var _v0 = model.gameId;
@@ -11746,9 +11768,6 @@ var $author$project$Main$viewSidebar = function (model) {
 			_Utils_ap(
 				playerList,
 				_Utils_ap(adminActions, gameoverActions))));
-};
-var $author$project$Main$SubmitText = function (a) {
-	return {$: 'SubmitText', a: a};
 };
 var $author$project$Main$TextField = {$: 'TextField'};
 var $elm$html$Html$Attributes$action = function (uri) {

@@ -161,6 +161,7 @@ type Msg
   = LinkClicked Browser.UrlRequest
   | UrlChanged Url.Url
   | Tick Time.Posix
+  | AutoSubmit Time.Posix
   | NoAction
   | NewGame
   | JoinGame
@@ -222,6 +223,16 @@ update msg model =
         else
           Cmd.none
       )
+
+    AutoSubmit _ ->
+      let
+        newMsg =
+          if isGameRunning model then
+            submitPackage model Periodic
+          else
+            NoAction
+      in
+        update newMsg model
 
     NoAction ->
       (model, Cmd.none)
@@ -621,6 +632,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch [
     Time.every 1000 Tick,
+    Time.every 7000 AutoSubmit,
     PortFunnels.subscriptions Receive model,
     confirmReturnPort ShownConfirmDialog,
     canvasReturnPort (\r -> SendImage (Tuple.first r) (Protocol.packageSourceFromString <| Tuple.second r))
@@ -1047,3 +1059,10 @@ lastElem list =
         head :: rest ->
             lastElem rest
 
+submitPackage : Model -> (PackageSource -> Msg)
+submitPackage model =
+  case model.status of
+    Drawing ->
+      SubmitImage
+    _ ->
+      SubmitText
