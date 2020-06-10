@@ -9,7 +9,7 @@ use rand::seq::SliceRandom; // 0.7.2
 ///
 pub fn generate_latin_matrix(n: usize) -> Vec<Vec<usize>> {
     let mut rng = rand::thread_rng();
-    let min_iterations: usize = n * n * n;
+    let min_iterations: usize = std::cmp::min(n * n * n, 1000);
 
     let identity_matrix: Vec<Vec<i8>> = (0..n)
         .map(|i| (0..n).map(|j| (i == j) as i8).collect())
