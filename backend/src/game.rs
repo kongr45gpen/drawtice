@@ -105,7 +105,7 @@ pub struct Game {
     pub players: Vec<Player>,
 
     #[serde(skip_serializing)]
-    default_time: Duration,
+    default_time: (Duration, Duration),
 
     pub workloads: Vec<WorkLoad>,
     pub current_stage: usize,
@@ -139,7 +139,7 @@ impl Game {
             uuid: Uuid::new_v4(),
             game_status: GameStatus::Lobby,
             players: vec![],
-            default_time: Duration::new(60 * 2, 0),
+            default_time: (Duration::new(60 * 2, 0), Duration::new(60, 0)),
             workloads: vec![],
             current_stage: 0,
             total_stages: 0,
@@ -225,7 +225,11 @@ impl Game {
             player.status = if self.game_status == GameStatus::GameOver {
                 PlayerStatus::Done
             } else {
-                let deadline = DateTime::from(SystemTime::now() + self.default_time);
+                let duration = match game.status {
+                    GameStatus::Understanding => self.default_time.1,
+                    _ => self.default_time.0
+                };
+                let deadline = DateTime::from(SystemTime::now() + duration);
                 player.deadline = Some(deadline);
 
                 PlayerStatus::Working
