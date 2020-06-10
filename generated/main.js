@@ -6899,17 +6899,31 @@ var $author$project$Main$init = F3(
 						A2($author$project$Main$getLocalStorageString, model, 'username')
 					])));
 	});
-var $author$project$Main$SendImage = function (a) {
-	return {$: 'SendImage', a: a};
-};
+var $author$project$Main$SendImage = F2(
+	function (a, b) {
+		return {$: 'SendImage', a: a, b: b};
+	});
 var $author$project$Main$ShownConfirmDialog = function (a) {
 	return {$: 'ShownConfirmDialog', a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $author$project$Main$canvasReturnPort = _Platform_incomingPort('canvasReturnPort', $elm$json$Json$Decode$string);
 var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$index = _Json_decodeIndex;
+var $author$project$Main$canvasReturnPort = _Platform_incomingPort(
+	'canvasReturnPort',
+	A2(
+		$elm$json$Json$Decode$andThen,
+		function (_v0) {
+			return A2(
+				$elm$json$Json$Decode$andThen,
+				function (_v1) {
+					return $elm$json$Json$Decode$succeed(
+						_Utils_Tuple2(_v0, _v1));
+				},
+				A2($elm$json$Json$Decode$index, 1, $elm$json$Json$Decode$string));
+		},
+		A2($elm$json$Json$Decode$index, 0, $elm$json$Json$Decode$string)));
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$Main$confirmReturnPort = _Platform_incomingPort(
 	'confirmReturnPort',
@@ -7157,6 +7171,25 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
+var $author$project$Protocol$Manual = {$: 'Manual'};
+var $author$project$Protocol$Periodic = {$: 'Periodic'};
+var $author$project$Protocol$Rollcall = {$: 'Rollcall'};
+var $author$project$Protocol$packageSourceFromString = function (string) {
+	switch (string) {
+		case 'Manual':
+			return $author$project$Protocol$Manual;
+		case 'Periodic':
+			return $author$project$Protocol$Periodic;
+		case 'Rollcall':
+			return $author$project$Protocol$Rollcall;
+		default:
+			return $author$project$Protocol$Manual;
+	}
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $author$project$PortFunnels$subPort = _Platform_incomingPort('subPort', $elm$json$Json$Decode$value);
 var $author$project$PortFunnels$subscriptions = F2(
 	function (process, model) {
@@ -7169,7 +7202,13 @@ var $author$project$Main$subscriptions = function (model) {
 				A2($elm$time$Time$every, 1000, $author$project$Main$Tick),
 				A2($author$project$PortFunnels$subscriptions, $author$project$Main$Receive, model),
 				$author$project$Main$confirmReturnPort($author$project$Main$ShownConfirmDialog),
-				$author$project$Main$canvasReturnPort($author$project$Main$SendImage)
+				$author$project$Main$canvasReturnPort(
+				function (r) {
+					return A2(
+						$author$project$Main$SendImage,
+						r.a,
+						$author$project$Protocol$packageSourceFromString(r.b));
+				})
 			]));
 };
 var $author$project$Protocol$ErrorResponse = function (a) {
@@ -7183,9 +7222,10 @@ var $author$project$Protocol$GameOver = {$: 'GameOver'};
 var $author$project$Protocol$ImagePackage = function (a) {
 	return {$: 'ImagePackage', a: a};
 };
-var $author$project$Protocol$ImagePackageCommand = function (a) {
-	return {$: 'ImagePackageCommand', a: a};
-};
+var $author$project$Protocol$ImagePackageCommand = F2(
+	function (a, b) {
+		return {$: 'ImagePackageCommand', a: a, b: b};
+	});
 var $author$project$Protocol$JoinCommand = F2(
 	function (a, b) {
 		return {$: 'JoinCommand', a: a, b: b};
@@ -7215,9 +7255,10 @@ var $author$project$Protocol$Stuck = {$: 'Stuck'};
 var $author$project$Protocol$TextPackage = function (a) {
 	return {$: 'TextPackage', a: a};
 };
-var $author$project$Protocol$TextPackageCommand = function (a) {
-	return {$: 'TextPackageCommand', a: a};
-};
+var $author$project$Protocol$TextPackageCommand = F2(
+	function (a, b) {
+		return {$: 'TextPackageCommand', a: a, b: b};
+	});
 var $author$project$Main$UsernameField = {$: 'UsernameField'};
 var $author$project$Protocol$UuidCommand = function (a) {
 	return {$: 'UuidCommand', a: a};
@@ -9120,6 +9161,16 @@ var $author$project$Main$maybeSetField = F2(
 			return $elm$core$Basics$identity;
 		}
 	});
+var $author$project$Protocol$packageSourceToString = function (source) {
+	switch (source.$) {
+		case 'Manual':
+			return 'Manual';
+		case 'Periodic':
+			return 'Periodic';
+		default:
+			return 'Rollcall';
+	}
+};
 var $author$project$Protocol$PersonalDetails = F2(
 	function (myId, amAdministrator) {
 		return {amAdministrator: amAdministrator, myId: myId};
@@ -9330,10 +9381,6 @@ var $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses 
 	}
 };
 var $elm$core$Basics$round = _Basics_round;
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $billstclair$elm_websocket_client$PortFunnel$WebSocket$makeSend = F2(
 	function (key, message) {
 		return $billstclair$elm_websocket_client$PortFunnel$WebSocket$InternalMessage$PWillSend(
@@ -9421,6 +9468,7 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 					$elm$json$Json$Encode$string(uuid)));
 		case 'TextPackageCommand':
 			var text = command.a;
+			var source = command.b;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
 				'text_package',
@@ -9430,10 +9478,15 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 							[
 								_Utils_Tuple2(
 								'text',
-								$elm$json$Json$Encode$string(text))
+								$elm$json$Json$Encode$string(text)),
+								_Utils_Tuple2(
+								'source',
+								$elm$json$Json$Encode$string(
+									$author$project$Protocol$packageSourceToString(source)))
 							]))));
 		case 'ImagePackageCommand':
 			var image = command.a;
+			var source = command.b;
 			return A2(
 				$author$project$Protocol$prepareSocketCommandJson,
 				'image_package',
@@ -9443,7 +9496,11 @@ var $author$project$Protocol$prepareSocketCommand = function (command) {
 							[
 								_Utils_Tuple2(
 								'data',
-								$elm$json$Json$Encode$string(image))
+								$elm$json$Json$Encode$string(image)),
+								_Utils_Tuple2(
+								'source',
+								$elm$json$Json$Encode$string(
+									$author$project$Protocol$packageSourceToString(source)))
 							]))));
 		case 'NextRoundCommand':
 			return A2($author$project$Protocol$prepareSocketCommandJson, 'next_round', $elm$core$Maybe$Nothing);
@@ -9815,15 +9872,20 @@ var $author$project$Main$update = F2(
 						$author$project$Main$leaveGame(model),
 						$author$project$Main$sendSocketCommand($author$project$Protocol$LeaveCommand));
 				case 'SubmitText':
+					var source = msg.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
-							$author$project$Protocol$TextPackageCommand(model.formFields.text)));
+							A2($author$project$Protocol$TextPackageCommand, model.formFields.text, source)));
 				case 'SubmitImage':
+					var source = msg.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$canvasPort(
-							_Utils_Tuple2('snap', $elm$core$Maybe$Nothing)));
+							_Utils_Tuple2(
+								'snap',
+								$elm$core$Maybe$Just(
+									$author$project$Protocol$packageSourceToString(source)))));
 				case 'KickPlayer':
 					var value = msg.a;
 					return _Utils_Tuple2(
@@ -10170,10 +10232,11 @@ var $author$project$Main$update = F2(
 					}
 				case 'SendImage':
 					var value = msg.a;
+					var source = msg.b;
 					return _Utils_Tuple2(
 						model,
 						$author$project$Main$sendSocketCommand(
-							$author$project$Protocol$ImagePackageCommand(value)));
+							A2($author$project$Protocol$ImagePackageCommand, value, source)));
 				case 'ShowLightbox':
 					var value = msg.a;
 					return _Utils_Tuple2(
@@ -10228,7 +10291,9 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $author$project$Main$SubmitImage = {$: 'SubmitImage'};
+var $author$project$Main$SubmitImage = function (a) {
+	return {$: 'SubmitImage', a: a};
+};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -10331,7 +10396,8 @@ var $author$project$Main$viewDrawing = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$class('pure-button pure-button-success landing-button'),
-						$elm$html$Html$Events$onClick($author$project$Main$SubmitImage)
+						$elm$html$Html$Events$onClick(
+						$author$project$Main$SubmitImage($author$project$Protocol$Manual))
 					]),
 				_List_fromArray(
 					[
@@ -11668,7 +11734,9 @@ var $author$project$Main$viewSidebar = function (model) {
 				playerList,
 				_Utils_ap(adminActions, gameoverActions))));
 };
-var $author$project$Main$SubmitText = {$: 'SubmitText'};
+var $author$project$Main$SubmitText = function (a) {
+	return {$: 'SubmitText', a: a};
+};
 var $author$project$Main$TextField = {$: 'TextField'};
 var $elm$html$Html$Attributes$action = function (uri) {
 	return A2(
@@ -11701,7 +11769,8 @@ var $author$project$Main$viewStarting = function (model) {
 					[
 						$elm$html$Html$Attributes$class('text-starting hall'),
 						$elm$html$Html$Attributes$action('#'),
-						$author$project$Main$onSubmitRaw($author$project$Main$SubmitText)
+						$author$project$Main$onSubmitRaw(
+						$author$project$Main$SubmitText($author$project$Protocol$Manual))
 					]),
 				_List_fromArray(
 					[
@@ -11897,7 +11966,8 @@ var $author$project$Main$viewUnderstanding = function (model) {
 					[
 						$elm$html$Html$Attributes$class('understanding-write'),
 						$elm$html$Html$Attributes$action('#'),
-						$author$project$Main$onSubmitRaw($author$project$Main$SubmitText)
+						$author$project$Main$onSubmitRaw(
+						$author$project$Main$SubmitText($author$project$Protocol$Manual))
 					]),
 				_List_fromArray(
 					[

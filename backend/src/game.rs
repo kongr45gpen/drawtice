@@ -46,6 +46,13 @@ pub enum WorkPackageData {
     ImagePackage(ImagePackage),
 }
 
+#[derive(Deserialize, Debug, Clone)]
+pub enum WorkPackageSource {
+    Manual,
+    Periodic,
+    Rollcall
+}
+
 #[derive(Serialize, Debug, Clone)]
 pub struct WorkPackage {
     pub player_id: usize,
@@ -53,6 +60,8 @@ pub struct WorkPackage {
 
     #[serde(skip_serializing)]
     kind: WorkPackageDataKind,
+    #[serde(skip_serializing)]
+    pub source: Option<WorkPackageSource>,
 
     pub data: Option<WorkPackageData>,
 
@@ -248,9 +257,7 @@ impl Game {
             self.stage_information_transmitted = false;
         }
 
-        for player in self.players.iter_mut()
-            .filter(|p| !p.stuck)
-        {
+        for player in self.players.iter_mut() {
             player.status = if self.game_status == GameStatus::GameOver {
                 PlayerStatus::Done
             } else {
@@ -275,7 +282,7 @@ impl Game {
         }
     }
 
-    pub fn provide_package(&mut self, player_id: usize, data: WorkPackageData) -> Result<(), protocol::Error>{
+    pub fn provide_package(&mut self, player_id: usize, data: WorkPackageData, source: WorkPackageSource) -> Result<(), protocol::Error>{
         // Find the player's current work package
         let package = self.search_current_package_mut(player_id)
             .ok_or(protocol::Error::from("No data package exists for you... Please try later"))?;
@@ -285,6 +292,7 @@ impl Game {
         }
 
         package.data = Some(data);
+        package.source = Some(source);
 
         let player = self.players.get_mut(player_id)
             .ok_or(protocol::Error::from("Nonexistent players cannot provide packages"))?;
@@ -363,6 +371,7 @@ impl Game {
                     player_id: *wp_target,
                     workload_id: wl_id,
                     kind: if wp_id % 2 == 0 { WorkPackageDataKind::TextPackage } else { WorkPackageDataKind::ImagePackage },
+                    source: None,
                     data: None,
                     filled_automatically: false
                 }).collect(),

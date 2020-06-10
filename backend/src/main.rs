@@ -540,7 +540,12 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         protocol::Command::TextPackage(c) => {
             let game = user.fetch_game_mut(games)?;
 
-            game.provide_package(user.game.unwrap().1, game::WorkPackageData::TextPackage(c))?;
+            let text_package = game::TextPackage{ text: c.text };
+            game.provide_package(
+                user.game.unwrap().1,
+                game::WorkPackageData::TextPackage(text_package),
+                c.source
+            )?;
             game.tx_game_details(users, false).await;
         }
         protocol::Command::ImagePackage(c) => {
@@ -557,7 +562,11 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
             let image_package = game::ImagePackage {
                 url: uuid + ".png"
             };
-            game.provide_package(user.game.unwrap().1, game::WorkPackageData::ImagePackage(image_package))?;
+            game.provide_package(
+                user.game.unwrap().1,
+                game::WorkPackageData::ImagePackage(image_package),
+                c.source
+            )?;
             game.tx_game_details(users, false).await;
         }
         protocol::Command::NextRound => {

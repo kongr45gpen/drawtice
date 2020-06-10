@@ -53,7 +53,7 @@ pub enum Command {
     LeaveGame,
     KickPlayer(KickCommand),
     MyUuid(String),
-    TextPackage(game::TextPackage),
+    TextPackage(RawTextPackage),
     ImagePackage(RawImagePackage),
     NextRound,
     ExtendDeadline(i32),
@@ -92,9 +92,17 @@ pub struct KickCommand {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct RawTextPackage {
+    pub text: String,
+    pub source: game::WorkPackageSource
+}
+
+
+#[derive(Deserialize, Debug)]
 pub struct RawImagePackage {
     #[serde(deserialize_with = "de_image_base64")]
-    pub data: Vec<u8>
+    pub data: Vec<u8>,
+    pub source: game::WorkPackageSource
 }
 
 #[derive(Serialize, Debug)]
@@ -134,7 +142,7 @@ pub fn parse(msg: &str) -> std::io::Result<Command> {
         "start_game" => Command::StartGame,
         "kick_player" => Command::KickPlayer(KickCommand::deserialize(data?)?),
         "my_uuid" => Command::MyUuid(String::deserialize(data?)?),
-        "text_package" => Command::TextPackage(game::TextPackage::deserialize(data?)?),
+        "text_package" => Command::TextPackage(RawTextPackage::deserialize(data?)?),
         "image_package" => {
             Command::ImagePackage(RawImagePackage::deserialize(data?)?)
         },

@@ -15,11 +15,13 @@ type SocketCommand
   | StartCommand
   | LeaveCommand
   | UuidCommand String
-  | TextPackageCommand String
-  | ImagePackageCommand String
+  | TextPackageCommand String PackageSource
+  | ImagePackageCommand String PackageSource
   | NextRoundCommand
   | ExtendDeadlineCommand Int
   | RestartGameCommand
+
+type PackageSource = Manual | Periodic | Rollcall
 
 type PlayerStatus = Done | Working Float | Uploading Float | Stuck
 
@@ -101,13 +103,17 @@ prepareSocketCommand command =
       prepareSocketCommandJson "my_uuid" (Just (JE.string
         uuid
       ))
-    TextPackageCommand text ->
+    TextPackageCommand text source ->
       prepareSocketCommandJson "text_package" (Just (JE.object
-        [ ( "text", JE.string text ) ]
+        [ ( "text", JE.string text )
+        , ( "source", JE.string <| packageSourceToString source )
+        ]
       ))
-    ImagePackageCommand image ->
+    ImagePackageCommand image source ->
       prepareSocketCommandJson "image_package" (Just (JE.object
-        [ ( "data", JE.string image ) ]
+        [ ( "data", JE.string image )
+        , ( "source", JE.string <| packageSourceToString source )
+        ]
       ))
     NextRoundCommand ->
       prepareSocketCommandJson "next_round" Nothing
@@ -232,3 +238,18 @@ playerStatusFromString string =
     "Working" -> Working 0
     "Uploading" -> Uploading 50
     _ -> Stuck
+
+packageSourceToString : PackageSource -> String
+packageSourceToString source =
+  case source of
+    Manual -> "Manual"
+    Periodic -> "Periodic"
+    Rollcall -> "Rollcall"
+
+packageSourceFromString : String -> PackageSource
+packageSourceFromString string =
+  case string of
+    "Manual" -> Manual
+    "Periodic" -> Periodic
+    "Rollcall" -> Rollcall
+    _ -> Manual

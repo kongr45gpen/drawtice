@@ -17,7 +17,7 @@ import Array
 import PortFunnel.WebSocket as WebSocket exposing (Response(..))
 import PortFunnel.LocalStorage as LocalStorage
 import PortFunnels exposing (FunnelDict, Handler(..), State)
-import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..), WorkPackage(..), Workload, WorkPackageDetails)
+import Protocol exposing (SocketCommand(..), PlayerStatus(..), GameStatus(..), WorkPackage(..), Workload, WorkPackageDetails, PackageSource(..))
 import Names
 import Cmd.Extra
 
@@ -54,7 +54,7 @@ port confirmReturnPort : ((Bool, Int) -> msg) -> Sub msg
 
 port canvasPort : (String, Maybe String) -> Cmd msg
 
-port canvasReturnPort : (String -> msg) -> Sub msg
+port canvasReturnPort : ((String, String) -> msg) -> Sub msg
 
 cmdPort : JE.Value -> Cmd Msg
 cmdPort =
@@ -170,8 +170,8 @@ type Msg
   | KickPlayer Int
   | NextRound
   | ExtendDeadline Float
-  | SubmitText
-  | SubmitImage
+  | SubmitText PackageSource
+  | SubmitImage PackageSource
   | SetField FormField String
   | MoveWorkload Direction
   | RestartGame
@@ -183,7 +183,7 @@ type Msg
   | RemoveError
   | ShowConfirmDialog String Msg
   | ShownConfirmDialog (Bool, Int)
-  | SendImage String
+  | SendImage String PackageSource
   | ShowLightbox String
   | CloseSelfSummary
 
@@ -245,11 +245,11 @@ update msg model =
     LeaveGame ->
       (leaveGame model, sendSocketCommand LeaveCommand)
 
-    SubmitText ->
-      (model, sendSocketCommand <| TextPackageCommand model.formFields.text )
+    SubmitText source ->
+      (model, sendSocketCommand <| TextPackageCommand model.formFields.text source )
 
-    SubmitImage ->
-      (model, canvasPort ("snap", Nothing))
+    SubmitImage source ->
+      (model, canvasPort ("snap", Just <| Protocol.packageSourceToString source))
 
     KickPlayer value ->
       (model, sendSocketCommand <| KickCommand value)
@@ -417,8 +417,8 @@ update msg model =
         else
           (mdl, Cmd.none)
 
-    SendImage value ->
-      (model, sendSocketCommand <| ImagePackageCommand value)
+    SendImage value source ->
+      (model, sendSocketCommand <| ImagePackageCommand value source)
 
     ShowLightbox value ->
       (model, canvasPort ("lightbox", Just value))
@@ -620,7 +620,7 @@ subscriptions model =
     Time.every 1000 Tick,
     PortFunnels.subscriptions Receive model,
     confirmReturnPort ShownConfirmDialog,
-    canvasReturnPort SendImage
+    canvasReturnPort (\r -> SendImage (Tuple.first r) (Protocol.packageSourceFromString <| Tuple.second r))
   ]
 
 
@@ -868,7 +868,7 @@ viewLobby model =
 viewStarting : Model -> Html Msg
 viewStarting model =
   section [ class "starting" ] [
-    Html.form [ class "text-starting hall", action "#", onSubmitRaw SubmitText ] [
+    Html.form [ class "text-starting hall", action "#", onSubmitRaw (SubmitText Manual) ] [
       div [ class "text-starting-prompt" ] [ text "What do you want people to draw?" ],
       textarea [ class "text-starting-input", onInput <| SetField TextField ] [ ],
       button [ class "pure-button landing-button" ] [ text "Submit idea" ]
@@ -884,7 +884,7 @@ viewDrawing model =
       div [ class "drawing-subject" ] [ text <| getWorkPackageText model ]
     ],
     node "drawing-canvas" [ class "drawing-canvas", attribute "key" (model.gameKey |> Maybe.withDefault "") ] [ ],
-    button [ class "pure-button pure-button-success landing-button", onClick SubmitImage ] [ text "I'm done!" ]
+    button [ class "pure-button pure-button-success landing-button", onClick (SubmitImage Manual) ] [ text "I'm done!" ]
   ]
 
 viewUnderstanding : Model -> Html Msg
@@ -894,7 +894,7 @@ viewUnderstanding model =
       div [ class "understanding-prompt-intro" ] [ text "Someone painted:" ],
       img [ class "understanding-image", src <| getWorkPackageImage model, alt "What the previous player drew" ] [ ]
     ],
-    Html.form [ class "understanding-write", action "#", onSubmitRaw SubmitText  ] [
+    Html.form [ class "understanding-write", action "#", onSubmitRaw (SubmitText Manual)  ] [
       div [ class "understanding-write-intro" ] [ text "What is that?" ],
       textarea [ class "text-understanding-input", onInput <| SetField TextField ] [ ],
       button [ class "pure-button landing-button understanding-button" ] [ text "Submit explanation" ]
