@@ -10321,12 +10321,17 @@ var $author$project$Main$update = F2(
 							_Utils_Tuple2(
 								'lightbox',
 								$elm$core$Maybe$Just(value))));
-				default:
+				case 'CloseSelfSummary':
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{showingGameoverSelf: false}),
 						$elm$core$Platform$Cmd$none);
+				default:
+					return _Utils_Tuple2(
+						model,
+						$author$project$Main$canvasPort(
+							_Utils_Tuple2('store', $elm$core$Maybe$Nothing)));
 			}
 		}
 	});
@@ -11557,6 +11562,7 @@ var $author$project$Main$viewSelfSummary = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$DownloadGame = {$: 'DownloadGame'};
 var $author$project$Main$ExtendDeadline = function (a) {
 	return {$: 'ExtendDeadline', a: a};
 };
@@ -11677,6 +11683,17 @@ var $author$project$Main$viewSidebar = function (model) {
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Restart game')
+						])) : $elm$html$Html$text(''),
+					(!model.showingGameoverSelf) ? A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('pure-button'),
+							$elm$html$Html$Events$onClick($author$project$Main$DownloadGame)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Download this')
 						])) : $elm$html$Html$text(''),
 					A2(
 					$elm$html$Html$button,

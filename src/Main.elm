@@ -186,6 +186,7 @@ type Msg
   | SendImage String PackageSource
   | ShowLightbox String
   | CloseSelfSummary
+  | DownloadGame
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -445,6 +446,9 @@ update msg model =
 
     CloseSelfSummary ->
       ({ model | showingGameoverSelf = False}, Cmd.none)
+
+    DownloadGame ->
+      (model, canvasPort ("store", Nothing))
 
 maybeSetField : FormField -> Maybe String -> (Model -> Model)
 maybeSetField field value =
@@ -783,11 +787,15 @@ viewSidebar model =
       else []
     gameoverActions = if model.status == GameOver
       then [
-        div [ class "admin-actions" ] [
-          if model.amAdministrator then
-            button [ class "pure-button", onClick RestartGame ] [ text "Restart game" ]
-          else
-            text ""
+        div [ class "admin-actions" ]
+          [ if model.amAdministrator then
+              button [ class "pure-button", onClick RestartGame ] [ text "Restart game" ]
+            else
+              text ""
+          , if not model.showingGameoverSelf then
+              button [ class "pure-button", onClick DownloadGame ] [ text "Download this" ]
+            else
+              text ""
           , button [ class "pure-button pure-button-danger", onClick (LeaveGame |> ShowConfirmDialog "Are you sure you want to leave this game?") ] [ text "Leave Game" ]
         ]
       ]
