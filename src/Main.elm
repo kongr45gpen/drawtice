@@ -336,14 +336,23 @@ update msg model =
           let
             playerCreator : Int -> Protocol.PlayerDetails -> Player
             playerCreator id player =
-              {
-                username = player.username,
-                image = player.imageUrl,
-                status = if player.stuck then Stuck else player.status,
-                isMe = model.myId |> Maybe.map (\i -> i == id) |> Maybe.withDefault False,
-                isAdministrator = player.isAdmin,
-                deadline = if player.deadline == 0 then Nothing else Just <| Time.millisToPosix (player.deadline * 1000)
-              }
+              let
+                status =
+                  if player.stuck then
+                    Stuck
+                  else
+                    case player.status of
+                      Working _ -> Working (toFloat player.deadline)
+                      _ -> player.status
+              in
+                {
+                  username = player.username,
+                  image = player.imageUrl,
+                  status = status,
+                  isMe = model.myId |> Maybe.map (\i -> i == id) |> Maybe.withDefault False,
+                  isAdministrator = player.isAdmin,
+                  deadline = Nothing
+                }
             players = Array.indexedMap playerCreator (Array.fromList details.players)
             me = model.myId |> Maybe.andThen (\id -> Array.get id players)
             username = Maybe.map (\p -> p.username) me
@@ -362,6 +371,7 @@ update msg model =
                     Cmd.none
                   else
                     Nav.pushUrl mdl.key (getGameLink mdl |> Url.toString)
+                , Task.perform Tick Time.now
                 ]
             )
         Protocol.ErrorResponse error ->
@@ -460,6 +470,9 @@ setField field value model =
   in
     { model | formFields = newForm }
 
+posixPlusSeconds : Time.Posix -> Float -> Time.Posix
+posixPlusSeconds a b =
+  Time.millisToPosix ((Time.posixToMillis a) + (round b * 1000))
 
 posixTimeDifferenceSeconds : Time.Posix -> Time.Posix -> Float
 posixTimeDifferenceSeconds a b =
@@ -469,11 +482,12 @@ updatePlayerTime : Time.Posix -> Player -> Player
 updatePlayerTime currentTime player =
   case player.status of
     Working timeLeft ->
-      { player | status = player.deadline
-                        |> Maybe.map (\d -> posixTimeDifferenceSeconds d currentTime)
-                        |> Maybe.withDefault 0
-                        |> Working
-      }
+      case player.deadline of
+        Just d ->
+          { player | status = Working (posixTimeDifferenceSeconds d currentTime) }
+        Nothing ->
+          -- Create the deadline based on current time
+          { player | deadline = Just (posixPlusSeconds currentTime timeLeft) }
     _ ->
       player
 

@@ -97,7 +97,7 @@ pub struct Player {
     pub status: PlayerStatus,
     pub stuck: bool,
 
-    #[serde(with = "posix_date_format")]
+    #[serde(with = "seconds_remaining")]
     deadline: Option<DateTime<Utc>>,
 
     pub is_admin: bool,
@@ -439,6 +439,30 @@ mod posix_date_format {
         match timestamp {
             0 => Ok(None),
             _ => Ok(Some(Utc.timestamp(timestamp, 0)))
+        }
+    }
+}
+
+mod seconds_remaining {
+    use chrono::{DateTime, Utc, TimeZone};
+    use std::time::SystemTime;
+    use serde::{self, Deserialize, Serializer, Deserializer};
+
+    pub fn serialize<S>(
+        date: &Option<DateTime<Utc>>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        let now: DateTime<Utc> = DateTime::from(SystemTime::now());
+
+        match date {
+            Some(d) => {
+                let duration = d.signed_duration_since(now);
+                serializer.serialize_i64(duration.num_seconds())
+            },
+            None => serializer.serialize_i64(0),
         }
     }
 }

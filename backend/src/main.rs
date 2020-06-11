@@ -556,7 +556,10 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 game::WorkPackageData::TextPackage(text_package),
                 c.source
             )?;
-            game.tx_game_details(users, false).await;
+
+            if c.source != WorkPackageSource::Periodic {
+                game.tx_game_details(users, false).await;
+            }
         }
         protocol::Command::ImagePackage(c) => {
             let game = user.fetch_game_mut(games)?;
@@ -577,7 +580,10 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 game::WorkPackageData::ImagePackage(image_package),
                 c.source
             )?;
-            game.tx_game_details(users, false).await;
+
+            if c.source != WorkPackageSource::Periodic {
+                game.tx_game_details(users, false).await;
+            }
         }
         protocol::Command::NextRound => {
             let game = user.fetch_game_mut(games)?;

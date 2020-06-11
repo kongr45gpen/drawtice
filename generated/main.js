@@ -7286,6 +7286,9 @@ var $author$project$Protocol$UuidCommand = function (a) {
 var $author$project$PortFunnels$WebSocketHandler = function (a) {
 	return {$: 'WebSocketHandler', a: a};
 };
+var $author$project$Protocol$Working = function (a) {
+	return {$: 'Working', a: a};
+};
 var $Janiczek$cmd_extra$Cmd$Extra$addCmd = F2(
 	function (cmd, _v0) {
 		var model = _v0.a;
@@ -7546,9 +7549,6 @@ var $elm$json$Json$Decode$map6 = _Json_map6;
 var $author$project$Protocol$Done = {$: 'Done'};
 var $author$project$Protocol$Uploading = function (a) {
 	return {$: 'Uploading', a: a};
-};
-var $author$project$Protocol$Working = function (a) {
-	return {$: 'Working', a: a};
 };
 var $author$project$Protocol$playerStatusFromString = function (string) {
 	switch (string) {
@@ -9633,6 +9633,11 @@ var $elm$core$Result$toMaybe = function (result) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
+var $author$project$Main$posixPlusSeconds = F2(
+	function (a, b) {
+		return $elm$time$Time$millisToPosix(
+			$elm$time$Time$posixToMillis(a) + ($elm$core$Basics$round(b) * 1000));
+	});
 var $author$project$Main$posixTimeDifferenceSeconds = F2(
 	function (a, b) {
 		return ($elm$time$Time$posixToMillis(a) - $elm$time$Time$posixToMillis(b)) / 1000;
@@ -9642,20 +9647,23 @@ var $author$project$Main$updatePlayerTime = F2(
 		var _v0 = player.status;
 		if (_v0.$ === 'Working') {
 			var timeLeft = _v0.a;
-			return _Utils_update(
-				player,
-				{
-					status: $author$project$Protocol$Working(
-						A2(
-							$elm$core$Maybe$withDefault,
-							0,
-							A2(
-								$elm$core$Maybe$map,
-								function (d) {
-									return A2($author$project$Main$posixTimeDifferenceSeconds, d, currentTime);
-								},
-								player.deadline)))
-				});
+			var _v1 = player.deadline;
+			if (_v1.$ === 'Just') {
+				var d = _v1.a;
+				return _Utils_update(
+					player,
+					{
+						status: $author$project$Protocol$Working(
+							A2($author$project$Main$posixTimeDifferenceSeconds, d, currentTime))
+					});
+			} else {
+				return _Utils_update(
+					player,
+					{
+						deadline: $elm$core$Maybe$Just(
+							A2($author$project$Main$posixPlusSeconds, currentTime, timeLeft))
+					});
+			}
 		} else {
 			return player;
 		}
@@ -9732,13 +9740,13 @@ var $author$project$Main$socketHandler = F3(
 						message);
 				};
 				var decodeDataUsingParser = function (parser) {
-					var _v18 = decodeData(parser.a);
-					if (_v18.$ === 'Err') {
-						var e = _v18.a;
+					var _v19 = decodeData(parser.a);
+					if (_v19.$ === 'Err') {
+						var e = _v19.a;
 						return $author$project$Protocol$ErrorResponse(
 							$elm$json$Json$Decode$errorToString(e));
 					} else {
-						var v = _v18.a;
+						var v = _v19.a;
 						return A2($elm$core$Tuple$second, parser, v);
 					}
 				};
@@ -9794,15 +9802,15 @@ var $author$project$Main$socketHandler = F3(
 					$author$project$Main$errorLog(
 						$billstclair$elm_websocket_client$PortFunnel$WebSocket$errorToString(error)));
 			default:
-				var _v19 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
-				if (!_v19.b) {
+				var _v20 = $billstclair$elm_websocket_client$PortFunnel$WebSocket$reconnectedResponses(response);
+				if (!_v20.b) {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
-					if ((_v19.a.$ === 'ReconnectedResponse') && (!_v19.b.b)) {
-						var r = _v19.a.a;
+					if ((_v20.a.$ === 'ReconnectedResponse') && (!_v20.b.b)) {
+						var r = _v20.a.a;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
-						var list = _v19;
+						var list = _v20;
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				}
@@ -10072,9 +10080,20 @@ var $author$project$Main$update = F2(
 							var showingGameoverSelf = model.showingGameoverSelf || (_Utils_eq(details.status, $author$project$Protocol$GameOver) && (!_Utils_eq(model.status, $author$project$Protocol$GameOver)));
 							var playerCreator = F2(
 								function (id, player) {
+									var status = function () {
+										if (player.stuck) {
+											return $author$project$Protocol$Stuck;
+										} else {
+											var _v10 = player.status;
+											if (_v10.$ === 'Working') {
+												return $author$project$Protocol$Working(player.deadline);
+											} else {
+												return player.status;
+											}
+										}
+									}();
 									return {
-										deadline: (!player.deadline) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-											$elm$time$Time$millisToPosix(player.deadline * 1000)),
+										deadline: $elm$core$Maybe$Nothing,
 										image: player.imageUrl,
 										isAdministrator: player.isAdmin,
 										isMe: A2(
@@ -10086,7 +10105,7 @@ var $author$project$Main$update = F2(
 													return _Utils_eq(i, id);
 												},
 												model.myId)),
-										status: player.stuck ? $author$project$Protocol$Stuck : player.status,
+										status: status,
 										username: player.username
 									};
 								});
@@ -10140,7 +10159,8 @@ var $author$project$Main$update = F2(
 											$elm$browser$Browser$Navigation$pushUrl,
 											mdl.key,
 											$elm$url$Url$toString(
-												$author$project$Main$getGameLink(mdl)))
+												$author$project$Main$getGameLink(mdl))),
+											A2($elm$core$Task$perform, $author$project$Main$Tick, $elm$time$Time$now)
 										])));
 						case 'ErrorResponse':
 							var error = value.a;
@@ -10264,9 +10284,9 @@ var $author$project$Main$update = F2(
 						$author$project$Main$confirmPort(
 							_Utils_Tuple2(message, nextDialogId)));
 				case 'ShownConfirmDialog':
-					var _v11 = msg.a;
-					var pressed = _v11.a;
-					var dialogId = _v11.b;
+					var _v12 = msg.a;
+					var pressed = _v12.a;
+					var dialogId = _v12.b;
 					var newMsg = A2($elm$core$Dict$get, dialogId, model.pendingDialogs);
 					var dict = A2($elm$core$Dict$remove, dialogId, model.pendingDialogs);
 					var mdl = _Utils_update(
@@ -10315,7 +10335,7 @@ function $author$project$Main$cyclic$funnelDict() {
 		$author$project$PortFunnels$makeFunnelDict,
 		$author$project$Main$cyclic$handlers(),
 		F2(
-			function (_v20, _v21) {
+			function (_v21, _v22) {
 				return $author$project$Main$cmdPort;
 			}));
 }
