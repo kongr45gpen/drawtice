@@ -370,8 +370,14 @@ impl Game {
         self.players
             .get_mut(player_id)
             .map(|player| player.stuck = stuck);
+    }
 
-        //TODO: Move round if done
+    /// Make a game name provided by a user into an alias
+    pub fn canonicalize_name(name: String) -> String {
+        name.replace(" ","-")
+            .replace("_","-")
+            .replace("#","")
+            .to_ascii_lowercase()
     }
 
     /// Populate the workloads array, creating and assigning the necessary workloads

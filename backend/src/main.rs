@@ -413,9 +413,13 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
         protocol::Command::JoinGame(c) => {
             let player = Player::new(user.uuid, my_id, c.username.as_str(), false);
 
+            let given_alias = Game::canonicalize_name(c.game_id);
+
             // Linear search of the game by the provided alias
             let game = games.iter_mut()
-                    .filter(|g| g.1.alias == c.game_id)
+                    .filter(|g| {
+                        Game::canonicalize_name(g.1.alias.clone()) == given_alias
+                    })
                     .next()
                     .ok_or("Could not find a game with this name!")?;
 
@@ -557,7 +561,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 c.source
             )?;
 
-            if c.source != WorkPackageSource::Periodic {
+            if c.source != game::WorkPackageSource::Periodic {
                 game.tx_game_details(users, false).await;
             }
         }
@@ -581,7 +585,7 @@ async fn game_command(users: &mut Users, my_id: usize, games: &mut Games, comman
                 c.source
             )?;
 
-            if c.source != WorkPackageSource::Periodic {
+            if c.source != game::WorkPackageSource::Periodic {
                 game.tx_game_details(users, false).await;
             }
         }
