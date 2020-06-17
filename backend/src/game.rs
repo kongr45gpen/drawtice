@@ -128,7 +128,7 @@ impl Player {
             uuid: Some(uuid),
             user_id: Some(user_id),
             username: username.to_string(),
-            image_url: format!("https://avatars.dicebear.com/api/human/dt_5gajr_{}.svg?background=%23559&width=256", username),
+            image_url: format!("https://avatars.dicebear.com/api/bottts/dt_5gajr_{}.svg?background=%23559&width=256", username),
             status: PlayerStatus::Done,
             stuck: false,
             deadline: None,
